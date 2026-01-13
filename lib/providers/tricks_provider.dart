@@ -1,0 +1,150 @@
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:off_training_note/models/tech_log.dart';
+import 'package:off_training_note/models/trick.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+
+final uuid = Uuid();
+
+final tricksProvider = NotifierProvider<TricksNotifier, List<Trick>>(TricksNotifier.new);
+
+class TricksNotifier extends Notifier<List<Trick>> {
+  static const _storageKey = 'tricks_data';
+
+  @override
+  List<Trick> build() {
+    _loadTricks();
+    // 初期値は空で返し、非同期ロード後に更新する形にする
+    // または同期的にロードできるならするが、SharedPreferencesは非同期
+    // ここでは一旦初期ダミーデータを返し、ロード完了後に上書きする戦略をとる
+    return _initialTricks;
+  }
+
+  Future<void> _loadTricks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? jsonString = prefs.getString(_storageKey);
+
+    if (jsonString != null) {
+      final List<dynamic> jsonList = json.decode(jsonString);
+      final tricks = jsonList.map((e) => Trick.fromJson(e)).toList();
+      state = tricks;
+    } else {
+      // 初回起動時などでデータがない場合は初期データを使用し、保存する
+      // build()で既に返しているのでstate更新は不要だが、保存はしておく
+      _saveTricks();
+    }
+  }
+
+  Future<void> _saveTricks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String jsonString = json.encode(state.map((e) => e.toJson()).toList());
+    await prefs.setString(_storageKey, jsonString);
+  }
+
+  void addTrick(Trick trick) {
+    state = [trick, ...state];
+    _saveTricks();
+  }
+
+  void addLog(String trickId, String focus, String outcome) {
+    state = state.map((trick) {
+      if (trick.id == trickId) {
+        final newLog = TechLog(
+          id: uuid.v4(),
+          focus: focus,
+          outcome: outcome,
+          createdAt: DateTime.now(),
+        );
+        return trick.copyWith(
+          logs: [newLog, ...trick.logs],
+          updatedAt: DateTime.now(),
+        );
+      }
+      return trick;
+    }).toList();
+    _saveTricks();
+  }
+
+  static final List<Trick> _initialTricks = [
+    Trick(
+      id: '1',
+      type: TrickType.air,
+      stance: Stance.regular,
+      takeoff: Takeoff.carving,
+      axis: '平軸',
+      spin: 540,
+      grab: 'ミュート',
+      logs: [
+        TechLog(
+          id: 'l1',
+          focus: 'テイクオフで肩のラインを水平に保つ',
+          outcome: '軸が安定して回転がスムーズになった',
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+        TechLog(
+          id: 'l2',
+          focus: '360の時点でランディングを見る',
+          outcome: '着地が完璧に決まった',
+          createdAt: DateTime.now().subtract(const Duration(days: 5)),
+        ),
+      ],
+      updatedAt: DateTime.now(),
+    ),
+    Trick(
+      id: '3',
+      type: TrickType.air,
+      stance: Stance.regular,
+      takeoff: Takeoff.standard,
+      axis: 'コーク',
+      spin: 720,
+      grab: 'セーフティ',
+      customName: 'コーク 720',
+      logs: [
+        TechLog(
+          id: 'l_c7_1',
+          focus: '右肩を下げながら抜ける',
+          outcome: 'しっかり軸が入った',
+          createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      ],
+      updatedAt: DateTime.now().subtract(const Duration(hours: 12)),
+    ),
+    Trick(
+      id: '4',
+      type: TrickType.air,
+      stance: Stance.switchStance,
+      takeoff: Takeoff.standard,
+      axis: '平軸',
+      spin: 540,
+      grab: 'ジャパン',
+      logs: [
+        TechLog(
+          id: 'l_sw5_1',
+          focus: '目線を先行させる',
+          outcome: '回転不足が解消',
+          createdAt: DateTime.now().subtract(const Duration(days: 3)),
+        ),
+      ],
+      updatedAt: DateTime.now().subtract(const Duration(days: 3)),
+    ),
+    Trick(
+      id: '2',
+      type: TrickType.jib,
+      stance: Stance.switchStance,
+      takeoff: Takeoff.standard,
+      spin: 270,
+      grab: 'なし',
+      customName: 'スイッチ 270 イン',
+      logs: [
+        TechLog(
+          id: 'l3',
+          focus: 'リップで早めに弾く',
+          outcome: 'ギャップを余裕で越えられた',
+          createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      ],
+      updatedAt: DateTime.now(),
+    ),
+  ];
+}
