@@ -11,6 +11,7 @@ class NewTrickModal extends StatefulWidget {
     String? axis,
     int spin,
     String grab,
+    Direction? direction,
   ) onAdd;
 
   const NewTrickModal({
@@ -26,6 +27,7 @@ class NewTrickModal extends StatefulWidget {
 class _NewTrickModalState extends State<NewTrickModal> {
   Stance _stance = Stance.regular;
   Takeoff _takeoff = Takeoff.standard;
+  Direction _direction = Direction.left;
   final TextEditingController _axisController = TextEditingController();
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
@@ -88,6 +90,25 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 'スイッチ',
                 _stance == Stance.switchStance,
                 () => setState(() => _stance = Stance.switchStance),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Direction
+          _buildSectionLabel('方向'),
+          Row(
+            children: [
+              _buildSelectButton(
+                'レフト',
+                _direction == Direction.left,
+                () => setState(() => _direction = Direction.left),
+              ),
+              const SizedBox(width: 12),
+              _buildSelectButton(
+                'ライト',
+                _direction == Direction.right,
+                () => setState(() => _direction = Direction.right),
               ),
             ],
           ),
@@ -209,6 +230,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 _axisController.text.isEmpty ? null : _axisController.text,
                 int.tryParse(_spinController.text) ?? 0,
                 _grabController.text.isEmpty ? 'なし' : _grabController.text,
+                _direction,
               );
               Navigator.pop(context);
             },

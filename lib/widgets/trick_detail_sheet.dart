@@ -83,16 +83,20 @@ class TrickDetailSheet extends ConsumerWidget {
                       runSpacing: 8,
                       children: [
                         _buildTag(trick.stance == Stance.regular ? 'レギュラー' : 'スイッチ'),
+                        if (trick.direction != null)
+                          _buildTag(
+                              trick.direction == Direction.left ? 'レフト' : 'ライト'),
                         if (trick.takeoff != null)
                           _buildTag(trick.takeoff == Takeoff.standard ? 'ストレート' : 'カービング'),
                         if (trick.axis != null) _buildTag(trick.axis!),
+                        if (trick.spin > 0) _buildTag(trick.spin.toString()),
                       ],
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-              const Divider(height: 1),
+              Divider(height: 1, color: Colors.grey.shade200),
 
               // Content List
               Expanded(

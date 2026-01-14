@@ -44,7 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => NewTrickModal(
         type: _activeTab,
-        onAdd: (stance, takeoff, axis, spin, grab) {
+        onAdd: (stance, takeoff, axis, spin, grab, direction) {
           final newTrick = Trick(
             id: _uuid.v4(),
             type: _activeTab,
@@ -53,6 +53,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             axis: axis,
             spin: spin,
             grab: grab,
+            direction: direction,
             logs: [],
             updatedAt: DateTime.now(),
           );
@@ -93,6 +94,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       body: Stack(
         children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _DottedBackgroundPainter(),
+            ),
+          ),
           Column(
             children: [
               // Header Tabs (Custom styled)
@@ -179,26 +185,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.tune, color: AppTheme.textSecondary),
-                        onPressed: () {
-                          // Filter settings (future)
-                        },
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -280,4 +266,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
+}
+
+class _DottedBackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final dotPaint = Paint()
+      ..color = Colors.grey.shade300.withOpacity(0.5);
+    const spacing = 20.0;
+    const radius = 1.2;
+
+    for (double y = 0; y <= size.height; y += spacing) {
+      for (double x = 0; x <= size.width; x += spacing) {
+        canvas.drawCircle(Offset(x, y), radius, dotPaint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
