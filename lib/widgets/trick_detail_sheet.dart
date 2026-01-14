@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/new_log_modal.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -11,30 +12,10 @@ class TrickDetailSheet extends ConsumerWidget {
 
   const TrickDetailSheet({super.key, required this.trick});
 
-  String _getTrickName(Trick trick) {
-    if (trick.customName != null && trick.customName!.isNotEmpty) {
-      return trick.customName!;
-    }
-    // Simple reconstruction if custom name is missing
-    final parts = <String>[];
-    if (trick.stance == Stance.switchStance) parts.add('スイッチ');
-    if (trick.type == TrickType.air && trick.takeoff == Takeoff.carving) {
-      parts.add('カービング');
-    }
-    if (trick.type == TrickType.air &&
-        trick.axis != null &&
-        trick.axis != '平軸') {
-      parts.add(trick.axis!);
-    }
-    if (trick.spin > 0) parts.add(trick.spin.toString());
-    if (trick.grab != 'なし') parts.add(trick.grab);
-    if (parts.isEmpty) return 'ストレートエア';
-    return parts.join(' ');
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final name = _getTrickName(trick);
+    final name = trick.displayName();
+    final tags = trick.tagLabels();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -81,16 +62,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       alignment: WrapAlignment.center,
                       spacing: 8,
                       runSpacing: 8,
-                      children: [
-                        _buildTag(trick.stance == Stance.regular ? 'レギュラー' : 'スイッチ'),
-                        if (trick.direction != null)
-                          _buildTag(
-                              trick.direction == Direction.left ? 'レフト' : 'ライト'),
-                        if (trick.takeoff != null)
-                          _buildTag(trick.takeoff == Takeoff.standard ? 'ストレート' : 'カービング'),
-                        if (trick.axis != null) _buildTag(trick.axis!),
-                        if (trick.spin > 0) _buildTag(trick.spin.toString()),
-                      ],
+                      children: tags.map(_buildTag).toList(),
                     ),
                   ],
                 ),

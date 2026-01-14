@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class TrickCard extends StatelessWidget {
@@ -9,43 +10,10 @@ class TrickCard extends StatelessWidget {
 
   const TrickCard({super.key, required this.trick, required this.onTap});
 
-  String _getTrickName(Trick trick) {
-    if (trick.customName != null && trick.customName!.isNotEmpty) {
-      return trick.customName!;
-    }
-
-    final parts = <String>[];
-
-    // Stance
-    if (trick.stance == Stance.switchStance) parts.add('スイッチ');
-
-    // Takeoff (Air only)
-    if (trick.type == TrickType.air && trick.takeoff == Takeoff.carving) {
-      parts.add('カービング');
-    }
-
-    // Axis
-    if (trick.type == TrickType.air &&
-        trick.axis != null &&
-        trick.axis != '平軸') {
-      parts.add(trick.axis!);
-    }
-
-    // Spin
-    if (trick.spin > 0) parts.add(trick.spin.toString());
-
-    // Grab
-    if (trick.grab != 'なし') parts.add(trick.grab);
-
-    if (parts.isEmpty) return 'ストレートエア';
-
-    return parts.join(' ');
-  }
-
   @override
   Widget build(BuildContext context) {
     final latestLog = trick.logs.isNotEmpty ? trick.logs.first : null;
-    final name = _getTrickName(trick);
+    final name = trick.displayName();
 
     return GestureDetector(
       onTap: onTap,

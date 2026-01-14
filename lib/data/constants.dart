@@ -1,8 +1,10 @@
+import 'package:off_training_note/utils/trick_labels.dart';
+
 class AppConstants {
   static const List<int> spins = [0, 180, 360, 540, 720, 900, 1080, 1260, 1440, 1620, 1800];
 
   static const List<String> axes = [
-    '平軸',
+    TrickLabels.axisFlat,
     'コーク',
     'バイオ',
     'ミスティ',
@@ -12,7 +14,7 @@ class AppConstants {
   ];
 
   static const List<String> grabs = [
-    'なし',
+    TrickLabels.grabNone,
     'セーフティ',
     'ミュート',
     'ジャパン',

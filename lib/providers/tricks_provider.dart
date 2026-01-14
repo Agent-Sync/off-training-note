@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_log.dart';
 import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/utils/trick_labels.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -73,7 +74,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       stance: Stance.regular,
       direction: Direction.left,
       takeoff: Takeoff.carving,
-      axis: '平軸',
+      axis: TrickLabels.axisFlat,
       spin: 540,
       grab: 'ミュート',
       logs: [
@@ -118,7 +119,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       stance: Stance.switchStance,
       direction: Direction.left,
       takeoff: Takeoff.standard,
-      axis: '平軸',
+      axis: TrickLabels.axisFlat,
       spin: 540,
       grab: 'ジャパン',
       logs: [
@@ -138,7 +139,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       direction: Direction.right,
       takeoff: Takeoff.standard,
       spin: 270,
-      grab: 'なし',
+      grab: TrickLabels.grabNone,
       customName: 'スイッチ 270 イン',
       logs: [
         TechLog(

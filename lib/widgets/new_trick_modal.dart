@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:off_training_note/data/constants.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/trick_labels.dart';
 
 class NewTrickModal extends StatefulWidget {
   final TrickType type;
@@ -81,13 +82,13 @@ class _NewTrickModalState extends State<NewTrickModal> {
           Row(
             children: [
               _buildSelectButton(
-                'レギュラー',
+                TrickLabels.stanceRegular,
                 _stance == Stance.regular,
                 () => setState(() => _stance = Stance.regular),
               ),
               const SizedBox(width: 12),
               _buildSelectButton(
-                'スイッチ',
+                TrickLabels.stanceSwitch,
                 _stance == Stance.switchStance,
                 () => setState(() => _stance = Stance.switchStance),
               ),
@@ -96,17 +97,17 @@ class _NewTrickModalState extends State<NewTrickModal> {
           const SizedBox(height: 16),
 
           // Direction
-          _buildSectionLabel('方向'),
+          _buildSectionLabel(TrickLabels.sectionDirection),
           Row(
             children: [
               _buildSelectButton(
-                'レフト',
+                TrickLabels.directionLeft,
                 _direction == Direction.left,
                 () => setState(() => _direction = Direction.left),
               ),
               const SizedBox(width: 12),
               _buildSelectButton(
-                'ライト',
+                TrickLabels.directionRight,
                 _direction == Direction.right,
                 () => setState(() => _direction = Direction.right),
               ),
@@ -116,17 +117,17 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
           if (widget.type == TrickType.air) ...[
             // Takeoff
-            _buildSectionLabel('テイクオフ'),
+            _buildSectionLabel(TrickLabels.sectionTakeoff),
             Row(
               children: [
                 _buildSelectButton(
-                  'ストレート',
+                  TrickLabels.takeoffStandard,
                   _takeoff == Takeoff.standard,
                   () => setState(() => _takeoff = Takeoff.standard),
                 ),
                 const SizedBox(width: 12),
                 _buildSelectButton(
-                  'カービング',
+                  TrickLabels.takeoffCarving,
                   _takeoff == Takeoff.carving,
                   () => setState(() => _takeoff = Takeoff.carving),
                 ),
@@ -135,7 +136,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
             const SizedBox(height: 16),
 
             // Axis
-            _buildSectionLabel('軸'),
+            _buildSectionLabel(TrickLabels.sectionAxis),
             Autocomplete<String>(
               optionsBuilder: (TextEditingValue textEditingValue) {
                 if (textEditingValue.text == '') {
@@ -229,7 +230,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 widget.type == TrickType.air ? _takeoff : null,
                 _axisController.text.isEmpty ? null : _axisController.text,
                 int.tryParse(_spinController.text) ?? 0,
-                _grabController.text.isEmpty ? 'なし' : _grabController.text,
+                _grabController.text.isEmpty
+                    ? TrickLabels.grabNone
+                    : _grabController.text,
                 _direction,
               );
               Navigator.pop(context);
