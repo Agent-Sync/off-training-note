@@ -8,7 +8,11 @@ class TrickCard extends StatelessWidget {
   final Trick trick;
   final VoidCallback onTap;
 
-  const TrickCard({super.key, required this.trick, required this.onTap});
+  const TrickCard({
+    super.key,
+    required this.trick,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

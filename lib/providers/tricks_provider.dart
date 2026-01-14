@@ -102,7 +102,6 @@ class TricksNotifier extends Notifier<List<Trick>> {
       axis: 'コーク',
       spin: 720,
       grab: 'セーフティ',
-      customName: 'コーク 720',
       logs: [
         TechLog(
           id: 'l_c7_1',
@@ -140,7 +139,6 @@ class TricksNotifier extends Notifier<List<Trick>> {
       takeoff: Takeoff.standard,
       spin: 270,
       grab: TrickLabels.grabNone,
-      customName: 'スイッチ 270 イン',
       logs: [
         TechLog(
           id: 'l3',

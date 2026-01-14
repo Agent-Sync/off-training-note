@@ -55,6 +55,8 @@ class TrickDetailSheet extends ConsumerWidget {
                         color: AppTheme.textMain,
                       ),
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 12),
                     // Tags

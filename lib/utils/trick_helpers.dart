@@ -3,10 +3,6 @@ import 'package:off_training_note/utils/trick_labels.dart';
 
 extension TrickHelpers on Trick {
   String displayName() {
-    if (customName != null && customName!.isNotEmpty) {
-      return customName!;
-    }
-
     final parts = <String>[];
 
     if (stance == Stance.switchStance) {
@@ -33,9 +29,6 @@ extension TrickHelpers on Trick {
   }
 
   String searchIndex() {
-    if (customName != null && customName!.isNotEmpty) {
-      return customName!;
-    }
     return '${spin} ${grab} ${axis ?? ""}';
   }
 

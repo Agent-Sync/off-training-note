@@ -14,7 +14,6 @@ class Trick {
   final int spin;
   final String grab;
   final Direction? direction;
-  final String? customName;
   final List<TechLog> logs;
   final DateTime updatedAt;
 
@@ -27,7 +26,6 @@ class Trick {
     required this.spin,
     required this.grab,
     this.direction,
-    this.customName,
     required this.logs,
     required this.updatedAt,
   });
@@ -41,7 +39,6 @@ class Trick {
     int? spin,
     String? grab,
     Direction? direction,
-    String? customName,
     List<TechLog>? logs,
     DateTime? updatedAt,
   }) {
@@ -54,7 +51,6 @@ class Trick {
       spin: spin ?? this.spin,
       grab: grab ?? this.grab,
       direction: direction ?? this.direction,
-      customName: customName ?? this.customName,
       logs: logs ?? this.logs,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -70,7 +66,6 @@ class Trick {
       'spin': spin,
       'grab': grab,
       'direction': direction?.name,
-      'customName': customName,
       'logs': logs.map((x) => x.toJson()).toList(),
       'updatedAt': updatedAt.millisecondsSinceEpoch,
     };
@@ -90,7 +85,6 @@ class Trick {
       direction: map['direction'] != null
           ? Direction.values.firstWhere((e) => e.name == map['direction'])
           : null,
-      customName: map['customName'],
       logs: List<TechLog>.from(map['logs']?.map((x) => TechLog.fromJson(x)) ?? []),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt']),
     );
