@@ -10,7 +10,10 @@ class AppConstants {
     'ミスティ',
     'ロデオ',
     'フラットスピン',
-    'アンダーフリップ'
+    'アンダーフリップ',
+    'ダブルコーク',
+    'ダブルミスティ',
+    'ダブルロデオ'
   ];
 
   static const List<String> grabs = [
