@@ -4,9 +4,10 @@ import 'package:off_training_note/data/constants.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_labels.dart';
+import 'package:off_training_note/widgets/form/two_option_toggle.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/axis_select_sheet.dart';
-import 'package:off_training_note/widgets/sheet/common/select_sheet.dart';
+import 'package:off_training_note/widgets/sheet/grab_select_sheet.dart';
 import 'package:off_training_note/widgets/sheet/spin_select_sheet.dart';
 
 class NewTrickModal extends StatefulWidget {
@@ -99,11 +100,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
         return AppBottomSheetContainer(
           padding: EdgeInsets.zero,
           useKeyboardInset: true,
-          child: AppSelectSheet(
-            title: title,
+          child: GrabSelectSheet(
             options: options,
             selectedValue: selectedValue,
-            enableSearch: true,
           ),
         );
       },
@@ -177,40 +176,24 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
           // Stance
           _buildSectionLabel('スタンス'),
-          Row(
-            children: [
-              _buildSelectButton(
-                TrickLabels.stanceRegular,
-                _stance == Stance.regular,
-                () => setState(() => _stance = Stance.regular),
-              ),
-              const SizedBox(width: 12),
-              _buildSelectButton(
-                TrickLabels.stanceSwitch,
-                _stance == Stance.switchStance,
-                () => setState(() => _stance = Stance.switchStance),
-              ),
-            ],
+          TwoOptionToggle(
+            leftLabel: TrickLabels.stanceRegular,
+            rightLabel: TrickLabels.stanceSwitch,
+            isLeftSelected: _stance == Stance.regular,
+            onLeftTap: () => setState(() => _stance = Stance.regular),
+            onRightTap: () => setState(() => _stance = Stance.switchStance),
           ),
           const SizedBox(height: 16),
 
           if (widget.type == TrickType.air) ...[
             // Takeoff
             _buildSectionLabel(TrickLabels.sectionTakeoff),
-            Row(
-              children: [
-                _buildSelectButton(
-                  TrickLabels.takeoffStandard,
-                  _takeoff == Takeoff.standard,
-                  () => setState(() => _takeoff = Takeoff.standard),
-                ),
-                const SizedBox(width: 12),
-                _buildSelectButton(
-                  TrickLabels.takeoffCarving,
-                  _takeoff == Takeoff.carving,
-                  () => setState(() => _takeoff = Takeoff.carving),
-                ),
-              ],
+            TwoOptionToggle(
+              leftLabel: TrickLabels.takeoffStandard,
+              rightLabel: TrickLabels.takeoffCarving,
+              isLeftSelected: _takeoff == Takeoff.standard,
+              onLeftTap: () => setState(() => _takeoff = Takeoff.standard),
+              onRightTap: () => setState(() => _takeoff = Takeoff.carving),
             ),
             const SizedBox(height: 16),
 
@@ -325,22 +308,13 @@ class _NewTrickModalState extends State<NewTrickModal> {
             TrickLabels.sectionDirection,
             enabled: !_isBackOrFront,
           ),
-          Row(
-            children: [
-              _buildSelectButton(
-                TrickLabels.directionLeft,
-                _direction == Direction.left,
-                () => setState(() => _direction = Direction.left),
-                enabled: !_isBackOrFront,
-              ),
-              const SizedBox(width: 12),
-              _buildSelectButton(
-                TrickLabels.directionRight,
-                _direction == Direction.right,
-                () => setState(() => _direction = Direction.right),
-                enabled: !_isBackOrFront,
-              ),
-            ],
+          TwoOptionToggle(
+            leftLabel: TrickLabels.directionLeft,
+            rightLabel: TrickLabels.directionRight,
+            isLeftSelected: _direction == Direction.left,
+            onLeftTap: () => setState(() => _direction = Direction.left),
+            onRightTap: () => setState(() => _direction = Direction.right),
+            enabled: !_isBackOrFront,
           ),
           const SizedBox(height: 24),
 
@@ -422,59 +396,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSelectButton(
-    String text,
-    bool isSelected,
-    VoidCallback onTap, {
-    bool enabled = true,
-  }) {
-    final buttonEnabled = enabled;
-    final backgroundColor = buttonEnabled
-        ? (isSelected ? Colors.white : Colors.grey.shade100)
-        : Colors.grey.shade50;
-    final borderColor = buttonEnabled && isSelected
-        ? AppTheme.focusColor.withOpacity(0.5)
-        : Colors.transparent;
-    final textColor = buttonEnabled
-        ? (isSelected ? AppTheme.focusColor : AppTheme.textHint)
-        : AppTheme.textHint;
-    return Expanded(
-      child: GestureDetector(
-        onTap: buttonEnabled ? onTap : null,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: borderColor,
-              width: 1,
-            ),
-            boxShadow: buttonEnabled && isSelected
-                ? [
-                    BoxShadow(
-                      color: AppTheme.focusColor.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : [],
-          ),
-          child: Center(
-            child: Text(
-                text,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-        ),
       ),
     );
   }

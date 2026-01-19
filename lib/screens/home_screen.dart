@@ -152,7 +152,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 foregroundColor: Colors.white,
                 elevation: 4,
                 icon: const Icon(Icons.add),
-                label: const Text('新しいトリック', style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text(
+                  '新しいトリック',
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
               ),
             ),
           ],
