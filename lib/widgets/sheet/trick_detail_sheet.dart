@@ -88,7 +88,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       )
                     : ListView.builder(
                         controller: scrollController,
-                        padding: const EdgeInsets.only(bottom: 24),
+                        padding: const EdgeInsets.only(top: 16, bottom: 24),
                         itemCount: trick.logs.length + 1, // +1 for spacer
                         itemBuilder: (context, index) {
                           if (index == trick.logs.length) {

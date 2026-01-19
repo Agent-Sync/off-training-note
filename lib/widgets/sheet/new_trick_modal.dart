@@ -5,8 +5,9 @@ import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_labels.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
-
-const Duration _optionCloseDelay = Duration(milliseconds: 150);
+import 'package:off_training_note/widgets/sheet/axis_select_sheet.dart';
+import 'package:off_training_note/widgets/sheet/common/select_sheet.dart';
+import 'package:off_training_note/widgets/sheet/spin_select_sheet.dart';
 
 class NewTrickModal extends StatefulWidget {
   final TrickType type;
@@ -38,79 +39,44 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _grabController = TextEditingController();
   bool _showValidation = false;
 
-  Future<void> _showOptionSheet({
-    required String title,
+  Future<void> _showAxisSheet({
     required List<String> options,
     required String? selectedValue,
     required ValueChanged<String> onSelected,
   }) async {
-    String? tempSelected = selectedValue;
     final selection = await showAppBottomSheet<String>(
       context: context,
       builder: (context) {
         return AppBottomSheetContainer(
           padding: EdgeInsets.zero,
           useKeyboardInset: false,
-          child: StatefulBuilder(
-            builder: (context, setModalState) {
-              return SafeArea(
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.8,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.textMain,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close, color: Colors.grey),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Divider(height: 1, color: Colors.grey.shade200),
-                      Flexible(
-                        child: ListView.separated(
-                          padding: const EdgeInsets.all(24),
-                          itemCount: options.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final option = options[index];
-                            final isSelected = option == tempSelected;
-                            return _OptionItem(
-                              text: option,
-                              isSelected: isSelected,
-                              onTap: () async {
-                                setModalState(() => tempSelected = option);
-                                await Future.delayed(_optionCloseDelay);
-                                if (Navigator.of(context).canPop()) {
-                                  Navigator.pop(context, option);
-                                }
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+          child: AxisSelectSheet(
+            options: options,
+            selectedValue: selectedValue,
+          ),
+        );
+      },
+    );
+
+    if (selection != null) {
+      onSelected(selection);
+    }
+  }
+
+  Future<void> _showSpinSheet({
+    required List<String> options,
+    required String? selectedValue,
+    required ValueChanged<String> onSelected,
+  }) async {
+    final selection = await showAppBottomSheet<String>(
+      context: context,
+      builder: (context) {
+        return AppBottomSheetContainer(
+          padding: EdgeInsets.zero,
+          useKeyboardInset: false,
+          child: SpinSelectSheet(
+            options: options,
+            selectedValue: selectedValue,
           ),
         );
       },
@@ -132,11 +98,12 @@ class _NewTrickModalState extends State<NewTrickModal> {
       builder: (context) {
         return AppBottomSheetContainer(
           padding: EdgeInsets.zero,
-          useKeyboardInset: false,
-          child: _SearchableSheet(
+          useKeyboardInset: true,
+          child: AppSelectSheet(
             title: title,
             options: options,
             selectedValue: selectedValue,
+            enableSearch: true,
           ),
         );
       },
@@ -259,8 +226,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               enableInteractiveSelection: false,
               style: const TextStyle(fontWeight: FontWeight.w600),
               onTap: () {
-                _showOptionSheet(
-                  title: '軸を選択',
+                _showAxisSheet(
                   options: AppConstants.axes,
                   selectedValue: _axisController.text.isEmpty
                       ? null
@@ -304,8 +270,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 fontWeight: FontWeight.w600,
               ),
               onTap: () {
-                _showOptionSheet(
-                  title: 'スピンを選択',
+                _showSpinSheet(
                   options:
                       AppConstants.spins.map((e) => e.toString()).toList(),
                   selectedValue: _spinController.text.isEmpty
@@ -541,180 +506,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: focusedColor, width: 2),
-      ),
-    );
-  }
-}
-
-class _OptionItem extends StatelessWidget {
-  final String text;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _OptionItem({
-    required this.text,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? AppTheme.focusColor.withOpacity(0.5)
-                : Colors.transparent,
-            width: 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppTheme.focusColor.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [],
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isSelected ? AppTheme.focusColor : AppTheme.textHint,
-            fontSize: 14,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SearchableSheet extends StatefulWidget {
-  final String title;
-  final List<String> options;
-  final String? selectedValue;
-
-  const _SearchableSheet({
-    required this.title,
-    required this.options,
-    required this.selectedValue,
-  });
-
-  @override
-  State<_SearchableSheet> createState() => _SearchableSheetState();
-}
-
-class _SearchableSheetState extends State<_SearchableSheet> {
-  late List<String> _filteredOptions;
-  final TextEditingController _searchController = TextEditingController();
-  String? _pendingSelection;
-
-  @override
-  void initState() {
-    super.initState();
-    _filteredOptions = widget.options;
-    _searchController.addListener(_onSearchChanged);
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredOptions = widget.options
-          .where((option) => option.toLowerCase().contains(query))
-          .toList();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.9,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    widget.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textMain,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.grey),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-          ),
-          Divider(height: 1, color: Colors.grey.shade200),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: '検索...',
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
-            Flexible(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                itemCount: _filteredOptions.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final option = _filteredOptions[index];
-                  final isSelected =
-                      option == (_pendingSelection ?? widget.selectedValue);
-                  return _OptionItem(
-                    text: option,
-                    isSelected: isSelected,
-                    onTap: () async {
-                      setState(() => _pendingSelection = option);
-                      await Future.delayed(_optionCloseDelay);
-                      if (!mounted) {
-                        return;
-                      }
-                      if (Navigator.of(context).canPop()) {
-                        Navigator.pop(context, option);
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
