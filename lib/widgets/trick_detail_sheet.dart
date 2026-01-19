@@ -83,7 +83,7 @@ class TrickDetailSheet extends ConsumerWidget {
                               padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade50,
-                                shape: BoxShape.circle,
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: Icon(Icons.edit_note,
                                   size: 48, color: Colors.grey.shade300),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:off_training_note/data/constants.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
@@ -33,15 +34,18 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
   final Set<FocusNode> _registeredFocusNodes = <FocusNode>{};
-  bool _axisPrimed = false;
-  bool _axisEditable = false;
-  bool _spinPrimed = false;
-  bool _spinEditable = false;
   bool _grabPrimed = false;
   bool _grabEditable = false;
 
   void _dismissKeyboard() {
     FocusScope.of(context).unfocus();
+  }
+
+  void _clearPrimedState() {
+    setState(() {
+      _grabPrimed = false;
+      _grabEditable = false;
+    });
   }
 
   void _registerFocusReset(FocusNode node, VoidCallback onReset) {
@@ -51,6 +55,85 @@ class _NewTrickModalState extends State<NewTrickModal> {
           onReset();
         }
       });
+    }
+  }
+
+  void _activateEditable(FocusNode focusNode, VoidCallback setEditable) {
+    setState(setEditable);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      focusNode.requestFocus();
+      SystemChannels.textInput.invokeMethod('TextInput.show');
+    });
+  }
+
+  Future<void> _showOptionSheet({
+    required String title,
+    required List<String> options,
+    required String? selectedValue,
+    required ValueChanged<String> onSelected,
+  }) async {
+    final selection = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMain,
+                  ),
+                ),
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: options.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final option = options[index];
+                    final isSelected = option == selectedValue;
+                    return ListTile(
+                      title: Text(
+                        option,
+                        style: TextStyle(
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? AppTheme.focusColor
+                              : AppTheme.textMain,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(Icons.check, color: AppTheme.focusColor)
+                          : null,
+                      onTap: () => Navigator.pop(context, option),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selection != null) {
+      onSelected(selection);
     }
   }
 
@@ -148,63 +231,24 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
             // Axis
             _buildSectionLabel(TrickLabels.sectionAxis),
-            Autocomplete<String>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text == '') {
-                  return AppConstants.axes;
-                }
-                return AppConstants.axes.where((String option) {
-                  return option.contains(textEditingValue.text);
-                });
-              },
-              onSelected: (String selection) {
-                setState(() {
-                  _axisController.text = selection;
-                });
-              },
-              fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                // Sync controllers
-                if (controller.text != _axisController.text) {
-                  controller.text = _axisController.text;
-                }
-                _registerFocusReset(focusNode, () {
-                  if (_axisPrimed || _axisEditable) {
-                    setState(() {
-                      _axisPrimed = false;
-                      _axisEditable = false;
-                    });
-                  }
-                });
-                return TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  readOnly: !_axisEditable,
-                  showCursor: _axisEditable,
-                  onTap: () {
-                    if (!focusNode.hasFocus) {
-                      focusNode.requestFocus();
-                    }
-                    if (_axisPrimed) {
-                      if (!_axisEditable) {
-                        setState(() => _axisEditable = true);
-                      }
-                    } else {
-                      setState(() => _axisPrimed = true);
-                    }
+            TextField(
+              controller: _axisController,
+              readOnly: true,
+              showCursor: false,
+              enableInteractiveSelection: false,
+              onTap: () {
+                _showOptionSheet(
+                  title: '軸を選択',
+                  options: AppConstants.axes,
+                  selectedValue: _axisController.text.isEmpty
+                      ? null
+                      : _axisController.text,
+                  onSelected: (value) {
+                    setState(() => _axisController.text = value);
                   },
-                  onEditingComplete: () {
-                    onEditingComplete();
-                    _dismissKeyboard();
-                  },
-                  onSubmitted: (_) => _dismissKeyboard(),
-                  onChanged: (val) {
-                    setState(() {
-                      _axisController.text = val;
-                    });
-                  },
-                  decoration: _inputDecoration('軸を選択'),
                 );
               },
+              decoration: _inputDecoration('軸を選択'),
             ),
             const SizedBox(height: 16),
           ],
@@ -212,56 +256,24 @@ class _NewTrickModalState extends State<NewTrickModal> {
           // Spin
           if (!_isBackOrFront) ...[
             _buildSectionLabel('スピン'),
-            Autocomplete<String>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                return AppConstants.spins
-                    .map((e) => e.toString())
-                    .where((String option) {
-                  return option.contains(textEditingValue.text);
-                });
-              },
-              onSelected: (String selection) {
-                _spinController.text = selection;
-              },
-              fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                 if (controller.text != _spinController.text) {
-                    controller.text = _spinController.text;
-                  }
-                _registerFocusReset(focusNode, () {
-                  if (_spinPrimed || _spinEditable) {
-                    setState(() {
-                      _spinPrimed = false;
-                      _spinEditable = false;
-                    });
-                  }
-                });
-                return TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  readOnly: !_spinEditable,
-                  showCursor: _spinEditable,
-                  onTap: () {
-                    if (!focusNode.hasFocus) {
-                      focusNode.requestFocus();
-                    }
-                    if (_spinPrimed) {
-                      if (!_spinEditable) {
-                        setState(() => _spinEditable = true);
-                      }
-                    } else {
-                      setState(() => _spinPrimed = true);
-                    }
+            TextField(
+              controller: _spinController,
+              readOnly: true,
+              showCursor: false,
+              enableInteractiveSelection: false,
+              onTap: () {
+                _showOptionSheet(
+                  title: 'スピンを選択',
+                  options: AppConstants.spins.map((e) => e.toString()).toList(),
+                  selectedValue: _spinController.text.isEmpty
+                      ? null
+                      : _spinController.text,
+                  onSelected: (value) {
+                    setState(() => _spinController.text = value);
                   },
-                  onEditingComplete: () {
-                    onEditingComplete();
-                    _dismissKeyboard();
-                  },
-                  onSubmitted: (_) => _dismissKeyboard(),
-                  onChanged: (val) => _spinController.text = val,
-                  keyboardType: TextInputType.number,
-                  decoration: _inputDecoration('0'),
                 );
               },
+              decoration: _inputDecoration('0'),
             ),
             const SizedBox(height: 16),
           ],
@@ -303,7 +315,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
                   }
                   if (_grabPrimed) {
                     if (!_grabEditable) {
-                      setState(() => _grabEditable = true);
+                      _activateEditable(
+                        focusNode,
+                        () => _grabEditable = true,
+                      );
                     }
                   } else {
                     setState(() => _grabPrimed = true);
@@ -314,6 +329,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
                   _dismissKeyboard();
                 },
                 onSubmitted: (_) => _dismissKeyboard(),
+                onTapOutside: (_) {
+                  _dismissKeyboard();
+                  _clearPrimedState();
+                },
                 onChanged: (val) => _grabController.text = val,
                 decoration: _inputDecoration('グラブを選択'),
               );
