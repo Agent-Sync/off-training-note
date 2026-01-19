@@ -32,10 +32,36 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _axisController = TextEditingController();
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
+  final Set<FocusNode> _registeredFocusNodes = <FocusNode>{};
+  bool _axisPrimed = false;
+  bool _axisEditable = false;
+  bool _spinPrimed = false;
+  bool _spinEditable = false;
+  bool _grabPrimed = false;
+  bool _grabEditable = false;
 
   void _dismissKeyboard() {
     FocusScope.of(context).unfocus();
   }
+
+  void _registerFocusReset(FocusNode node, VoidCallback onReset) {
+    if (_registeredFocusNodes.add(node)) {
+      node.addListener(() {
+        if (!node.hasFocus) {
+          onReset();
+        }
+      });
+    }
+  }
+
+  String get _axisHintText =>
+      _axisPrimed && !_axisEditable ? 'タップで検索' : '軸を選択';
+
+  String get _spinHintText =>
+      _spinPrimed && !_spinEditable ? 'タップで検索' : '0';
+
+  String get _grabHintText =>
+      _grabPrimed && !_grabEditable ? 'タップで検索' : 'グラブを選択';
 
   @override
   void dispose() {
@@ -134,7 +160,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
             Autocomplete<String>(
               optionsBuilder: (TextEditingValue textEditingValue) {
                 if (textEditingValue.text == '') {
-                  return const Iterable<String>.empty();
+                  return AppConstants.axes;
                 }
                 return AppConstants.axes.where((String option) {
                   return option.contains(textEditingValue.text);
@@ -150,10 +176,31 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 if (controller.text != _axisController.text) {
                   controller.text = _axisController.text;
                 }
+                _registerFocusReset(focusNode, () {
+                  if (_axisPrimed || _axisEditable) {
+                    setState(() {
+                      _axisPrimed = false;
+                      _axisEditable = false;
+                    });
+                  }
+                });
                 return TextField(
                   controller: controller,
                   focusNode: focusNode,
-                  onTap: () => FocusScope.of(context).requestFocus(focusNode),
+                  readOnly: !_axisEditable,
+                  showCursor: _axisEditable,
+                  onTap: () {
+                    if (!focusNode.hasFocus) {
+                      focusNode.requestFocus();
+                    }
+                    if (_axisPrimed) {
+                      if (!_axisEditable) {
+                        setState(() => _axisEditable = true);
+                      }
+                    } else {
+                      setState(() => _axisPrimed = true);
+                    }
+                  },
                   onEditingComplete: () {
                     onEditingComplete();
                     _dismissKeyboard();
@@ -164,7 +211,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                       _axisController.text = val;
                     });
                   },
-                  decoration: _inputDecoration('軸を選択'),
+                  decoration: _inputDecoration(_axisHintText),
                 );
               },
             ),
@@ -189,10 +236,31 @@ class _NewTrickModalState extends State<NewTrickModal> {
                  if (controller.text != _spinController.text) {
                     controller.text = _spinController.text;
                   }
+                _registerFocusReset(focusNode, () {
+                  if (_spinPrimed || _spinEditable) {
+                    setState(() {
+                      _spinPrimed = false;
+                      _spinEditable = false;
+                    });
+                  }
+                });
                 return TextField(
                   controller: controller,
                   focusNode: focusNode,
-                  onTap: () => FocusScope.of(context).requestFocus(focusNode),
+                  readOnly: !_spinEditable,
+                  showCursor: _spinEditable,
+                  onTap: () {
+                    if (!focusNode.hasFocus) {
+                      focusNode.requestFocus();
+                    }
+                    if (_spinPrimed) {
+                      if (!_spinEditable) {
+                        setState(() => _spinEditable = true);
+                      }
+                    } else {
+                      setState(() => _spinPrimed = true);
+                    }
+                  },
                   onEditingComplete: () {
                     onEditingComplete();
                     _dismissKeyboard();
@@ -200,7 +268,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                   onSubmitted: (_) => _dismissKeyboard(),
                   onChanged: (val) => _spinController.text = val,
                   keyboardType: TextInputType.number,
-                  decoration: _inputDecoration('0'),
+                  decoration: _inputDecoration(_spinHintText),
                 );
               },
             ),
@@ -211,9 +279,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
           _buildSectionLabel('グラブ'),
           Autocomplete<String>(
             optionsBuilder: (TextEditingValue textEditingValue) {
-               if (textEditingValue.text == '') {
-                  return const Iterable<String>.empty();
-                }
+              if (textEditingValue.text == '') {
+                return AppConstants.grabs;
+              }
               return AppConstants.grabs.where((String option) {
                 return option.contains(textEditingValue.text);
               });
@@ -225,17 +293,38 @@ class _NewTrickModalState extends State<NewTrickModal> {
                if (controller.text != _grabController.text) {
                   controller.text = _grabController.text;
                 }
+              _registerFocusReset(focusNode, () {
+                if (_grabPrimed || _grabEditable) {
+                  setState(() {
+                    _grabPrimed = false;
+                    _grabEditable = false;
+                  });
+                }
+              });
               return TextField(
                 controller: controller,
                 focusNode: focusNode,
-                onTap: () => FocusScope.of(context).requestFocus(focusNode),
+                readOnly: !_grabEditable,
+                showCursor: _grabEditable,
+                onTap: () {
+                  if (!focusNode.hasFocus) {
+                    focusNode.requestFocus();
+                  }
+                  if (_grabPrimed) {
+                    if (!_grabEditable) {
+                      setState(() => _grabEditable = true);
+                    }
+                  } else {
+                    setState(() => _grabPrimed = true);
+                  }
+                },
                 onEditingComplete: () {
                   onEditingComplete();
                   _dismissKeyboard();
                 },
                 onSubmitted: (_) => _dismissKeyboard(),
                 onChanged: (val) => _grabController.text = val,
-                decoration: _inputDecoration('グラブを選択'),
+                decoration: _inputDecoration(_grabHintText),
               );
             },
           ),
