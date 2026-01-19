@@ -20,6 +20,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const double _searchBarOverlap = 72;
   TrickType _activeTab = TrickType.air;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -128,8 +129,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Column(
               children: [
                 _buildHeaderTabs(context),
-                _buildSearchBar(),
-                Expanded(child: _buildContent(filteredTricks)),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      _buildContent(filteredTricks),
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: _buildSearchBar(),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
 
@@ -149,6 +161,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildContent(List<Trick> filteredTricks) {
+    if (filteredTricks.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: _searchBarOverlap),
+        child: _buildEmptyState(),
+      );
+    }
+
+    return MasonryGridView.count(
+      padding: const EdgeInsets.fromLTRB(16, 8 + _searchBarOverlap, 16, 100),
+      crossAxisCount: 2,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      itemCount: filteredTricks.length,
+      itemBuilder: (context, index) {
+        final trick = filteredTricks[index];
+        return TrickCard(
+          trick: trick,
+          onTap: () => _showTrickDetail(trick),
+        );
+      },
     );
   }
 
@@ -225,8 +261,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Container(
+      color: AppTheme.background.withOpacity(0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
           Expanded(
@@ -246,45 +283,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 controller: _searchController,
                 focusNode: _searchFocusNode,
                 canRequestFocus: !_suppressSearchFocus,
+                textAlignVertical: TextAlignVertical.center,
                 onChanged: (val) {
                   setState(() {
                     _searchQuery = val;
                   });
                 },
                 decoration: const InputDecoration(
+                  isDense: true,
                   hintText: 'トリックを検索...',
                   hintStyle: TextStyle(color: AppTheme.textHint),
                   prefixIcon: Icon(Icons.search, color: AppTheme.textHint),
                   border: InputBorder.none,
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 ),
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildContent(List<Trick> filteredTricks) {
-    if (filteredTricks.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    return MasonryGridView.count(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-      crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      itemCount: filteredTricks.length,
-      itemBuilder: (context, index) {
-        final trick = filteredTricks[index];
-        return TrickCard(
-          trick: trick,
-          onTap: () => _showTrickDetail(trick),
-        );
-      },
     );
   }
 
@@ -309,7 +327,7 @@ class _DottedBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final dotPaint = Paint()
-      ..color = Colors.grey.shade300.withOpacity(0.5);
+      ..color = Colors.grey.shade400.withOpacity(0.6);
     const spacing = 20.0;
     const radius = 1.2;
 
