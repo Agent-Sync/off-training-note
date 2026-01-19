@@ -54,15 +54,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
     }
   }
 
-  String get _axisHintText =>
-      _axisPrimed && !_axisEditable ? 'タップで検索' : '軸を選択';
-
-  String get _spinHintText =>
-      _spinPrimed && !_spinEditable ? 'タップで検索' : '0';
-
-  String get _grabHintText =>
-      _grabPrimed && !_grabEditable ? 'タップで検索' : 'グラブを選択';
-
   @override
   void dispose() {
     _axisController.dispose();
@@ -211,7 +202,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                       _axisController.text = val;
                     });
                   },
-                  decoration: _inputDecoration(_axisHintText),
+                  decoration: _inputDecoration('軸を選択'),
                 );
               },
             ),
@@ -268,7 +259,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                   onSubmitted: (_) => _dismissKeyboard(),
                   onChanged: (val) => _spinController.text = val,
                   keyboardType: TextInputType.number,
-                  decoration: _inputDecoration(_spinHintText),
+                  decoration: _inputDecoration('0'),
                 );
               },
             ),
@@ -324,7 +315,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 },
                 onSubmitted: (_) => _dismissKeyboard(),
                 onChanged: (val) => _grabController.text = val,
-                decoration: _inputDecoration(_grabHintText),
+                decoration: _inputDecoration('グラブを選択'),
               );
             },
           ),
