@@ -35,6 +35,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _axisController = TextEditingController();
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
+  bool _showValidation = false;
 
   Future<void> _showOptionSheet({
     required String title,
@@ -159,6 +160,18 @@ class _NewTrickModalState extends State<NewTrickModal> {
     return _isBackOrFrontValue(_axisController.text);
   }
 
+  bool get _isAxisMissing {
+    return widget.type == TrickType.air && _axisController.text.isEmpty;
+  }
+
+  bool get _isSpinMissing {
+    return !_isBackOrFront && _spinController.text.isEmpty;
+  }
+
+  bool get _isGrabMissing {
+    return _grabController.text.isEmpty;
+  }
+
   bool _isBackOrFrontValue(String value) {
     final normalized = value.trim().toLowerCase();
     return normalized == 'バックフリップ' ||
@@ -245,7 +258,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
             const SizedBox(height: 16),
 
             // Axis
-            _buildSectionLabel(TrickLabels.sectionAxis),
+            _buildSectionLabel(
+              TrickLabels.sectionAxis,
+              showError: _showValidation && _isAxisMissing,
+            ),
             TextField(
               controller: _axisController,
               readOnly: true,
@@ -270,13 +286,20 @@ class _NewTrickModalState extends State<NewTrickModal> {
                   },
                 );
               },
-              decoration: _inputDecoration('軸を選択'),
+              decoration: _inputDecoration(
+                '軸を選択',
+                showError: _showValidation && _isAxisMissing,
+              ),
             ),
             const SizedBox(height: 16),
           ],
 
           // Spin
-          _buildSectionLabel('スピン', enabled: !_isBackOrFront),
+          _buildSectionLabel(
+            'スピン',
+            enabled: !_isBackOrFront,
+            showError: _showValidation && _isSpinMissing,
+          ),
           AbsorbPointer(
             absorbing: _isBackOrFront,
             child: TextField(
@@ -303,13 +326,20 @@ class _NewTrickModalState extends State<NewTrickModal> {
                   },
                 );
               },
-              decoration: _inputDecoration('0'),
+              decoration: _inputDecoration(
+                '回転数を選択',
+                enabled: !_isBackOrFront,
+                showError: _showValidation && _isSpinMissing,
+              ),
             ),
           ),
           const SizedBox(height: 16),
 
           // Grab
-          _buildSectionLabel('グラブ'),
+          _buildSectionLabel(
+            'グラブ',
+            showError: _showValidation && _isGrabMissing,
+          ),
           TextField(
             controller: _grabController,
             readOnly: true,
@@ -328,7 +358,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 },
               );
             },
-            decoration: _inputDecoration('グラブを選択'),
+            decoration: _inputDecoration(
+              'グラブを選択',
+              showError: _showValidation && _isGrabMissing,
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -359,6 +392,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
           // Submit Button
           ElevatedButton(
             onPressed: () {
+              setState(() => _showValidation = true);
+              if (_isAxisMissing || _isSpinMissing || _isGrabMissing) {
+                return;
+              }
               final spinValue =
                   _isBackOrFront ? 0 : int.tryParse(_spinController.text) ?? 0;
               final directionValue = _isBackOrFront ? null : _direction;
@@ -386,7 +423,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
             ),
             child: const Text(
               '作成する',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
             ),
           ),
           ],
@@ -395,19 +432,41 @@ class _NewTrickModalState extends State<NewTrickModal> {
     );
   }
 
-  Widget _buildSectionLabel(String text, {bool enabled = true}) {
+  Widget _buildSectionLabel(
+    String text, {
+    bool enabled = true,
+    bool showError = false,
+  }) {
     final labelColor = enabled
         ? AppTheme.textSecondary
         : AppTheme.textHint.withOpacity(0.5);
+    final trailingColor = showError ? Colors.red.shade400 : AppTheme.textHint;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: labelColor,
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: labelColor,
+            ),
+          ),
+          if (showError)
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(
+                '選択してください',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: trailingColor,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -465,8 +524,16 @@ class _NewTrickModalState extends State<NewTrickModal> {
     );
   }
 
-  InputDecoration _inputDecoration(String hint, {bool enabled = true}) {
+  InputDecoration _inputDecoration(
+    String hint, {
+    bool enabled = true,
+    bool showError = false,
+  }) {
     final fillColor = enabled ? Colors.grey.shade50 : Colors.grey.shade100;
+    final borderColor =
+        showError ? Colors.red.shade400 : Colors.grey.shade200;
+    final focusedColor =
+        showError ? Colors.red.shade400 : AppTheme.focusColor;
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(color: AppTheme.textHint),
@@ -475,15 +542,15 @@ class _NewTrickModalState extends State<NewTrickModal> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade200),
+        borderSide: BorderSide(color: borderColor),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade200),
+        borderSide: BorderSide(color: borderColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppTheme.focusColor, width: 2),
+        borderSide: BorderSide(color: focusedColor, width: 2),
       ),
     );
   }
