@@ -49,7 +49,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
       context: context,
       builder: (context) {
         return AppBottomSheetContainer(
-          padding: EdgeInsets.zero,
           useKeyboardInset: false,
           child: AxisSelectSheet(
             options: options,
@@ -73,7 +72,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
       context: context,
       builder: (context) {
         return AppBottomSheetContainer(
-          padding: EdgeInsets.zero,
           useKeyboardInset: false,
           child: SpinSelectSheet(
             options: options,
@@ -98,7 +96,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
       context: context,
       builder: (context) {
         return AppBottomSheetContainer(
-          padding: EdgeInsets.zero,
           useKeyboardInset: true,
           child: GrabSelectSheet(
             options: options,
