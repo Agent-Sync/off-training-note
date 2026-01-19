@@ -33,41 +33,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _axisController = TextEditingController();
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
-  final Set<FocusNode> _registeredFocusNodes = <FocusNode>{};
-  bool _grabPrimed = false;
-  bool _grabEditable = false;
-
-  void _dismissKeyboard() {
-    FocusScope.of(context).unfocus();
-  }
-
-  void _clearPrimedState() {
-    setState(() {
-      _grabPrimed = false;
-      _grabEditable = false;
-    });
-  }
-
-  void _registerFocusReset(FocusNode node, VoidCallback onReset) {
-    if (_registeredFocusNodes.add(node)) {
-      node.addListener(() {
-        if (!node.hasFocus) {
-          onReset();
-        }
-      });
-    }
-  }
-
-  void _activateEditable(FocusNode focusNode, VoidCallback setEditable) {
-    setState(setEditable);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      focusNode.requestFocus();
-      SystemChannels.textInput.invokeMethod('TextInput.show');
-    });
-  }
 
   Future<void> _showOptionSheet({
     required String title,
@@ -78,55 +43,59 @@ class _NewTrickModalState extends State<NewTrickModal> {
     final selection = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textMain,
-                  ),
-                ),
-              ),
-              const Divider(height: 1),
-              Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: options.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final option = options[index];
-                    final isSelected = option == selectedValue;
-                    return ListTile(
-                      title: Text(
-                        option,
-                        style: TextStyle(
-                          fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected
-                              ? AppTheme.focusColor
-                              : AppTheme.textMain,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textMain,
                         ),
                       ),
-                      trailing: isSelected
-                          ? const Icon(Icons.check, color: AppTheme.focusColor)
-                          : null,
-                      onTap: () => Navigator.pop(context, option),
-                    );
-                  },
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.grey),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Divider(height: 1, color: Colors.grey.shade200),
+                Flexible(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(24),
+                    itemCount: options.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final option = options[index];
+                      final isSelected = option == selectedValue;
+                      return _OptionItem(
+                        text: option,
+                        isSelected: isSelected,
+                        onTap: () => Navigator.pop(context, option),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -136,6 +105,34 @@ class _NewTrickModalState extends State<NewTrickModal> {
       onSelected(selection);
     }
   }
+
+  Future<void> _showSearchableOptionSheet({
+    required String title,
+    required List<String> options,
+    required String? selectedValue,
+    required ValueChanged<String> onSelected,
+  }) async {
+    final selection = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return _SearchableSheet(
+          title: title,
+          options: options,
+          selectedValue: selectedValue,
+        );
+      },
+    );
+
+    if (selection != null) {
+      onSelected(selection);
+    }
+  }
+
 
   @override
   void dispose() {
@@ -192,6 +189,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               ),
             ],
           ),
+          Divider(height: 1, color: Colors.grey.shade200),
           const SizedBox(height: 24),
 
           // Stance
@@ -297,63 +295,24 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
           // Grab
           _buildSectionLabel('グラブ'),
-          Autocomplete<String>(
-            optionsBuilder: (TextEditingValue textEditingValue) {
-              if (textEditingValue.text == '') {
-                return AppConstants.grabs;
-              }
-              return AppConstants.grabs.where((String option) {
-                return option.contains(textEditingValue.text);
-              });
-            },
-            onSelected: (String selection) {
-              _grabController.text = selection;
-            },
-            fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-               if (controller.text != _grabController.text) {
-                  controller.text = _grabController.text;
-                }
-              _registerFocusReset(focusNode, () {
-                if (_grabPrimed || _grabEditable) {
-                  setState(() {
-                    _grabPrimed = false;
-                    _grabEditable = false;
-                  });
-                }
-              });
-              return TextField(
-                controller: controller,
-                focusNode: focusNode,
-                readOnly: !_grabEditable,
-                showCursor: _grabEditable,
-                onTap: () {
-                  if (!focusNode.hasFocus) {
-                    focusNode.requestFocus();
-                  }
-                  if (_grabPrimed) {
-                    if (!_grabEditable) {
-                      _activateEditable(
-                        focusNode,
-                        () => _grabEditable = true,
-                      );
-                    }
-                  } else {
-                    setState(() => _grabPrimed = true);
-                  }
+          TextField(
+            controller: _grabController,
+            readOnly: true,
+            showCursor: false,
+            enableInteractiveSelection: false,
+            onTap: () {
+              _showSearchableOptionSheet(
+                title: 'グラブを選択',
+                options: AppConstants.grabs,
+                selectedValue: _grabController.text.isEmpty
+                    ? null
+                    : _grabController.text,
+                onSelected: (value) {
+                  setState(() => _grabController.text = value);
                 },
-                onEditingComplete: () {
-                  onEditingComplete();
-                  _dismissKeyboard();
-                },
-                onSubmitted: (_) => _dismissKeyboard(),
-                onTapOutside: (_) {
-                  _dismissKeyboard();
-                  _clearPrimedState();
-                },
-                onChanged: (val) => _grabController.text = val,
-                decoration: _inputDecoration('グラブを選択'),
               );
             },
+            decoration: _inputDecoration('グラブを選択'),
           ),
           const SizedBox(height: 24),
 
@@ -509,6 +468,169 @@ class _NewTrickModalState extends State<NewTrickModal> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppTheme.focusColor, width: 2),
+      ),
+    );
+  }
+}
+
+class _OptionItem extends StatelessWidget {
+  final String text;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _OptionItem({
+    required this.text,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? AppTheme.focusColor.withOpacity(0.5)
+                : Colors.transparent,
+            width: 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.focusColor.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [],
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isSelected ? AppTheme.focusColor : AppTheme.textHint,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchableSheet extends StatefulWidget {
+  final String title;
+  final List<String> options;
+  final String? selectedValue;
+
+  const _SearchableSheet({
+    required this.title,
+    required this.options,
+    required this.selectedValue,
+  });
+
+  @override
+  State<_SearchableSheet> createState() => _SearchableSheetState();
+}
+
+class _SearchableSheetState extends State<_SearchableSheet> {
+  late List<String> _filteredOptions;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredOptions = widget.options;
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredOptions = widget.options
+          .where((option) => option.toLowerCase().contains(query))
+          .toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textMain,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: Colors.grey.shade200),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: '検索...',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            Flexible(
+              child: ListView.separated(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                itemCount: _filteredOptions.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final option = _filteredOptions[index];
+                  final isSelected = option == widget.selectedValue;
+                  return _OptionItem(
+                    text: option,
+                    isSelected: isSelected,
+                    onTap: () => Navigator.pop(context, option),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

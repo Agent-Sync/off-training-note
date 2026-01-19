@@ -64,6 +64,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void _dismissSearchFocus() {
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     final allTricks = ref.watch(tricksProvider);
@@ -77,35 +81,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     filteredTricks.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _DottedBackgroundPainter(),
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _dismissSearchFocus,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _DottedBackgroundPainter(),
+              ),
             ),
-          ),
-          Column(
-            children: [
-              _buildHeaderTabs(context),
-              _buildSearchBar(),
-              Expanded(child: _buildContent(filteredTricks)),
-            ],
-          ),
+            Column(
+              children: [
+                _buildHeaderTabs(context),
+                _buildSearchBar(),
+                Expanded(child: _buildContent(filteredTricks)),
+              ],
+            ),
 
-          // FAB
-          Positioned(
-            bottom: 24,
-            right: 24,
-            child: FloatingActionButton.extended(
-              onPressed: _showNewTrickModal,
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              elevation: 4,
-              icon: const Icon(Icons.add),
-              label: const Text('新しいトリック', style: TextStyle(fontWeight: FontWeight.bold)),
+            // FAB
+            Positioned(
+              bottom: 24,
+              right: 24,
+              child: FloatingActionButton.extended(
+                onPressed: _showNewTrickModal,
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                elevation: 4,
+                icon: const Icon(Icons.add),
+                label: const Text('新しいトリック', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
