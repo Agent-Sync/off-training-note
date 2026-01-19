@@ -5,6 +5,8 @@ import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_labels.dart';
 
+const Duration _optionCloseDelay = Duration(milliseconds: 150);
+
 class NewTrickModal extends StatefulWidget {
   final TrickType type;
   final Function(
@@ -40,6 +42,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
     required String? selectedValue,
     required ValueChanged<String> onSelected,
   }) async {
+    String? tempSelected = selectedValue;
     final selection = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: Colors.white,
@@ -48,55 +51,65 @@ class _NewTrickModalState extends State<NewTrickModal> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        return SafeArea(
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.8,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textMain,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.grey),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.8,
                 ),
-                Divider(height: 1, color: Colors.grey.shade200),
-                Flexible(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(24),
-                    itemCount: options.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final option = options[index];
-                      final isSelected = option == selectedValue;
-                      return _OptionItem(
-                        text: option,
-                        isSelected: isSelected,
-                        onTap: () => Navigator.pop(context, option),
-                      );
-                    },
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textMain,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.grey),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(height: 1, color: Colors.grey.shade200),
+                    Flexible(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(24),
+                        itemCount: options.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final option = options[index];
+                          final isSelected = option == tempSelected;
+                          return _OptionItem(
+                            text: option,
+                            isSelected: isSelected,
+                            onTap: () async {
+                              setModalState(() => tempSelected = option);
+                              await Future.delayed(_optionCloseDelay);
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.pop(context, option);
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -238,6 +251,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               readOnly: true,
               showCursor: false,
               enableInteractiveSelection: false,
+              style: const TextStyle(fontWeight: FontWeight.w600),
               onTap: () {
                 _showOptionSheet(
                   title: '軸を選択',
@@ -274,6 +288,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 color: _isBackOrFront
                     ? AppTheme.textHint.withOpacity(0.5)
                     : AppTheme.textMain,
+                fontWeight: FontWeight.w600,
               ),
               onTap: () {
                 _showOptionSheet(
@@ -300,6 +315,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
             readOnly: true,
             showCursor: false,
             enableInteractiveSelection: false,
+            style: const TextStyle(fontWeight: FontWeight.w600),
             onTap: () {
               _showSearchableOptionSheet(
                 title: 'グラブを選択',
@@ -540,6 +556,7 @@ class _SearchableSheet extends StatefulWidget {
 class _SearchableSheetState extends State<_SearchableSheet> {
   late List<String> _filteredOptions;
   final TextEditingController _searchController = TextEditingController();
+  String? _pendingSelection;
 
   @override
   void initState() {
@@ -620,11 +637,21 @@ class _SearchableSheetState extends State<_SearchableSheet> {
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final option = _filteredOptions[index];
-                  final isSelected = option == widget.selectedValue;
+                  final isSelected =
+                      option == (_pendingSelection ?? widget.selectedValue);
                   return _OptionItem(
                     text: option,
                     isSelected: isSelected,
-                    onTap: () => Navigator.pop(context, option),
+                    onTap: () async {
+                      setState(() => _pendingSelection = option);
+                      await Future.delayed(_optionCloseDelay);
+                      if (!mounted) {
+                        return;
+                      }
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.pop(context, option);
+                      }
+                    },
                   );
                 },
               ),
