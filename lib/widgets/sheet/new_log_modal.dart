@@ -29,15 +29,18 @@ class _NewLogModalState extends State<NewLogModal> {
   @override
   Widget build(BuildContext context) {
     return AppBottomSheetContainer(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                '新しい技術メモ',
+                '新しいメモ',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -54,7 +57,7 @@ class _NewLogModalState extends State<NewLogModal> {
 
           // Focus Input
           const Text(
-            '意識 (Focus)',
+            '意識',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -66,7 +69,7 @@ class _NewLogModalState extends State<NewLogModal> {
             controller: _focusController,
             onChanged: (_) => setState(() {}),
             maxLines: 3,
-            decoration: _inputDecoration('例: 早めにランディングを見る、肩を水平に...'),
+            decoration: _inputDecoration('例: 一旦ランディングを見る、肩を水平に...'),
           ),
 
           const SizedBox(height: 16),
@@ -77,7 +80,7 @@ class _NewLogModalState extends State<NewLogModal> {
 
           // Outcome Input
           const Text(
-            'どう変わったか (Result)',
+            'どう変わったか',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -89,7 +92,7 @@ class _NewLogModalState extends State<NewLogModal> {
             controller: _outcomeController,
             onChanged: (_) => setState(() {}),
             maxLines: 3,
-            decoration: _inputDecoration('例: 回転がスムーズになった、着地が決まった...'),
+            decoration: _inputDecoration('例: 後傾着地が直った、カウンターが...'),
           ),
 
           const SizedBox(height: 32),
@@ -146,7 +149,8 @@ class _NewLogModalState extends State<NewLogModal> {
               ),
             ],
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
