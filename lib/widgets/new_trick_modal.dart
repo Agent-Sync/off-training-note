@@ -33,6 +33,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
 
+  void _dismissKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   void dispose() {
     _axisController.dispose();
@@ -51,21 +55,22 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: 24,
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.only(
+          top: 24,
+          left: 24,
+          right: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -148,7 +153,12 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 return TextField(
                   controller: controller,
                   focusNode: focusNode,
-                  onEditingComplete: onEditingComplete,
+                  onTap: () => FocusScope.of(context).requestFocus(focusNode),
+                  onEditingComplete: () {
+                    onEditingComplete();
+                    _dismissKeyboard();
+                  },
+                  onSubmitted: (_) => _dismissKeyboard(),
                   onChanged: (val) {
                     setState(() {
                       _axisController.text = val;
@@ -182,7 +192,12 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 return TextField(
                   controller: controller,
                   focusNode: focusNode,
-                  onEditingComplete: onEditingComplete,
+                  onTap: () => FocusScope.of(context).requestFocus(focusNode),
+                  onEditingComplete: () {
+                    onEditingComplete();
+                    _dismissKeyboard();
+                  },
+                  onSubmitted: (_) => _dismissKeyboard(),
                   onChanged: (val) => _spinController.text = val,
                   keyboardType: TextInputType.number,
                   decoration: _inputDecoration('0'),
@@ -213,7 +228,12 @@ class _NewTrickModalState extends State<NewTrickModal> {
               return TextField(
                 controller: controller,
                 focusNode: focusNode,
-                onEditingComplete: onEditingComplete,
+                onTap: () => FocusScope.of(context).requestFocus(focusNode),
+                onEditingComplete: () {
+                  onEditingComplete();
+                  _dismissKeyboard();
+                },
+                onSubmitted: (_) => _dismissKeyboard(),
                 onChanged: (val) => _grabController.text = val,
                 decoration: _inputDecoration('グラブを選択'),
               );
@@ -275,7 +295,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
