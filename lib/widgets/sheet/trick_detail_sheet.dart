@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:off_training_note/models/tech_log.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/sheet/new_log_modal.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
@@ -137,15 +139,54 @@ class TrickDetailSheet extends ConsumerWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          timeago.format(log.createdAt,
-                                              locale: 'ja'),
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppTheme.textSecondary,
-                                            letterSpacing: 0.5,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              timeago.format(log.createdAt,
+                                                  locale: 'ja'),
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppTheme.textSecondary,
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Builder(
+                                                  builder: (context) {
+                                                    final conditionStyle =
+                                                        _getConditionStyle(log.condition);
+                                                    final sizeLabel = _getSizeLabel(log.size);
+                                                    return Wrap(
+                                                      spacing: 4,
+                                                      children: [
+                                                        if (conditionStyle != null)
+                                                          _buildLogTag(
+                                                            conditionStyle.label,
+                                                            backgroundColor:
+                                                                conditionStyle.background,
+                                                            textColor: conditionStyle.text,
+                                                            borderColor: conditionStyle.border,
+                                                          ),
+                                                        if (sizeLabel != null) _buildLogTag(sizeLabel),
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                                const SizedBox(width: 4),
+                                                IconButton(
+                                                  icon: const Icon(Icons.more_vert, size: 16, color: Colors.grey),
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: const BoxConstraints(),
+                                                  splashRadius: 20,
+                                                  onPressed: () => _showLogActionMenu(context, ref, log),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                         const SizedBox(height: 8),
                                         Container(
@@ -255,10 +296,10 @@ class TrickDetailSheet extends ConsumerWidget {
                     showAppBottomSheet(
                       context: context,
                       builder: (context) => NewLogModal(
-                        onAdd: (focus, outcome) {
+                        onAdd: (focus, outcome, condition, size) {
                            ref
                               .read(tricksProvider.notifier)
-                              .addLog(trick.id, focus, outcome);
+                              .addLog(trick.id, focus, outcome, condition: condition, size: size);
                            // Stay on detail sheet, it will update
                         },
                       ),
@@ -288,6 +329,115 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
+  void _showLogActionMenu(BuildContext context, WidgetRef ref, TechLog log) {
+    showAppBottomSheet(
+      context: context,
+      builder: (context) => AppBottomSheetContainer(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildActionItem(
+              context,
+              icon: Icons.edit_outlined,
+              label: 'メモを編集',
+              onTap: () {
+                Navigator.pop(context); // Close menu
+                showAppBottomSheet(
+                  context: context,
+                  builder: (context) => NewLogModal(
+                    initialLog: log,
+                    onAdd: (focus, outcome, condition, size) {
+                      final updatedLog = log.copyWith(
+                        focus: focus,
+                        outcome: outcome,
+                        condition: condition,
+                        size: size,
+                      );
+                      ref
+                          .read(tricksProvider.notifier)
+                          .updateLog(trick.id, updatedLog);
+                    },
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            _buildActionItem(
+              context,
+              icon: Icons.delete_outline,
+              label: 'メモを削除',
+              isDestructive: true,
+              onTap: () {
+                Navigator.pop(context); // Close menu
+                _showDeleteConfirmDialog(context, ref, log);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmDialog(BuildContext context, WidgetRef ref, TechLog log) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('メモを削除', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('このメモを削除してもよろしいですか？\nこの操作は取り消せません。'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('キャンセル', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(tricksProvider.notifier).deleteLog(trick.id, log.id);
+              Navigator.pop(context);
+            },
+            child: const Text('削除', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isDestructive ? Colors.red : AppTheme.textMain,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDestructive ? Colors.red : AppTheme.textMain,
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTag(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -305,5 +455,37 @@ class TrickDetailSheet extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildLogTag(String label, {Color? backgroundColor, Color? textColor, Color? borderColor}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: backgroundColor ?? Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor ?? Colors.grey.shade300),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: textColor ?? AppTheme.textSecondary,
+        ),
+      ),
+    );
+  }
+
+  ConditionTagStyle? _getConditionStyle(String? condition) {
+    return ConditionTags.style(condition);
+  }
+
+  String? _getSizeLabel(String? size) {
+    switch (size) {
+      case 'small': return 'スモール';
+      case 'middle': return 'ミドル';
+      case 'big': return 'ビッグ';
+      default: return null;
+    }
   }
 }
