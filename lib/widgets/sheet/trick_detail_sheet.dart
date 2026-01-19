@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_log.dart';
@@ -380,26 +382,75 @@ class TrickDetailSheet extends ConsumerWidget {
   }
 
   void _showDeleteConfirmDialog(BuildContext context, WidgetRef ref, TechLog log) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('メモを削除', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('このメモを削除してもよろしいですか？\nこの操作は取り消せません。'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('キャンセル', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+      barrierDismissible: true,
+      barrierLabel: 'delete_log_dialog',
+      barrierColor: Colors.black.withOpacity(0.1),
+      pageBuilder: (context, _, __) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Center(
+            child: AlertDialog(
+              backgroundColor: Colors.white,
+              title: const Text(
+                '本当に削除しますか？',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              content: const Text(
+                '削除すると元に戻せません。',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              actionsPadding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey.shade300),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        child: const Text(
+                          'キャンセル',
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          ref.read(tricksProvider.notifier).deleteLog(trick.id, log.id);
+                          Navigator.pop(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.red.shade200),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        child: const Text(
+                          '削除',
+                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              ref.read(tricksProvider.notifier).deleteLog(trick.id, log.id);
-              Navigator.pop(context);
-            },
-            child: const Text('削除', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
