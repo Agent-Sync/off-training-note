@@ -5,6 +5,8 @@ class AppConstants {
 
   static const List<String> axes = [
     TrickLabels.axisFlat,
+    'バックフリップ',
+    'フロントフリップ',
     'コーク',
     'バイオ',
     'ミスティ',

@@ -146,11 +146,15 @@ class _NewTrickModalState extends State<NewTrickModal> {
   }
 
   bool get _isBackOrFront {
-    final value = _axisController.text.trim().toLowerCase();
-    return value == 'back' ||
-        value == 'front' ||
-        value == 'バック' ||
-        value == 'フロント';
+    return _isBackOrFrontValue(_axisController.text);
+  }
+
+  bool _isBackOrFrontValue(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'バックフリップ' ||
+        normalized == 'フロントフリップ' ||
+        normalized == 'back flip' ||
+        normalized == 'front flip';
   }
 
   @override
@@ -244,7 +248,13 @@ class _NewTrickModalState extends State<NewTrickModal> {
                       ? null
                       : _axisController.text,
                   onSelected: (value) {
-                    setState(() => _axisController.text = value);
+                    setState(() {
+                      _axisController.text = value;
+                      if (_isBackOrFrontValue(value)) {
+                        _spinController.text = '0';
+                        _direction = Direction.left;
+                      }
+                    });
                   },
                 );
               },
@@ -254,29 +264,31 @@ class _NewTrickModalState extends State<NewTrickModal> {
           ],
 
           // Spin
-          if (!_isBackOrFront) ...[
-            _buildSectionLabel('スピン'),
-            TextField(
-              controller: _spinController,
-              readOnly: true,
-              showCursor: false,
-              enableInteractiveSelection: false,
-              onTap: () {
-                _showOptionSheet(
-                  title: 'スピンを選択',
-                  options: AppConstants.spins.map((e) => e.toString()).toList(),
-                  selectedValue: _spinController.text.isEmpty
-                      ? null
-                      : _spinController.text,
-                  onSelected: (value) {
-                    setState(() => _spinController.text = value);
+          _buildSectionLabel('スピン'),
+          TextField(
+            controller: _spinController,
+            readOnly: true,
+            enabled: !_isBackOrFront,
+            showCursor: false,
+            enableInteractiveSelection: false,
+            onTap: _isBackOrFront
+                ? null
+                : () {
+                    _showOptionSheet(
+                      title: 'スピンを選択',
+                      options:
+                          AppConstants.spins.map((e) => e.toString()).toList(),
+                      selectedValue: _spinController.text.isEmpty
+                          ? null
+                          : _spinController.text,
+                      onSelected: (value) {
+                        setState(() => _spinController.text = value);
+                      },
+                    );
                   },
-                );
-              },
-              decoration: _inputDecoration('0'),
-            ),
-            const SizedBox(height: 16),
-          ],
+            decoration: _inputDecoration('0', enabled: !_isBackOrFront),
+          ),
+          const SizedBox(height: 16),
 
           // Grab
           _buildSectionLabel('グラブ'),
@@ -340,26 +352,26 @@ class _NewTrickModalState extends State<NewTrickModal> {
           ),
           const SizedBox(height: 24),
 
-          if (!_isBackOrFront) ...[
-            // Direction
-            _buildSectionLabel(TrickLabels.sectionDirection),
-            Row(
-              children: [
-                _buildSelectButton(
-                  TrickLabels.directionLeft,
-                  _direction == Direction.left,
-                  () => setState(() => _direction = Direction.left),
-                ),
-                const SizedBox(width: 12),
-                _buildSelectButton(
-                  TrickLabels.directionRight,
-                  _direction == Direction.right,
-                  () => setState(() => _direction = Direction.right),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
+          // Direction
+          _buildSectionLabel(TrickLabels.sectionDirection),
+          Row(
+            children: [
+              _buildSelectButton(
+                TrickLabels.directionLeft,
+                _direction == Direction.left,
+                () => setState(() => _direction = Direction.left),
+                enabled: !_isBackOrFront,
+              ),
+              const SizedBox(width: 12),
+              _buildSelectButton(
+                TrickLabels.directionRight,
+                _direction == Direction.right,
+                () => setState(() => _direction = Direction.right),
+                enabled: !_isBackOrFront,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
 
           // Submit Button
           ElevatedButton(
@@ -414,20 +426,35 @@ class _NewTrickModalState extends State<NewTrickModal> {
     );
   }
 
-  Widget _buildSelectButton(String text, bool isSelected, VoidCallback onTap) {
+  Widget _buildSelectButton(
+    String text,
+    bool isSelected,
+    VoidCallback onTap, {
+    bool enabled = true,
+  }) {
+    final buttonEnabled = enabled;
+    final backgroundColor = buttonEnabled
+        ? (isSelected ? Colors.white : Colors.grey.shade100)
+        : Colors.grey.shade50;
+    final borderColor = buttonEnabled && isSelected
+        ? AppTheme.focusColor.withOpacity(0.5)
+        : Colors.transparent;
+    final textColor = buttonEnabled
+        ? (isSelected ? AppTheme.focusColor : AppTheme.textHint)
+        : AppTheme.textHint;
     return Expanded(
       child: GestureDetector(
-        onTap: onTap,
+        onTap: buttonEnabled ? onTap : null,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.grey.shade100,
+            color: backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? AppTheme.focusColor.withOpacity(0.5) : Colors.transparent,
+              color: borderColor,
               width: 1,
             ),
-            boxShadow: isSelected
+            boxShadow: buttonEnabled && isSelected
                 ? [
                     BoxShadow(
                       color: AppTheme.focusColor.withOpacity(0.1),
@@ -439,25 +466,26 @@ class _NewTrickModalState extends State<NewTrickModal> {
           ),
           child: Center(
             child: Text(
-              text,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isSelected ? AppTheme.focusColor : AppTheme.textHint,
-                fontSize: 14,
+                text,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                  fontSize: 14,
+                ),
               ),
             ),
-          ),
         ),
       ),
     );
   }
 
-  InputDecoration _inputDecoration(String hint) {
+  InputDecoration _inputDecoration(String hint, {bool enabled = true}) {
+    final fillColor = enabled ? Colors.grey.shade50 : Colors.grey.shade100;
     return InputDecoration(
       hintText: hint,
       hintStyle: const TextStyle(color: AppTheme.textHint),
       filled: true,
-      fillColor: Colors.grey.shade50,
+      fillColor: fillColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
