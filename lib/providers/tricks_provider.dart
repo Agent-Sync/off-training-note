@@ -48,7 +48,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
     _saveTricks();
   }
 
-  void addLog(String trickId, String focus, String outcome) {
+  void addLog(String trickId, String focus, String outcome, {String? condition, String? size}) {
     state = state.map((trick) {
       if (trick.id == trickId) {
         final newLog = TechLog(
@@ -56,9 +56,41 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: focus,
           outcome: outcome,
           createdAt: DateTime.now(),
+          condition: condition,
+          size: size,
         );
         return trick.copyWith(
           logs: [newLog, ...trick.logs],
+          updatedAt: DateTime.now(),
+        );
+      }
+      return trick;
+    }).toList();
+    _saveTricks();
+  }
+
+  void updateLog(String trickId, TechLog updatedLog) {
+    state = state.map((trick) {
+      if (trick.id == trickId) {
+        final newLogs = trick.logs.map((log) {
+          return log.id == updatedLog.id ? updatedLog : log;
+        }).toList();
+        return trick.copyWith(
+          logs: newLogs,
+          updatedAt: DateTime.now(),
+        );
+      }
+      return trick;
+    }).toList();
+    _saveTricks();
+  }
+
+  void deleteLog(String trickId, String logId) {
+    state = state.map((trick) {
+      if (trick.id == trickId) {
+        final newLogs = trick.logs.where((log) => log.id != logId).toList();
+        return trick.copyWith(
+          logs: newLogs,
           updatedAt: DateTime.now(),
         );
       }
@@ -83,12 +115,16 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: 'テイクオフで肩のラインを水平に保つ',
           outcome: '軸が安定して回転がスムーズになった',
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
+          condition: 'snow',
+          size: 'big',
         ),
         TechLog(
           id: 'l2',
           focus: '360の時点でランディングを見る',
           outcome: '着地が完璧に決まった',
           createdAt: DateTime.now().subtract(const Duration(days: 5)),
+          condition: 'snow',
+          size: 'middle',
         ),
       ],
       updatedAt: DateTime.now(),
@@ -108,6 +144,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: '右肩を下げながら抜ける',
           outcome: 'しっかり軸が入った',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
+          condition: 'snow',
+          size: 'big',
         ),
       ],
       updatedAt: DateTime.now().subtract(const Duration(hours: 12)),
@@ -127,6 +165,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: '目線を先行させる',
           outcome: '回転不足が解消',
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
+          condition: 'brush',
+          size: 'small',
         ),
       ],
       updatedAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -145,6 +185,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: 'リップで早めに弾く',
           outcome: 'ギャップを余裕で越えられた',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
+          condition: 'snow',
+          size: 'small',
         ),
       ],
       updatedAt: DateTime.now(),

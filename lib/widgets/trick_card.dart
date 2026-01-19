@@ -133,7 +133,8 @@ class TrickCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(12),
@@ -141,7 +142,8 @@ class TrickCard extends StatelessWidget {
                     ),
                     child: Text(
                       '${trick.logs.length} notes',
-                      style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+                      style: const TextStyle(
+                          fontSize: 10, color: AppTheme.textSecondary),
                     ),
                   ),
                 ],
