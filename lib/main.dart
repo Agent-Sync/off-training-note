@@ -1,18 +1,50 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/screens/home_screen.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-void main() {
-  timeago.setLocaleMessages('ja', timeago.JaMessages());
-  timeago.setDefaultLocale('ja');
-  
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+Future<void> main() async {
+  // グローバルなエラーハンドリングを設定
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('Flutter Error: ${details.exception}');
+    debugPrint('Stack trace: ${details.stack}');
+  };
+
+  // 未処理のエラーをキャッチ
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    // .envファイルの読み込み（オプショナル）
+    try {
+      await dotenv.load(fileName: 'assets/.env');
+    } catch (e) {
+      // .envファイルが存在しない場合は無視（デバッグモードでは問題なし）
+      debugPrint('Warning: Could not load .env file: $e');
+    }
+    
+    // Supabaseの初期化
+    // await Supabase.initialize(
+    //   url: dotenv.env['SUPABASE_URL'] ?? '',
+    //   anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+    // );
+
+    timeago.setLocaleMessages('ja', timeago.JaMessages());
+    timeago.setDefaultLocale('ja');
+    
+    runApp(
+      const ProviderScope(
+        child: MyApp(),
+      ),
+    );
+  }, (error, stack) {
+    debugPrint('Uncaught error: $error');
+    debugPrint('Stack trace: $stack');
+  });
 }
 
 class MyApp extends StatelessWidget {

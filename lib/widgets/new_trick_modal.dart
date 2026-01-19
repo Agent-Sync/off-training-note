@@ -41,6 +41,14 @@ class _NewTrickModalState extends State<NewTrickModal> {
     super.dispose();
   }
 
+  bool get _isBackOrFront {
+    final value = _axisController.text.trim().toLowerCase();
+    return value == 'back' ||
+        value == 'front' ||
+        value == 'バック' ||
+        value == 'フロント';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -96,25 +104,6 @@ class _NewTrickModalState extends State<NewTrickModal> {
           ),
           const SizedBox(height: 16),
 
-          // Direction
-          _buildSectionLabel(TrickLabels.sectionDirection),
-          Row(
-            children: [
-              _buildSelectButton(
-                TrickLabels.directionLeft,
-                _direction == Direction.left,
-                () => setState(() => _direction = Direction.left),
-              ),
-              const SizedBox(width: 12),
-              _buildSelectButton(
-                TrickLabels.directionRight,
-                _direction == Direction.right,
-                () => setState(() => _direction = Direction.right),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
           if (widget.type == TrickType.air) ...[
             // Takeoff
             _buildSectionLabel(TrickLabels.sectionTakeoff),
@@ -147,7 +136,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 });
               },
               onSelected: (String selection) {
-                _axisController.text = selection;
+                setState(() {
+                  _axisController.text = selection;
+                });
               },
               fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
                 // Sync controllers
@@ -158,7 +149,11 @@ class _NewTrickModalState extends State<NewTrickModal> {
                   controller: controller,
                   focusNode: focusNode,
                   onEditingComplete: onEditingComplete,
-                  onChanged: (val) => _axisController.text = val,
+                  onChanged: (val) {
+                    setState(() {
+                      _axisController.text = val;
+                    });
+                  },
                   decoration: _inputDecoration('軸を選択'),
                 );
               },
@@ -167,31 +162,35 @@ class _NewTrickModalState extends State<NewTrickModal> {
           ],
 
           // Spin
-          _buildSectionLabel('スピン'),
-          Autocomplete<String>(
-            optionsBuilder: (TextEditingValue textEditingValue) {
-              return AppConstants.spins.map((e) => e.toString()).where((String option) {
-                return option.contains(textEditingValue.text);
-              });
-            },
-            onSelected: (String selection) {
-              _spinController.text = selection;
-            },
-            fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-               if (controller.text != _spinController.text) {
-                  controller.text = _spinController.text;
-                }
-              return TextField(
-                controller: controller,
-                focusNode: focusNode,
-                onEditingComplete: onEditingComplete,
-                onChanged: (val) => _spinController.text = val,
-                keyboardType: TextInputType.number,
-                decoration: _inputDecoration('0'),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
+          if (!_isBackOrFront) ...[
+            _buildSectionLabel('スピン'),
+            Autocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                return AppConstants.spins
+                    .map((e) => e.toString())
+                    .where((String option) {
+                  return option.contains(textEditingValue.text);
+                });
+              },
+              onSelected: (String selection) {
+                _spinController.text = selection;
+              },
+              fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                 if (controller.text != _spinController.text) {
+                    controller.text = _spinController.text;
+                  }
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  onEditingComplete: onEditingComplete,
+                  onChanged: (val) => _spinController.text = val,
+                  keyboardType: TextInputType.number,
+                  decoration: _inputDecoration('0'),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
 
           // Grab
           _buildSectionLabel('グラブ'),
@@ -222,18 +221,43 @@ class _NewTrickModalState extends State<NewTrickModal> {
           ),
           const SizedBox(height: 24),
 
+          if (!_isBackOrFront) ...[
+            // Direction
+            _buildSectionLabel(TrickLabels.sectionDirection),
+            Row(
+              children: [
+                _buildSelectButton(
+                  TrickLabels.directionLeft,
+                  _direction == Direction.left,
+                  () => setState(() => _direction = Direction.left),
+                ),
+                const SizedBox(width: 12),
+                _buildSelectButton(
+                  TrickLabels.directionRight,
+                  _direction == Direction.right,
+                  () => setState(() => _direction = Direction.right),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // Submit Button
           ElevatedButton(
             onPressed: () {
+              final spinValue =
+                  _isBackOrFront ? 0 : int.tryParse(_spinController.text) ?? 0;
+              final directionValue = _isBackOrFront ? null : _direction;
+
               widget.onAdd(
                 _stance,
                 widget.type == TrickType.air ? _takeoff : null,
                 _axisController.text.isEmpty ? null : _axisController.text,
-                int.tryParse(_spinController.text) ?? 0,
+                spinValue,
                 _grabController.text.isEmpty
                     ? TrickLabels.grabNone
                     : _grabController.text,
-                _direction,
+                directionValue,
               );
               Navigator.pop(context);
             },
