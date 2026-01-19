@@ -354,7 +354,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
 
           // Submit Button
           ElevatedButton(
