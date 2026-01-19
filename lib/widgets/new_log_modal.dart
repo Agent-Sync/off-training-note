@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
 
 class NewLogModal extends StatefulWidget {
   final Function(String focus, String outcome) onAdd;
@@ -27,17 +28,7 @@ class _NewLogModalState extends State<NewLogModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: 24,
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+    return AppBottomSheetContainer(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

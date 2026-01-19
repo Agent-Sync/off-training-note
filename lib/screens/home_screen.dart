@@ -7,6 +7,7 @@ import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
+import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/new_trick_modal.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/trick_detail_sheet.dart';
@@ -57,10 +58,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _showNewTrickModal() {
     _dismissSearchFocus();
     _lockSearchFocus();
-    showModalBottomSheet(
+    showAppBottomSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => NewTrickModal(
         type: _activeTab,
         onAdd: (stance, takeoff, axis, spin, grab, direction) {
@@ -88,10 +87,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _showTrickDetail(Trick trick) {
     _dismissSearchFocus();
     _lockSearchFocus();
-    showModalBottomSheet(
+    showAppBottomSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => TrickDetailSheet(trick: trick),
     ).whenComplete(() {
       _dismissSearchFocus();

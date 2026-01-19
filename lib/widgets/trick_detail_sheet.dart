@@ -5,6 +5,7 @@ import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/new_log_modal.dart';
+import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class TrickDetailSheet extends ConsumerWidget {
@@ -23,11 +24,9 @@ class TrickDetailSheet extends ConsumerWidget {
       maxChildSize: 0.95,
       expand: false,
       builder: (_, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
+        return AppBottomSheetContainer(
+          padding: EdgeInsets.zero,
+          useKeyboardInset: false,
           child: Column(
             children: [
               // Handle
@@ -272,10 +271,8 @@ class TrickDetailSheet extends ConsumerWidget {
                 ),
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    showModalBottomSheet(
+                    showAppBottomSheet(
                       context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
                       builder: (context) => NewLogModal(
                         onAdd: (focus, outcome) {
                            ref

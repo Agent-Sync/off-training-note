@@ -4,6 +4,7 @@ import 'package:off_training_note/data/constants.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_labels.dart';
+import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
 
 const Duration _optionCloseDelay = Duration(milliseconds: 150);
 
@@ -44,73 +45,73 @@ class _NewTrickModalState extends State<NewTrickModal> {
     required ValueChanged<String> onSelected,
   }) async {
     String? tempSelected = selectedValue;
-    final selection = await showModalBottomSheet<String>(
+    final selection = await showAppBottomSheet<String>(
       context: context,
-      backgroundColor: Colors.white,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return SafeArea(
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.8,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textMain,
+        return AppBottomSheetContainer(
+          padding: EdgeInsets.zero,
+          useKeyboardInset: false,
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              return SafeArea(
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.8,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textMain,
+                              ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close, color: Colors.grey),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ],
+                            IconButton(
+                              icon: const Icon(Icons.close, color: Colors.grey),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Divider(height: 1, color: Colors.grey.shade200),
-                    Flexible(
-                      child: ListView.separated(
-                        padding: const EdgeInsets.all(24),
-                        itemCount: options.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final option = options[index];
-                          final isSelected = option == tempSelected;
-                          return _OptionItem(
-                            text: option,
-                            isSelected: isSelected,
-                            onTap: () async {
-                              setModalState(() => tempSelected = option);
-                              await Future.delayed(_optionCloseDelay);
-                              if (Navigator.of(context).canPop()) {
-                                Navigator.pop(context, option);
-                              }
-                            },
-                          );
-                        },
+                      Divider(height: 1, color: Colors.grey.shade200),
+                      Flexible(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(24),
+                          itemCount: options.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            final option = options[index];
+                            final isSelected = option == tempSelected;
+                            return _OptionItem(
+                              text: option,
+                              isSelected: isSelected,
+                              onTap: () async {
+                                setModalState(() => tempSelected = option);
+                                await Future.delayed(_optionCloseDelay);
+                                if (Navigator.of(context).canPop()) {
+                                  Navigator.pop(context, option);
+                                }
+                              },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );
@@ -126,18 +127,17 @@ class _NewTrickModalState extends State<NewTrickModal> {
     required String? selectedValue,
     required ValueChanged<String> onSelected,
   }) async {
-    final selection = await showModalBottomSheet<String>(
+    final selection = await showAppBottomSheet<String>(
       context: context,
-      backgroundColor: Colors.white,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (context) {
-        return _SearchableSheet(
-          title: title,
-          options: options,
-          selectedValue: selectedValue,
+        return AppBottomSheetContainer(
+          padding: EdgeInsets.zero,
+          useKeyboardInset: false,
+          child: _SearchableSheet(
+            title: title,
+            options: options,
+            selectedValue: selectedValue,
+          ),
         );
       },
     );
@@ -182,18 +182,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.only(
-          top: 24,
-          left: 24,
-          right: 24,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
+    return AppBottomSheetContainer(
+      child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
