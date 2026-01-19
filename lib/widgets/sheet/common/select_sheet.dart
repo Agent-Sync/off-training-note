@@ -83,6 +83,7 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
                 ],
               ),
             ),
+            const SizedBox(height: 24),
             Divider(height: 1, color: Colors.grey.shade200),
             if (widget.enableSearch)
               Padding(
