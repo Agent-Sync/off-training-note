@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -21,15 +23,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   TrickType _activeTab = TrickType.air;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   final _uuid = const Uuid();
+  Timer? _searchFocusTimer;
+  bool _suppressSearchFocus = false;
 
   @override
   void dispose() {
+    _searchFocusTimer?.cancel();
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
+  void _lockSearchFocus() {
+    if (_suppressSearchFocus) {
+      return;
+    }
+    setState(() => _suppressSearchFocus = true);
+  }
+
+  void _unlockSearchFocusWithDelay() {
+    _searchFocusTimer?.cancel();
+    _searchFocusTimer = Timer(const Duration(milliseconds: 150), () {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _suppressSearchFocus = false);
+    });
+  }
+
   void _showNewTrickModal() {
+    _dismissSearchFocus();
+    _lockSearchFocus();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -52,16 +78,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ref.read(tricksProvider.notifier).addTrick(newTrick);
         },
       ),
-    );
+    ).whenComplete(() {
+      _dismissSearchFocus();
+      _unlockSearchFocusWithDelay();
+    });
   }
 
   void _showTrickDetail(Trick trick) {
+    _dismissSearchFocus();
+    _lockSearchFocus();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => TrickDetailSheet(trick: trick),
-    );
+    ).whenComplete(() {
+      _dismissSearchFocus();
+      _unlockSearchFocusWithDelay();
+    });
   }
 
   void _dismissSearchFocus() {
@@ -210,6 +244,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               child: TextField(
                 controller: _searchController,
+                focusNode: _searchFocusNode,
+                canRequestFocus: !_suppressSearchFocus,
                 onChanged: (val) {
                   setState(() {
                     _searchQuery = val;
