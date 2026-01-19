@@ -21,6 +21,7 @@ class TrickDetailSheet extends ConsumerWidget {
       initialChildSize: 0.85,
       minChildSize: 0.5,
       maxChildSize: 0.95,
+      expand: false,
       builder: (_, scrollController) {
         return Container(
           decoration: const BoxDecoration(
