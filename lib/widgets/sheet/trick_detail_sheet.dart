@@ -4,8 +4,8 @@ import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
-import 'package:off_training_note/widgets/new_log_modal.dart';
-import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
+import 'package:off_training_note/widgets/sheet/new_log_modal.dart';
+import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class TrickDetailSheet extends ConsumerWidget {
@@ -25,49 +25,32 @@ class TrickDetailSheet extends ConsumerWidget {
       expand: false,
       builder: (_, scrollController) {
         return AppBottomSheetContainer(
-          padding: EdgeInsets.zero,
           useKeyboardInset: false,
           child: Column(
             children: [
-              // Handle
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 20),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-
               // Title Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textMain,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+              Column(
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textMain,
                     ),
-                    const SizedBox(height: 12),
-                    // Tags
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: tags.map(_buildTag).toList(),
-                    ),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  // Tags
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: tags.map(_buildTag).toList(),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
               Divider(height: 1, color: Colors.grey.shade200),
@@ -105,7 +88,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       )
                     : ListView.builder(
                         controller: scrollController,
-                        padding: const EdgeInsets.all(24),
+                        padding: const EdgeInsets.only(bottom: 24),
                         itemCount: trick.logs.length + 1, // +1 for spacer
                         itemBuilder: (context, index) {
                           if (index == trick.logs.length) {
@@ -264,8 +247,6 @@ class TrickDetailSheet extends ConsumerWidget {
               // Bottom Button
               Padding(
                 padding: EdgeInsets.only(
-                  left: 24,
-                  right: 24,
                   bottom: MediaQuery.of(context).viewInsets.bottom + 24,
                   top: 16,
                 ),

@@ -7,10 +7,10 @@ import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
-import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
-import 'package:off_training_note/widgets/new_trick_modal.dart';
+import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
+import 'package:off_training_note/widgets/sheet/new_trick_modal.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
-import 'package:off_training_note/widgets/trick_detail_sheet.dart';
+import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
 import 'package:uuid/uuid.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {

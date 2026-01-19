@@ -4,11 +4,12 @@ const Color kBottomSheetBackgroundColor = Colors.white;
 const BorderRadius kBottomSheetBorderRadius =
     BorderRadius.vertical(top: Radius.circular(24));
 const EdgeInsets kBottomSheetContentPadding = EdgeInsets.only(
-  top: 24,
+  top: 0,
   left: 24,
   right: 24,
   bottom: 24,
 );
+const double kBottomSheetTopGap = 20;
 
 Future<T?> showAppBottomSheet<T>({
   required BuildContext context,
@@ -38,13 +39,17 @@ class AppBottomSheetContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomInset =
         useKeyboardInset ? MediaQuery.of(context).viewInsets.bottom : 0.0;
+    final content = Padding(
+      padding: const EdgeInsets.only(top: kBottomSheetTopGap),
+      child: child,
+    );
     return Container(
       padding: padding.add(EdgeInsets.only(bottom: bottomInset)),
       decoration: BoxDecoration(
         color: kBottomSheetBackgroundColor,
         borderRadius: kBottomSheetBorderRadius,
       ),
-      child: child,
+      child: content,
     );
   }
 }

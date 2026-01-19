@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/theme/app_theme.dart';
-import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
+import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
 class NewLogModal extends StatefulWidget {
   final Function(String focus, String outcome) onAdd;

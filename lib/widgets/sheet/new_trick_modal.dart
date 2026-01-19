@@ -4,7 +4,7 @@ import 'package:off_training_note/data/constants.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_labels.dart';
-import 'package:off_training_note/widgets/common/app_bottom_sheet.dart';
+import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
 const Duration _optionCloseDelay = Duration(milliseconds: 150);
 
@@ -667,8 +667,8 @@ class _SearchableSheetState extends State<_SearchableSheet> {
                   ),
                 ],
               ),
-            ),
-            Divider(height: 1, color: Colors.grey.shade200),
+          ),
+          Divider(height: 1, color: Colors.grey.shade200),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: TextField(
