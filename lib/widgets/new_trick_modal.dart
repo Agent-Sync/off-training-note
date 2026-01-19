@@ -264,29 +264,34 @@ class _NewTrickModalState extends State<NewTrickModal> {
           ],
 
           // Spin
-          _buildSectionLabel('スピン'),
-          TextField(
-            controller: _spinController,
-            readOnly: true,
-            enabled: !_isBackOrFront,
-            showCursor: false,
-            enableInteractiveSelection: false,
-            onTap: _isBackOrFront
-                ? null
-                : () {
-                    _showOptionSheet(
-                      title: 'スピンを選択',
-                      options:
-                          AppConstants.spins.map((e) => e.toString()).toList(),
-                      selectedValue: _spinController.text.isEmpty
-                          ? null
-                          : _spinController.text,
-                      onSelected: (value) {
-                        setState(() => _spinController.text = value);
-                      },
-                    );
+          _buildSectionLabel('スピン', enabled: !_isBackOrFront),
+          AbsorbPointer(
+            absorbing: _isBackOrFront,
+            child: TextField(
+              controller: _spinController,
+              readOnly: true,
+              showCursor: false,
+              enableInteractiveSelection: false,
+              style: TextStyle(
+                color: _isBackOrFront
+                    ? AppTheme.textHint.withOpacity(0.5)
+                    : AppTheme.textMain,
+              ),
+              onTap: () {
+                _showOptionSheet(
+                  title: 'スピンを選択',
+                  options:
+                      AppConstants.spins.map((e) => e.toString()).toList(),
+                  selectedValue: _spinController.text.isEmpty
+                      ? null
+                      : _spinController.text,
+                  onSelected: (value) {
+                    setState(() => _spinController.text = value);
                   },
-            decoration: _inputDecoration('0', enabled: !_isBackOrFront),
+                );
+              },
+              decoration: _inputDecoration('0'),
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -353,7 +358,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
           const SizedBox(height: 24),
 
           // Direction
-          _buildSectionLabel(TrickLabels.sectionDirection),
+          _buildSectionLabel(
+            TrickLabels.sectionDirection,
+            enabled: !_isBackOrFront,
+          ),
           Row(
             children: [
               _buildSelectButton(
@@ -412,15 +420,18 @@ class _NewTrickModalState extends State<NewTrickModal> {
     );
   }
 
-  Widget _buildSectionLabel(String text) {
+  Widget _buildSectionLabel(String text, {bool enabled = true}) {
+    final labelColor = enabled
+        ? AppTheme.textSecondary
+        : AppTheme.textHint.withOpacity(0.5);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppTheme.textSecondary,
+          color: labelColor,
         ),
       ),
     );
