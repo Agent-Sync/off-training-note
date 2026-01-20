@@ -4,21 +4,21 @@ import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
-class NewLogModal extends StatefulWidget {
+class LogFormSheet extends StatefulWidget {
   final Function(String focus, String outcome, String? condition, String? size) onAdd;
   final TechLog? initialLog;
 
-  const NewLogModal({
+  const LogFormSheet({
     super.key,
     required this.onAdd,
     this.initialLog,
   });
 
   @override
-  State<NewLogModal> createState() => _NewLogModalState();
+  State<LogFormSheet> createState() => _LogFormSheetState();
 }
 
-class _NewLogModalState extends State<NewLogModal> {
+class _LogFormSheetState extends State<LogFormSheet> {
   late final TextEditingController _focusController;
   late final TextEditingController _outcomeController;
   String? _selectedCondition;
@@ -52,28 +52,30 @@ class _NewLogModalState extends State<NewLogModal> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                _isEditing ? 'メモを編集' : '新しいメモ',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textMain,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _isEditing ? 'メモを編集' : '新しいメモ',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMain,
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.grey),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.grey),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
 
           // Focus Input
           const Text(
@@ -179,61 +181,62 @@ class _NewLogModalState extends State<NewLogModal> {
 
           const SizedBox(height: 32),
 
-          // Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+            // Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(color: Colors.grey.shade300),
                     ),
-                    side: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  child: const Text(
-                    'キャンセル',
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontWeight: FontWeight.bold,
+                    child: const Text(
+                      'キャンセル',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _isValid
-                      ? () {
-                          widget.onAdd(
-                            _focusController.text,
-                            _outcomeController.text,
-                            _selectedCondition,
-                            _selectedSize,
-                          );
-                          Navigator.pop(context);
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.grey.shade300,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isValid
+                        ? () {
+                            widget.onAdd(
+                              _focusController.text,
+                              _outcomeController.text,
+                              _selectedCondition,
+                              _selectedSize,
+                            );
+                            Navigator.pop(context);
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade300,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: _isValid ? 4 : 0,
                     ),
-                    elevation: _isValid ? 4 : 0,
-                  ),
-                  child: Text(
-                    _isEditing ? '更新する' : '追加する',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    child: Text(
+                      _isEditing ? '更新する' : '追加する',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
+              ],
+            ),
             ],
           ),
-          ],
         ),
       ),
     );

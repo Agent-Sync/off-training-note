@@ -8,7 +8,7 @@ import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
-import 'package:off_training_note/widgets/sheet/new_log_modal.dart';
+import 'package:off_training_note/widgets/sheet/log_form_sheet.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -297,7 +297,7 @@ class TrickDetailSheet extends ConsumerWidget {
                   onPressed: () {
                     showAppBottomSheet(
                       context: context,
-                      builder: (context) => NewLogModal(
+                      builder: (context) => LogFormSheet(
                         onAdd: (focus, outcome, condition, size) {
                            ref
                               .read(tricksProvider.notifier)
@@ -346,7 +346,7 @@ class TrickDetailSheet extends ConsumerWidget {
                 Navigator.pop(context); // Close menu
                 showAppBottomSheet(
                   context: context,
-                  builder: (context) => NewLogModal(
+                  builder: (context) => LogFormSheet(
                     initialLog: log,
                     onAdd: (focus, outcome, condition, size) {
                       final updatedLog = log.copyWith(
