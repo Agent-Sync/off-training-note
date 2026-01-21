@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_memo.dart';
-import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/models/air_trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
@@ -13,7 +13,7 @@ import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class TrickDetailSheet extends ConsumerWidget {
-  final Trick trick;
+  final AirTrick trick;
 
   const TrickDetailSheet({super.key, required this.trick});
 

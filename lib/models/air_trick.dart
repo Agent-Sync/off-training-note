@@ -1,10 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 
-part 'trick.freezed.dart';
-part 'trick.g.dart';
-
-enum TrickType { air, jib }
+part 'air_trick.freezed.dart';
+part 'air_trick.g.dart';
 
 enum Stance { regular, switchStance } // 'switch' is a keyword in Dart
 
@@ -13,10 +11,9 @@ enum Takeoff { standard, carving }
 enum Direction { none, left, right }
 
 @freezed
-abstract class Trick with _$Trick {
-  const factory Trick({
+abstract class AirTrick with _$AirTrick {
+  const factory AirTrick({
     required String id,
-    required TrickType type,
     required Stance stance,
     required Takeoff takeoff,
     required String axis,
@@ -25,7 +22,6 @@ abstract class Trick with _$Trick {
     required Direction direction,
     required List<TechMemo> memos,
     required DateTime createdAt,
-    required DateTime updatedAt,
   }) = _Trick;
 
   static const spins = [
@@ -76,5 +72,6 @@ abstract class Trick with _$Trick {
     'タイパン',
   ];
 
-  factory Trick.fromJson(Map<String, dynamic> json) => _$TrickFromJson(json);
+  factory AirTrick.fromJson(Map<String, dynamic> json) =>
+      _$AirTrickFromJson(json);
 }

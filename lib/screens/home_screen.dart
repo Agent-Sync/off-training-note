@@ -3,11 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/models/jib_trick.dart';
+import 'package:off_training_note/models/air_trick.dart';
+import 'package:off_training_note/providers/jib_tricks_provider.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
+import 'package:off_training_note/widgets/jib_trick_card.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
+import 'package:off_training_note/widgets/sheet/new_jib_modal.dart';
 import 'package:off_training_note/widgets/sheet/new_trick_modal.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
@@ -20,9 +24,11 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
+enum _HomeTab { air, jib }
+
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   static const double _searchBarOverlap = 72;
-  TrickType _activeTab = TrickType.air;
+  _HomeTab _activeTab = _HomeTab.air;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -58,25 +64,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _showNewTrickModal() {
     _dismissSearchFocus();
     _lockSearchFocus();
+    if (_activeTab == _HomeTab.air) {
+      showAppBottomSheet(
+        context: context,
+        builder: (context) => NewTrickModal(
+          onAdd: (stance, takeoff, axis, spin, grab, direction) {
+            final newTrick = AirTrick(
+              id: _uuid.v4(),
+              stance: stance,
+              takeoff: takeoff,
+              axis: axis,
+              spin: spin,
+              grab: grab,
+              direction: direction,
+              memos: [],
+              createdAt: DateTime.now(),
+            );
+            ref.read(tricksProvider.notifier).addTrick(newTrick);
+          },
+        ),
+      ).whenComplete(() {
+        _dismissSearchFocus();
+        _unlockSearchFocusWithDelay();
+      });
+      return;
+    }
+
     showAppBottomSheet(
       context: context,
-      builder: (context) => NewTrickModal(
-        type: _activeTab,
-        onAdd: (stance, takeoff, axis, spin, grab, direction) {
-          final newTrick = Trick(
-            id: _uuid.v4(),
-            type: _activeTab,
-            stance: stance,
-            takeoff: takeoff,
-            axis: axis,
-            spin: spin,
-            grab: grab,
-            direction: direction,
-            memos: [],
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          );
-          ref.read(tricksProvider.notifier).addTrick(newTrick);
+      builder: (context) => NewJibModal(
+        onAdd: (customName) {
+          ref.read(jibTricksProvider.notifier).addJibTrick(customName);
         },
       ),
     ).whenComplete(() {
@@ -85,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  void _showTrickDetail(Trick trick) {
+  void _showTrickDetail(AirTrick trick) {
     _dismissSearchFocus();
     _lockSearchFocus();
     showAppBottomSheet(
@@ -104,14 +122,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final allTricks = ref.watch(tricksProvider);
+    final allJibTricks = ref.watch(jibTricksProvider);
 
     final filteredTricks = allTricks
-        .where((t) => t.type == _activeTab)
         .where((t) => t.matchesQuery(_searchQuery))
         .toList();
 
-    // Sort by updated at desc
-    filteredTricks.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    final filteredJibTricks = allJibTricks
+        .where(
+          (jib) =>
+              jib.customName.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
+        .toList();
+
+    DateTime latestMemoAt(AirTrick trick) {
+      if (trick.memos.isEmpty) return trick.createdAt;
+      return trick.memos
+          .map((memo) => memo.updatedAt)
+          .reduce((a, b) => a.isAfter(b) ? a : b);
+    }
+
+    // Sort by latest memo desc, fall back to createdAt
+    filteredTricks.sort((a, b) => latestMemoAt(b).compareTo(latestMemoAt(a)));
+    filteredJibTricks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    final content = _activeTab == _HomeTab.air
+        ? _buildTrickContent(filteredTricks)
+        : _buildJibContent(filteredJibTricks);
 
     return Scaffold(
       body: GestureDetector(
@@ -128,7 +165,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Expanded(
                   child: Stack(
                     children: [
-                      _buildContent(filteredTricks),
+                      content,
                       Positioned(
                         top: 0,
                         left: 0,
@@ -163,7 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildContent(List<Trick> filteredTricks) {
+  Widget _buildTrickContent(List<AirTrick> filteredTricks) {
     if (filteredTricks.isEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: _searchBarOverlap),
@@ -184,7 +221,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildTabButton(String label, TrickType type) {
+  Widget _buildJibContent(List<JibTrick> filteredJibTricks) {
+    if (filteredJibTricks.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: _searchBarOverlap),
+        child: _buildEmptyState(),
+      );
+    }
+
+    return MasonryGridView.count(
+      padding: const EdgeInsets.fromLTRB(16, 8 + _searchBarOverlap, 16, 100),
+      crossAxisCount: 2,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      itemCount: filteredJibTricks.length,
+      itemBuilder: (context, index) {
+        final jib = filteredJibTricks[index];
+        return JibTrickCard(jibTrick: jib);
+      },
+    );
+  }
+
+  Widget _buildTabButton(String label, _HomeTab type) {
     final isActive = _activeTab == type;
     return Expanded(
       child: GestureDetector(
@@ -228,7 +286,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               AnimatedAlign(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOut,
-                alignment: _activeTab == TrickType.air
+                alignment: _activeTab == _HomeTab.air
                     ? Alignment.centerLeft
                     : Alignment.centerRight,
                 child: Container(
@@ -243,8 +301,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               Row(
                 children: [
-                  _buildTabButton('AIR', TrickType.air),
-                  _buildTabButton('JIB', TrickType.jib),
+                  _buildTabButton('AIR', _HomeTab.air),
+                  _buildTabButton('JIB', _HomeTab.jib),
                 ],
               ),
             ],

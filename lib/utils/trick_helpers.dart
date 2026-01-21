@@ -1,4 +1,4 @@
-import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/models/air_trick.dart';
 
 const _stanceSwitchLabel = 'スイッチ';
 const _takeoffCarvingLabel = 'カービング';
@@ -10,7 +10,7 @@ const _directionLeftLabel = 'レフト';
 const _directionRightLabel = 'ライト';
 const _takeoffStandardLabel = 'ストレート';
 
-extension TrickHelpers on Trick {
+extension TrickHelpers on AirTrick {
   String displayName() {
     final parts = <String>[];
 

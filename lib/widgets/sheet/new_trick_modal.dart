@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/models/air_trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/form/two_option_toggle.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
@@ -8,7 +8,6 @@ import 'package:off_training_note/widgets/sheet/grab_select_sheet.dart';
 import 'package:off_training_note/widgets/sheet/spin_select_sheet.dart';
 
 class NewTrickModal extends StatefulWidget {
-  final TrickType type;
   final Function(
     Stance stance,
     Takeoff takeoff,
@@ -19,7 +18,7 @@ class NewTrickModal extends StatefulWidget {
   )
   onAdd;
 
-  const NewTrickModal({super.key, required this.type, required this.onAdd});
+  const NewTrickModal({super.key, required this.onAdd});
 
   @override
   State<NewTrickModal> createState() => _NewTrickModalState();
@@ -121,7 +120,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
   }
 
   bool get _isAxisMissing {
-    return widget.type == TrickType.air && _axisController.text.isEmpty;
+    return _axisController.text.isEmpty;
   }
 
   bool get _isSpinMissing {
@@ -152,7 +151,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '新しい${widget.type == TrickType.air ? 'エア' : 'ジブ'}トリック',
+                  '新しいエアトリック',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -179,55 +178,53 @@ class _NewTrickModalState extends State<NewTrickModal> {
             ),
             const SizedBox(height: 16),
 
-            if (widget.type == TrickType.air) ...[
-              // Takeoff
-              _buildSectionLabel('テイクオフ'),
-              TwoOptionToggle(
-                leftLabel: 'ストレート',
-                rightLabel: 'カービング',
-                isLeftSelected: _takeoff == Takeoff.standard,
-                onLeftTap: () => setState(() => _takeoff = Takeoff.standard),
-                onRightTap: () => setState(() => _takeoff = Takeoff.carving),
-              ),
-              const SizedBox(height: 16),
+            // Takeoff
+            _buildSectionLabel('テイクオフ'),
+            TwoOptionToggle(
+              leftLabel: 'ストレート',
+              rightLabel: 'カービング',
+              isLeftSelected: _takeoff == Takeoff.standard,
+              onLeftTap: () => setState(() => _takeoff = Takeoff.standard),
+              onRightTap: () => setState(() => _takeoff = Takeoff.carving),
+            ),
+            const SizedBox(height: 16),
 
-              // Axis
-              _buildSectionLabel(
-                '軸',
+            // Axis
+            _buildSectionLabel(
+              '軸',
+              showError: _showValidation && _isAxisMissing,
+            ),
+            TextField(
+              controller: _axisController,
+              readOnly: true,
+              showCursor: false,
+              enableInteractiveSelection: false,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+              onTap: () {
+                _showAxisSheet(
+                  options: AirTrick.axes,
+                  selectedValue: _axisController.text.isEmpty
+                      ? null
+                      : _axisController.text,
+                  onSelected: (value) {
+                    setState(() {
+                      _axisController.text = value;
+                      if (_isBackOrFrontValue(value)) {
+                        _spinController.text = '0';
+                        _direction = Direction.none;
+                      } else if (_direction == Direction.none) {
+                        _direction = Direction.left;
+                      }
+                    });
+                  },
+                );
+              },
+              decoration: _inputDecoration(
+                '軸を選択',
                 showError: _showValidation && _isAxisMissing,
               ),
-              TextField(
-                controller: _axisController,
-                readOnly: true,
-                showCursor: false,
-                enableInteractiveSelection: false,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-                onTap: () {
-                  _showAxisSheet(
-                    options: Trick.axes,
-                    selectedValue: _axisController.text.isEmpty
-                        ? null
-                        : _axisController.text,
-                    onSelected: (value) {
-                      setState(() {
-                        _axisController.text = value;
-                        if (_isBackOrFrontValue(value)) {
-                          _spinController.text = '0';
-                          _direction = Direction.none;
-                        } else if (_direction == Direction.none) {
-                          _direction = Direction.left;
-                        }
-                      });
-                    },
-                  );
-                },
-                decoration: _inputDecoration(
-                  '軸を選択',
-                  showError: _showValidation && _isAxisMissing,
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
+            ),
+            const SizedBox(height: 16),
 
             // Spin
             _buildSectionLabel(
@@ -250,7 +247,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 ),
                 onTap: () {
                   _showSpinSheet(
-                    options: Trick.spins.map((e) => e.toString()).toList(),
+                    options: AirTrick.spins.map((e) => e.toString()).toList(),
                     selectedValue: _spinController.text.isEmpty
                         ? null
                         : _spinController.text,
@@ -289,7 +286,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               onTap: () {
                 _showSearchableOptionSheet(
                   title: 'グラブを選択',
-                  options: Trick.grabs,
+                  options: AirTrick.grabs,
                   selectedValue: _grabController.text.isEmpty
                       ? null
                       : _grabController.text,
