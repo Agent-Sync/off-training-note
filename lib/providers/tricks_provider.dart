@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
-import 'package:off_training_note/utils/trick_labels.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -101,17 +100,17 @@ class TricksNotifier extends Notifier<List<Trick>> {
 
   static final List<Trick> _initialTricks = [
     Trick(
-      id: '1',
+      id: uuid.v4(),
       type: TrickType.air,
       stance: Stance.regular,
       direction: Direction.left,
       takeoff: Takeoff.carving,
-      axis: TrickLabels.axisFlat,
+      axis: '平軸',
       spin: 540,
       grab: 'ミュート',
       memos: [
         TechMemo(
-          id: 'l1',
+          id: uuid.v4(),
           focus: 'テイクオフで肩のラインを水平に保つ',
           outcome: '軸が安定して回転がスムーズになった',
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -119,7 +118,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           size: 'big',
         ),
         TechMemo(
-          id: 'l2',
+          id: uuid.v4(),
           focus: '360の時点でランディングを見る',
           outcome: '着地が完璧に決まった',
           createdAt: DateTime.now().subtract(const Duration(days: 5)),
@@ -131,7 +130,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       updatedAt: DateTime.now(),
     ),
     Trick(
-      id: '3',
+      id: uuid.v4(),
       type: TrickType.air,
       stance: Stance.regular,
       direction: Direction.right,
@@ -141,7 +140,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       grab: 'セーフティ',
       memos: [
         TechMemo(
-          id: 'l_c7_1',
+          id: uuid.v4(),
           focus: '右肩を下げながら抜ける',
           outcome: 'しっかり軸が入った',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -153,17 +152,17 @@ class TricksNotifier extends Notifier<List<Trick>> {
       updatedAt: DateTime.now().subtract(const Duration(hours: 12)),
     ),
     Trick(
-      id: '4',
+      id: uuid.v4(),
       type: TrickType.air,
       stance: Stance.switchStance,
       direction: Direction.left,
       takeoff: Takeoff.standard,
-      axis: TrickLabels.axisFlat,
+      axis: '平軸',
       spin: 540,
       grab: 'ジャパン',
       memos: [
         TechMemo(
-          id: 'l_sw5_1',
+          id: uuid.v4(),
           focus: '目線を先行させる',
           outcome: '回転不足が解消',
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -175,17 +174,17 @@ class TricksNotifier extends Notifier<List<Trick>> {
       updatedAt: DateTime.now().subtract(const Duration(days: 3)),
     ),
     Trick(
-      id: '2',
+      id: uuid.v4(),
       type: TrickType.jib,
       stance: Stance.switchStance,
       direction: Direction.right,
       takeoff: Takeoff.standard,
-      axis: TrickLabels.axisFlat,
+      axis: '平軸',
       spin: 270,
-      grab: TrickLabels.grabNone,
+      grab: 'なし',
       memos: [
         TechMemo(
-          id: 'l3',
+          id: uuid.v4(),
           focus: 'リップで早めに弾く',
           outcome: 'ギャップを余裕で越えられた',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),

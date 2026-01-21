@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:off_training_note/data/constants.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
-import 'package:off_training_note/utils/trick_labels.dart';
 import 'package:off_training_note/widgets/form/two_option_toggle.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/axis_select_sheet.dart';
@@ -174,8 +172,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
           // Stance
           _buildSectionLabel('スタンス'),
           TwoOptionToggle(
-            leftLabel: TrickLabels.stanceRegular,
-            rightLabel: TrickLabels.stanceSwitch,
+            leftLabel: 'レギュラー',
+            rightLabel: 'スイッチ',
             isLeftSelected: _stance == Stance.regular,
             onLeftTap: () => setState(() => _stance = Stance.regular),
             onRightTap: () => setState(() => _stance = Stance.switchStance),
@@ -184,10 +182,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
           if (widget.type == TrickType.air) ...[
             // Takeoff
-            _buildSectionLabel(TrickLabels.sectionTakeoff),
+            _buildSectionLabel('テイクオフ'),
             TwoOptionToggle(
-              leftLabel: TrickLabels.takeoffStandard,
-              rightLabel: TrickLabels.takeoffCarving,
+              leftLabel: 'ストレート',
+              rightLabel: 'カービング',
               isLeftSelected: _takeoff == Takeoff.standard,
               onLeftTap: () => setState(() => _takeoff = Takeoff.standard),
               onRightTap: () => setState(() => _takeoff = Takeoff.carving),
@@ -196,7 +194,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
             // Axis
             _buildSectionLabel(
-              TrickLabels.sectionAxis,
+              '軸',
               showError: _showValidation && _isAxisMissing,
             ),
             TextField(
@@ -207,7 +205,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               style: const TextStyle(fontWeight: FontWeight.w600),
               onTap: () {
                 _showAxisSheet(
-                  options: AppConstants.axes,
+                  options: Trick.axes,
                   selectedValue: _axisController.text.isEmpty
                       ? null
                       : _axisController.text,
@@ -252,7 +250,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               onTap: () {
                 _showSpinSheet(
                   options:
-                      AppConstants.spins.map((e) => e.toString()).toList(),
+                      Trick.spins.map((e) => e.toString()).toList(),
                   selectedValue: _spinController.text.isEmpty
                       ? null
                       : _spinController.text,
@@ -284,7 +282,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
             onTap: () {
               _showSearchableOptionSheet(
                 title: 'グラブを選択',
-                options: AppConstants.grabs,
+                options: Trick.grabs,
                 selectedValue: _grabController.text.isEmpty
                     ? null
                     : _grabController.text,
@@ -302,12 +300,12 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
           // Direction
           _buildSectionLabel(
-            TrickLabels.sectionDirection,
+            '方向',
             enabled: !_isBackOrFront,
           ),
           TwoOptionToggle(
-            leftLabel: TrickLabels.directionLeft,
-            rightLabel: TrickLabels.directionRight,
+            leftLabel: 'レフト',
+            rightLabel: 'ライト',
             isLeftSelected: _direction == Direction.left,
             onLeftTap: () => setState(() => _direction = Direction.left),
             onRightTap: () => setState(() => _direction = Direction.right),
@@ -330,11 +328,11 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 _stance,
                 _takeoff,
                 _axisController.text.trim().isEmpty
-                    ? TrickLabels.axisFlat
+                    ? '平軸'
                     : _axisController.text.trim(),
                 spinValue,
                 _grabController.text.isEmpty
-                    ? TrickLabels.grabNone
+                    ? 'なし'
                     : _grabController.text,
                 directionValue,
               );
