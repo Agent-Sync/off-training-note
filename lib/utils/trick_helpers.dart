@@ -15,7 +15,12 @@ extension TrickHelpers on Trick {
     final parts = <String>[];
 
     if (stance == Stance.regular && spin == 0) {
-      parts.add(_takeoffStandardLabel);
+      if (takeoff == Takeoff.carving) {
+        parts.add(_takeoffCarvingLabel);
+        parts.add(_takeoffStandardLabel);
+      } else {
+        parts.add(_takeoffStandardLabel);
+      }
       if (grab != _grabNoneLabel) {
         parts.add(grab);
       }
