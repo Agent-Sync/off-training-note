@@ -34,6 +34,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _grabController = TextEditingController();
   bool _showValidation = false;
 
+  bool get _isSpinZero => int.tryParse(_spinController.text) == 0;
+
   Future<void> _showAxisSheet({
     required List<String> options,
     required String? selectedValue,
@@ -251,7 +253,14 @@ class _NewTrickModalState extends State<NewTrickModal> {
                         ? null
                         : _spinController.text,
                     onSelected: (value) {
-                      setState(() => _spinController.text = value);
+                      setState(() {
+                        _spinController.text = value;
+                        if (value == '0') {
+                          _direction = Direction.none;
+                        } else if (_direction == Direction.none) {
+                          _direction = Direction.left;
+                        }
+                      });
                     },
                   );
                 },
@@ -295,14 +304,14 @@ class _NewTrickModalState extends State<NewTrickModal> {
             const SizedBox(height: 24),
 
             // Direction
-            _buildSectionLabel('方向', enabled: !_isBackOrFront),
+            _buildSectionLabel('方向', enabled: !_isBackOrFront && !_isSpinZero),
             TwoOptionToggle(
               leftLabel: 'レフト',
               rightLabel: 'ライト',
               isLeftSelected: _direction == Direction.left,
               onLeftTap: () => setState(() => _direction = Direction.left),
               onRightTap: () => setState(() => _direction = Direction.right),
-              enabled: !_isBackOrFront,
+              enabled: !_isBackOrFront && !_isSpinZero,
             ),
             const SizedBox(height: 24),
 
@@ -316,7 +325,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 final spinValue = _isBackOrFront
                     ? 0
                     : int.tryParse(_spinController.text) ?? 0;
-                final directionValue = _isBackOrFront
+                final directionValue = _isBackOrFront || spinValue == 0
                     ? Direction.none
                     : (_direction == Direction.none
                           ? Direction.left

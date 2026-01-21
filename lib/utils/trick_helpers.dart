@@ -4,7 +4,7 @@ const _stanceSwitchLabel = 'スイッチ';
 const _takeoffCarvingLabel = 'カービング';
 const _axisFlatLabel = '平軸';
 const _grabNoneLabel = 'なし';
-const _defaultAirLabel = 'ストレートエア';
+const _defaultAirLabel = 'ストレート';
 const _stanceRegularLabel = 'レギュラー';
 const _directionLeftLabel = 'レフト';
 const _directionRightLabel = 'ライト';
@@ -13,6 +13,14 @@ const _takeoffStandardLabel = 'ストレート';
 extension TrickHelpers on Trick {
   String displayName() {
     final parts = <String>[];
+
+    if (stance == Stance.regular && spin == 0) {
+      parts.add(_takeoffStandardLabel);
+      if (grab != _grabNoneLabel) {
+        parts.add(grab);
+      }
+      return parts.join(' ');
+    }
 
     if (stance == Stance.switchStance) {
       parts.add(_stanceSwitchLabel);
