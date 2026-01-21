@@ -47,7 +47,13 @@ class TricksNotifier extends Notifier<List<Trick>> {
     _saveTricks();
   }
 
-  void addMemo(String trickId, String focus, String outcome, {String? condition, String? size}) {
+  void addMemo(
+    String trickId,
+    String focus,
+    String outcome, {
+    MemoCondition condition = MemoCondition.none,
+    MemoSize size = MemoSize.none,
+  }) {
     state = state.map((trick) {
       if (trick.id == trickId) {
         final newMemo = TechMemo(
@@ -114,16 +120,16 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: 'テイクオフで肩のラインを水平に保つ',
           outcome: '軸が安定して回転がスムーズになった',
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
-          condition: 'snow',
-          size: 'big',
+          condition: MemoCondition.snow,
+          size: MemoSize.big,
         ),
         TechMemo(
           id: uuid.v4(),
           focus: '360の時点でランディングを見る',
           outcome: '着地が完璧に決まった',
           createdAt: DateTime.now().subtract(const Duration(days: 5)),
-          condition: 'snow',
-          size: 'middle',
+          condition: MemoCondition.snow,
+          size: MemoSize.middle,
         ),
       ],
       createdAt: DateTime.now(),
@@ -144,8 +150,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: '右肩を下げながら抜ける',
           outcome: 'しっかり軸が入った',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          condition: 'snow',
-          size: 'big',
+          condition: MemoCondition.snow,
+          size: MemoSize.big,
         ),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -166,8 +172,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: '目線を先行させる',
           outcome: '回転不足が解消',
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
-          condition: 'brush',
-          size: 'small',
+          condition: MemoCondition.brush,
+          size: MemoSize.small,
         ),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -188,8 +194,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
           focus: 'リップで早めに弾く',
           outcome: 'ギャップを余裕で越えられた',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          condition: 'snow',
-          size: 'small',
+          condition: MemoCondition.snow,
+          size: MemoSize.small,
         ),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 1)),

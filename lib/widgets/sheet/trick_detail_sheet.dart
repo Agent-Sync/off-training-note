@@ -527,16 +527,20 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  ConditionTagStyle? _getConditionStyle(String? condition) {
+  ConditionTagStyle? _getConditionStyle(MemoCondition condition) {
     return ConditionTags.style(condition);
   }
 
-  String? _getSizeLabel(String? size) {
+  String? _getSizeLabel(MemoSize size) {
     switch (size) {
-      case 'small': return 'スモール';
-      case 'middle': return 'ミドル';
-      case 'big': return 'ビッグ';
-      default: return null;
+      case MemoSize.small:
+        return 'スモール';
+      case MemoSize.middle:
+        return 'ミドル';
+      case MemoSize.big:
+        return 'ビッグ';
+      case MemoSize.none:
+        return null;
     }
   }
 }

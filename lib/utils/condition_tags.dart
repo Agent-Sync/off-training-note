@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:off_training_note/models/tech_memo.dart';
 
 class ConditionTagStyle {
   final String label;
@@ -15,26 +16,23 @@ class ConditionTagStyle {
 }
 
 class ConditionTags {
-  static const String snow = 'snow';
-  static const String brush = 'brush';
-
-  static ConditionTagStyle? style(String? condition) {
+  static ConditionTagStyle? style(MemoCondition condition) {
     switch (condition) {
-      case snow:
+      case MemoCondition.snow:
         return ConditionTagStyle(
           label: '雪',
           background: Colors.blue.shade50,
           text: Colors.blue.shade700,
           border: Colors.blue.shade200,
         );
-      case brush:
+      case MemoCondition.brush:
         return ConditionTagStyle(
           label: 'ブラシ',
           background: Colors.green.shade50,
           text: Colors.green.shade700,
           border: Colors.green.shade200,
         );
-      default:
+      case MemoCondition.none:
         return null;
     }
   }

@@ -5,7 +5,7 @@ import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
 class LogFormSheet extends StatefulWidget {
-  final Function(String focus, String outcome, String? condition, String? size) onAdd;
+  final Function(String focus, String outcome, MemoCondition condition, MemoSize size) onAdd;
   final TechMemo? initialMemo;
 
   const LogFormSheet({
@@ -21,8 +21,8 @@ class LogFormSheet extends StatefulWidget {
 class _LogFormSheetState extends State<LogFormSheet> {
   late final TextEditingController _focusController;
   late final TextEditingController _outcomeController;
-  String? _selectedCondition;
-  String? _selectedSize;
+  MemoCondition _selectedCondition = MemoCondition.none;
+  MemoSize _selectedSize = MemoSize.none;
 
   bool get _isEditing => widget.initialMemo != null;
 
@@ -31,8 +31,8 @@ class _LogFormSheetState extends State<LogFormSheet> {
     super.initState();
     _focusController = TextEditingController(text: widget.initialMemo?.focus ?? '');
     _outcomeController = TextEditingController(text: widget.initialMemo?.outcome ?? '');
-    _selectedCondition = widget.initialMemo?.condition;
-    _selectedSize = widget.initialMemo?.size;
+    _selectedCondition = widget.initialMemo?.condition ?? MemoCondition.none;
+    _selectedSize = widget.initialMemo?.size ?? MemoSize.none;
   }
 
   bool get _isValid =>
@@ -135,22 +135,22 @@ class _LogFormSheetState extends State<LogFormSheet> {
             runSpacing: 8,
             children: [
               _buildConditionChip(
-                ConditionTags.snow,
-                _selectedCondition == ConditionTags.snow,
+                MemoCondition.snow,
+                _selectedCondition == MemoCondition.snow,
                 () {
                   setState(() {
                     _selectedCondition =
-                        _selectedCondition == ConditionTags.snow ? null : ConditionTags.snow;
+                        _selectedCondition == MemoCondition.snow ? MemoCondition.none : MemoCondition.snow;
                   });
                 },
               ),
               _buildConditionChip(
-                ConditionTags.brush,
-                _selectedCondition == ConditionTags.brush,
+                MemoCondition.brush,
+                _selectedCondition == MemoCondition.brush,
                 () {
                   setState(() {
                     _selectedCondition =
-                        _selectedCondition == ConditionTags.brush ? null : ConditionTags.brush;
+                        _selectedCondition == MemoCondition.brush ? MemoCondition.none : MemoCondition.brush;
                   });
                 },
               ),
@@ -161,19 +161,19 @@ class _LogFormSheetState extends State<LogFormSheet> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _buildChoiceChip('スモール(~5m)', _selectedSize == 'small', () {
+              _buildChoiceChip('スモール(~5m)', _selectedSize == MemoSize.small, () {
                 setState(() {
-                  _selectedSize = _selectedSize == 'small' ? null : 'small';
+                  _selectedSize = _selectedSize == MemoSize.small ? MemoSize.none : MemoSize.small;
                 });
               }),
-              _buildChoiceChip('ミドル(~9m)', _selectedSize == 'middle', () {
+              _buildChoiceChip('ミドル(~9m)', _selectedSize == MemoSize.middle, () {
                 setState(() {
-                  _selectedSize = _selectedSize == 'middle' ? null : 'middle';
+                  _selectedSize = _selectedSize == MemoSize.middle ? MemoSize.none : MemoSize.middle;
                 });
               }),
-              _buildChoiceChip('ビッグ(10m~)', _selectedSize == 'big', () {
+              _buildChoiceChip('ビッグ(10m~)', _selectedSize == MemoSize.big, () {
                 setState(() {
-                  _selectedSize = _selectedSize == 'big' ? null : 'big';
+                  _selectedSize = _selectedSize == MemoSize.big ? MemoSize.none : MemoSize.big;
                 });
               }),
             ],
@@ -242,10 +242,14 @@ class _LogFormSheetState extends State<LogFormSheet> {
     );
   }
 
-  Widget _buildConditionChip(String conditionKey, bool selected, VoidCallback onSelected) {
+  Widget _buildConditionChip(
+    MemoCondition conditionKey,
+    bool selected,
+    VoidCallback onSelected,
+  ) {
     final style = ConditionTags.style(conditionKey);
     if (style == null) {
-      return _buildChoiceChip(conditionKey, selected, onSelected);
+      return _buildChoiceChip('なし', selected, onSelected);
     }
     return _buildChoiceChip(
       style.label,
