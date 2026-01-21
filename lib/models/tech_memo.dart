@@ -1,5 +1,5 @@
 
-class TechLog {
+class TechMemo {
   final String id;
   final String focus;
   final String outcome;
@@ -7,7 +7,7 @@ class TechLog {
   final String? condition; // 'snow', 'brush'
   final String? size; // 'small', 'middle', 'big'
 
-  TechLog({
+  TechMemo({
     required this.id,
     required this.focus,
     required this.outcome,
@@ -16,7 +16,7 @@ class TechLog {
     this.size,
   });
 
-  TechLog copyWith({
+  TechMemo copyWith({
     String? id,
     String? focus,
     String? outcome,
@@ -24,7 +24,7 @@ class TechLog {
     String? condition,
     String? size,
   }) {
-    return TechLog(
+    return TechMemo(
       id: id ?? this.id,
       focus: focus ?? this.focus,
       outcome: outcome ?? this.outcome,
@@ -45,8 +45,8 @@ class TechLog {
     };
   }
 
-  factory TechLog.fromJson(Map<String, dynamic> map) {
-    return TechLog(
+  factory TechMemo.fromJson(Map<String, dynamic> map) {
+    return TechMemo(
       id: map['id'],
       focus: map['focus'],
       outcome: map['outcome'],

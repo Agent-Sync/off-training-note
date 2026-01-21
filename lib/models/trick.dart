@@ -1,4 +1,4 @@
-import 'package:off_training_note/models/tech_log.dart';
+import 'package:off_training_note/models/tech_memo.dart';
 
 enum TrickType { air, jib }
 enum Stance { regular, switchStance } // 'switch' is a keyword in Dart
@@ -14,7 +14,7 @@ class Trick {
   final int spin;
   final String grab;
   final Direction? direction;
-  final List<TechLog> logs;
+  final List<TechMemo> memos;
   final DateTime updatedAt;
 
   Trick({
@@ -26,7 +26,7 @@ class Trick {
     required this.spin,
     required this.grab,
     this.direction,
-    required this.logs,
+    required this.memos,
     required this.updatedAt,
   });
 
@@ -39,7 +39,7 @@ class Trick {
     int? spin,
     String? grab,
     Direction? direction,
-    List<TechLog>? logs,
+    List<TechMemo>? memos,
     DateTime? updatedAt,
   }) {
     return Trick(
@@ -51,7 +51,7 @@ class Trick {
       spin: spin ?? this.spin,
       grab: grab ?? this.grab,
       direction: direction ?? this.direction,
-      logs: logs ?? this.logs,
+      memos: memos ?? this.memos,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -66,7 +66,7 @@ class Trick {
       'spin': spin,
       'grab': grab,
       'direction': direction?.name,
-      'logs': logs.map((x) => x.toJson()).toList(),
+      'memos': memos.map((x) => x.toJson()).toList(),
       'updatedAt': updatedAt.millisecondsSinceEpoch,
     };
   }
@@ -85,7 +85,9 @@ class Trick {
       direction: map['direction'] != null
           ? Direction.values.firstWhere((e) => e.name == map['direction'])
           : null,
-      logs: List<TechLog>.from(map['logs']?.map((x) => TechLog.fromJson(x)) ?? []),
+      memos: List<TechMemo>.from(
+        (map['memos'] ?? map['logs'])?.map((x) => TechMemo.fromJson(x)) ?? [],
+      ),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt']),
     );
   }

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:off_training_note/models/tech_log.dart';
+import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/utils/trick_labels.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,10 +48,10 @@ class TricksNotifier extends Notifier<List<Trick>> {
     _saveTricks();
   }
 
-  void addLog(String trickId, String focus, String outcome, {String? condition, String? size}) {
+  void addMemo(String trickId, String focus, String outcome, {String? condition, String? size}) {
     state = state.map((trick) {
       if (trick.id == trickId) {
-        final newLog = TechLog(
+        final newMemo = TechMemo(
           id: uuid.v4(),
           focus: focus,
           outcome: outcome,
@@ -60,7 +60,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           size: size,
         );
         return trick.copyWith(
-          logs: [newLog, ...trick.logs],
+          memos: [newMemo, ...trick.memos],
           updatedAt: DateTime.now(),
         );
       }
@@ -69,14 +69,14 @@ class TricksNotifier extends Notifier<List<Trick>> {
     _saveTricks();
   }
 
-  void updateLog(String trickId, TechLog updatedLog) {
+  void updateMemo(String trickId, TechMemo updatedMemo) {
     state = state.map((trick) {
       if (trick.id == trickId) {
-        final newLogs = trick.logs.map((log) {
-          return log.id == updatedLog.id ? updatedLog : log;
+        final newMemos = trick.memos.map((memo) {
+          return memo.id == updatedMemo.id ? updatedMemo : memo;
         }).toList();
         return trick.copyWith(
-          logs: newLogs,
+          memos: newMemos,
           updatedAt: DateTime.now(),
         );
       }
@@ -85,12 +85,12 @@ class TricksNotifier extends Notifier<List<Trick>> {
     _saveTricks();
   }
 
-  void deleteLog(String trickId, String logId) {
+  void deleteMemo(String trickId, String memoId) {
     state = state.map((trick) {
       if (trick.id == trickId) {
-        final newLogs = trick.logs.where((log) => log.id != logId).toList();
+        final newMemos = trick.memos.where((memo) => memo.id != memoId).toList();
         return trick.copyWith(
-          logs: newLogs,
+          memos: newMemos,
           updatedAt: DateTime.now(),
         );
       }
@@ -109,8 +109,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
       axis: TrickLabels.axisFlat,
       spin: 540,
       grab: 'ミュート',
-      logs: [
-        TechLog(
+      memos: [
+        TechMemo(
           id: 'l1',
           focus: 'テイクオフで肩のラインを水平に保つ',
           outcome: '軸が安定して回転がスムーズになった',
@@ -118,7 +118,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           condition: 'snow',
           size: 'big',
         ),
-        TechLog(
+        TechMemo(
           id: 'l2',
           focus: '360の時点でランディングを見る',
           outcome: '着地が完璧に決まった',
@@ -138,8 +138,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
       axis: 'コーク',
       spin: 720,
       grab: 'セーフティ',
-      logs: [
-        TechLog(
+      memos: [
+        TechMemo(
           id: 'l_c7_1',
           focus: '右肩を下げながら抜ける',
           outcome: 'しっかり軸が入った',
@@ -159,8 +159,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
       axis: TrickLabels.axisFlat,
       spin: 540,
       grab: 'ジャパン',
-      logs: [
-        TechLog(
+      memos: [
+        TechMemo(
           id: 'l_sw5_1',
           focus: '目線を先行させる',
           outcome: '回転不足が解消',
@@ -179,8 +179,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
       takeoff: Takeoff.standard,
       spin: 270,
       grab: TrickLabels.grabNone,
-      logs: [
-        TechLog(
+      memos: [
+        TechMemo(
           id: 'l3',
           focus: 'リップで早めに弾く',
           outcome: 'ギャップを余裕で越えられた',

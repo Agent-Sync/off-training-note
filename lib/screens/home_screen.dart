@@ -72,7 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             spin: spin,
             grab: grab,
             direction: direction,
-            logs: [],
+            memos: [],
             updatedAt: DateTime.now(),
           );
           ref.read(tricksProvider.notifier).addTrick(newTrick);

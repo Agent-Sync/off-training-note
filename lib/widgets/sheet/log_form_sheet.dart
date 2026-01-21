@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:off_training_note/models/tech_log.dart';
+import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
 class LogFormSheet extends StatefulWidget {
   final Function(String focus, String outcome, String? condition, String? size) onAdd;
-  final TechLog? initialLog;
+  final TechMemo? initialMemo;
 
   const LogFormSheet({
     super.key,
     required this.onAdd,
-    this.initialLog,
+    this.initialMemo,
   });
 
   @override
@@ -24,15 +24,15 @@ class _LogFormSheetState extends State<LogFormSheet> {
   String? _selectedCondition;
   String? _selectedSize;
 
-  bool get _isEditing => widget.initialLog != null;
+  bool get _isEditing => widget.initialMemo != null;
 
   @override
   void initState() {
     super.initState();
-    _focusController = TextEditingController(text: widget.initialLog?.focus ?? '');
-    _outcomeController = TextEditingController(text: widget.initialLog?.outcome ?? '');
-    _selectedCondition = widget.initialLog?.condition;
-    _selectedSize = widget.initialLog?.size;
+    _focusController = TextEditingController(text: widget.initialMemo?.focus ?? '');
+    _outcomeController = TextEditingController(text: widget.initialMemo?.outcome ?? '');
+    _selectedCondition = widget.initialMemo?.condition;
+    _selectedSize = widget.initialMemo?.size;
   }
 
   bool get _isValid =>

@@ -16,7 +16,7 @@ class TrickCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final latestLog = trick.logs.isNotEmpty ? trick.logs.first : null;
+    final latestMemo = trick.memos.isNotEmpty ? trick.memos.first : null;
     final name = trick.displayName();
 
     return GestureDetector(
@@ -49,7 +49,7 @@ class TrickCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            if (latestLog != null) ...[
+            if (latestMemo != null) ...[
               // Log Content Box
               Container(
                 decoration: BoxDecoration(
@@ -73,7 +73,7 @@ class TrickCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      latestLog.focus,
+                      latestMemo.focus,
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppTheme.textMain,
@@ -113,7 +113,7 @@ class TrickCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      latestLog.outcome,
+                      latestMemo.outcome,
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppTheme.textMain,
@@ -129,7 +129,7 @@ class TrickCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    timeago.format(latestLog.createdAt, locale: 'ja'),
+                    timeago.format(latestMemo.createdAt, locale: 'ja'),
                     style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
                   ),
                   Container(
@@ -141,7 +141,7 @@ class TrickCard extends StatelessWidget {
                       border: Border.all(color: Colors.grey.shade100),
                     ),
                     child: Text(
-                      '${trick.logs.length} notes',
+                      '${trick.memos.length} メモ',
                       style: const TextStyle(
                           fontSize: 10, color: AppTheme.textSecondary),
                     ),

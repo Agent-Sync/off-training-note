@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:off_training_note/models/tech_log.dart';
+import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
@@ -61,7 +61,7 @@ class TrickDetailSheet extends ConsumerWidget {
 
               // Content List
               Expanded(
-                child: trick.logs.isEmpty
+                child: trick.memos.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,12 +93,12 @@ class TrickDetailSheet extends ConsumerWidget {
                     : ListView.builder(
                         controller: scrollController,
                         padding: const EdgeInsets.only(top: 16, bottom: 24),
-                        itemCount: trick.logs.length + 1, // +1 for spacer
+                        itemCount: trick.memos.length + 1, // +1 for spacer
                         itemBuilder: (context, index) {
-                          if (index == trick.logs.length) {
+                          if (index == trick.memos.length) {
                             return const SizedBox(height: 80); // Fab spacer
                           }
-                          final log = trick.logs[index];
+                          final memo = trick.memos[index];
                           return IntrinsicHeight(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -146,7 +146,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              timeago.format(log.createdAt,
+                                              timeago.format(memo.createdAt,
                                                   locale: 'ja'),
                                               style: const TextStyle(
                                                 fontSize: 10,
@@ -159,9 +159,9 @@ class TrickDetailSheet extends ConsumerWidget {
                                               children: [
                                                 Builder(
                                                   builder: (context) {
-                                                    final conditionStyle =
-                                                        _getConditionStyle(log.condition);
-                                                    final sizeLabel = _getSizeLabel(log.size);
+                                                final conditionStyle =
+                                                    _getConditionStyle(memo.condition);
+                                                final sizeLabel = _getSizeLabel(memo.size);
                                                     return Wrap(
                                                       spacing: 4,
                                                       children: [
@@ -184,7 +184,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                                   padding: EdgeInsets.zero,
                                                   constraints: const BoxConstraints(),
                                                   splashRadius: 20,
-                                                  onPressed: () => _showLogActionMenu(context, ref, log),
+                                                  onPressed: () => _showMemoActionMenu(context, ref, memo),
                                                 ),
                                               ],
                                             ),
@@ -216,7 +216,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                log.focus,
+                                                memo.focus,
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   color: AppTheme.textMain,
@@ -266,7 +266,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                log.outcome,
+                                                memo.outcome,
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   color: AppTheme.textMain,
@@ -301,7 +301,7 @@ class TrickDetailSheet extends ConsumerWidget {
                         onAdd: (focus, outcome, condition, size) {
                            ref
                               .read(tricksProvider.notifier)
-                              .addLog(trick.id, focus, outcome, condition: condition, size: size);
+                              .addMemo(trick.id, focus, outcome, condition: condition, size: size);
                            // Stay on detail sheet, it will update
                         },
                       ),
@@ -331,7 +331,7 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  void _showLogActionMenu(BuildContext context, WidgetRef ref, TechLog log) {
+  void _showMemoActionMenu(BuildContext context, WidgetRef ref, TechMemo memo) {
     showAppBottomSheet(
       context: context,
       builder: (context) => AppBottomSheetContainer(
@@ -347,9 +347,9 @@ class TrickDetailSheet extends ConsumerWidget {
                 showAppBottomSheet(
                   context: context,
                   builder: (context) => LogFormSheet(
-                    initialLog: log,
+                    initialMemo: memo,
                     onAdd: (focus, outcome, condition, size) {
-                      final updatedLog = log.copyWith(
+                      final updatedMemo = memo.copyWith(
                         focus: focus,
                         outcome: outcome,
                         condition: condition,
@@ -357,7 +357,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       );
                       ref
                           .read(tricksProvider.notifier)
-                          .updateLog(trick.id, updatedLog);
+                          .updateMemo(trick.id, updatedMemo);
                     },
                   ),
                 );
@@ -371,7 +371,7 @@ class TrickDetailSheet extends ConsumerWidget {
               isDestructive: true,
               onTap: () {
                 Navigator.pop(context); // Close menu
-                _showDeleteConfirmDialog(context, ref, log);
+                _showDeleteMemoConfirmDialog(context, ref, memo);
               },
             ),
             const SizedBox(height: 16),
@@ -381,11 +381,11 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  void _showDeleteConfirmDialog(BuildContext context, WidgetRef ref, TechLog log) {
+  void _showDeleteMemoConfirmDialog(BuildContext context, WidgetRef ref, TechMemo memo) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'delete_log_dialog',
+      barrierLabel: 'delete_memo_dialog',
       barrierColor: Colors.black.withOpacity(0.1),
       pageBuilder: (context, _, __) {
         return BackdropFilter(
@@ -429,7 +429,7 @@ class TrickDetailSheet extends ConsumerWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          ref.read(tricksProvider.notifier).deleteLog(trick.id, log.id);
+                          ref.read(tricksProvider.notifier).deleteMemo(trick.id, memo.id);
                           Navigator.pop(context);
                         },
                         style: OutlinedButton.styleFrom(
