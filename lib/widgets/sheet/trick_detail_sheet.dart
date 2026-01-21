@@ -72,20 +72,27 @@ class TrickDetailSheet extends ConsumerWidget {
                                 color: Colors.grey.shade50,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Icon(Icons.edit_note,
-                                  size: 48, color: Colors.grey.shade300),
+                              child: Icon(
+                                Icons.edit_note,
+                                size: 48,
+                                color: Colors.grey.shade300,
+                              ),
                             ),
                             const SizedBox(height: 16),
                             const Text(
                               'まだメモがありません',
                               style: TextStyle(
-                                  color: AppTheme.textHint, fontSize: 16),
+                                color: AppTheme.textHint,
+                                fontSize: 16,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             const Text(
                               '練習の意識を記録しましょう！',
                               style: TextStyle(
-                                  color: AppTheme.textHint, fontSize: 12),
+                                color: AppTheme.textHint,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
@@ -113,13 +120,15 @@ class TrickDetailSheet extends ConsumerWidget {
                                         color: AppTheme.focusColor,
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                            color: Colors.white, width: 2),
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppTheme.focusColor
-                                                .withOpacity(0.3),
+                                                .withValues(alpha: 0.3),
                                             blurRadius: 4,
-                                          )
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -132,7 +141,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                   ],
                                 ),
                                 const SizedBox(width: 16),
-                                
+
                                 // Content
                                 Expanded(
                                   child: Padding(
@@ -146,8 +155,10 @@ class TrickDetailSheet extends ConsumerWidget {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              timeago.format(memo.createdAt,
-                                                  locale: 'ja'),
+                                              timeago.format(
+                                                memo.createdAt,
+                                                locale: 'ja',
+                                              ),
                                               style: const TextStyle(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
@@ -159,32 +170,57 @@ class TrickDetailSheet extends ConsumerWidget {
                                               children: [
                                                 Builder(
                                                   builder: (context) {
-                                                final conditionStyle =
-                                                    _getConditionStyle(memo.condition);
-                                                final sizeLabel = _getSizeLabel(memo.size);
+                                                    final conditionStyle =
+                                                        _getConditionStyle(
+                                                          memo.condition,
+                                                        );
+                                                    final sizeLabel =
+                                                        _getSizeLabel(
+                                                          memo.size,
+                                                        );
                                                     return Wrap(
                                                       spacing: 4,
                                                       children: [
-                                                        if (conditionStyle != null)
+                                                        if (conditionStyle !=
+                                                            null)
                                                           _buildLogTag(
-                                                            conditionStyle.label,
+                                                            conditionStyle
+                                                                .label,
                                                             backgroundColor:
-                                                                conditionStyle.background,
-                                                            textColor: conditionStyle.text,
-                                                            borderColor: conditionStyle.border,
+                                                                conditionStyle
+                                                                    .background,
+                                                            textColor:
+                                                                conditionStyle
+                                                                    .text,
+                                                            borderColor:
+                                                                conditionStyle
+                                                                    .border,
                                                           ),
-                                                        if (sizeLabel != null) _buildLogTag(sizeLabel),
+                                                        if (sizeLabel != null)
+                                                          _buildLogTag(
+                                                            sizeLabel,
+                                                          ),
                                                       ],
                                                     );
                                                   },
                                                 ),
                                                 const SizedBox(width: 4),
                                                 IconButton(
-                                                  icon: const Icon(Icons.more_vert, size: 16, color: Colors.grey),
+                                                  icon: const Icon(
+                                                    Icons.more_vert,
+                                                    size: 16,
+                                                    color: Colors.grey,
+                                                  ),
                                                   padding: EdgeInsets.zero,
-                                                  constraints: const BoxConstraints(),
+                                                  constraints:
+                                                      const BoxConstraints(),
                                                   splashRadius: 20,
-                                                  onPressed: () => _showMemoActionMenu(context, ref, memo),
+                                                  onPressed: () =>
+                                                      _showMemoActionMenu(
+                                                        context,
+                                                        ref,
+                                                        memo,
+                                                      ),
                                                 ),
                                               ],
                                             ),
@@ -195,10 +231,12 @@ class TrickDetailSheet extends ConsumerWidget {
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
                                             color: Colors.grey.shade50,
-                                            borderRadius:
-                                                BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
                                             border: Border.all(
-                                                color: Colors.grey.shade100),
+                                              color: Colors.grey.shade100,
+                                            ),
                                           ),
                                           child: Column(
                                             crossAxisAlignment:
@@ -228,28 +266,37 @@ class TrickDetailSheet extends ConsumerWidget {
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                        vertical: 12),
+                                                      vertical: 12,
+                                                    ),
                                                 child: Row(
                                                   children: [
                                                     Expanded(
-                                                        child: Container(
-                                                            height: 1,
-                                                            color: Colors.grey
-                                                                .shade200)),
+                                                      child: Container(
+                                                        height: 1,
+                                                        color: Colors
+                                                            .grey
+                                                            .shade200,
+                                                      ),
+                                                    ),
                                                     const Padding(
                                                       padding:
                                                           EdgeInsets.symmetric(
-                                                              horizontal: 8),
+                                                            horizontal: 8,
+                                                          ),
                                                       child: Icon(
-                                                          Icons.arrow_downward,
-                                                          size: 14,
-                                                          color: Colors.grey),
+                                                        Icons.arrow_downward,
+                                                        size: 14,
+                                                        color: Colors.grey,
+                                                      ),
                                                     ),
                                                     Expanded(
-                                                        child: Container(
-                                                            height: 1,
-                                                            color: Colors.grey
-                                                                .shade200)),
+                                                      child: Container(
+                                                        height: 1,
+                                                        color: Colors
+                                                            .grey
+                                                            .shade200,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -299,10 +346,16 @@ class TrickDetailSheet extends ConsumerWidget {
                       context: context,
                       builder: (context) => LogFormSheet(
                         onAdd: (focus, outcome, condition, size) {
-                           ref
+                          ref
                               .read(tricksProvider.notifier)
-                              .addMemo(trick.id, focus, outcome, condition: condition, size: size);
-                           // Stay on detail sheet, it will update
+                              .addMemo(
+                                trick.id,
+                                focus,
+                                outcome,
+                                condition: condition,
+                                size: size,
+                              );
+                          // Stay on detail sheet, it will update
                         },
                       ),
                     );
@@ -315,7 +368,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 4,
-                    shadowColor: Colors.black.withOpacity(0.3),
+                    shadowColor: Colors.black.withValues(alpha: 0.3),
                   ),
                   icon: const Icon(Icons.add),
                   label: const Text(
@@ -381,13 +434,17 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  void _showDeleteMemoConfirmDialog(BuildContext context, WidgetRef ref, TechMemo memo) {
+  void _showDeleteMemoConfirmDialog(
+    BuildContext context,
+    WidgetRef ref,
+    TechMemo memo,
+  ) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'delete_memo_dialog',
-      barrierColor: Colors.black.withOpacity(0.1),
-      pageBuilder: (context, _, __) {
+      barrierColor: Colors.black.withValues(alpha: 0.1),
+      pageBuilder: (context, animation, secondaryAnimation) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
           child: Center(
@@ -401,8 +458,14 @@ class TrickDetailSheet extends ConsumerWidget {
                 '削除すると元に戻せません。',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              actionsPadding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              actionsPadding: const EdgeInsets.only(
+                bottom: 16,
+                left: 16,
+                right: 16,
+              ),
               actions: [
                 Row(
                   children: [
@@ -429,7 +492,9 @@ class TrickDetailSheet extends ConsumerWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          ref.read(tricksProvider.notifier).deleteMemo(trick.id, memo.id);
+                          ref
+                              .read(tricksProvider.notifier)
+                              .deleteMemo(trick.id, memo.id);
                           Navigator.pop(context);
                         },
                         style: OutlinedButton.styleFrom(
@@ -440,7 +505,10 @@ class TrickDetailSheet extends ConsumerWidget {
                         ),
                         child: const Text(
                           '削除',
-                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -508,7 +576,12 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildLogTag(String label, {Color? backgroundColor, Color? textColor, Color? borderColor}) {
+  Widget _buildLogTag(
+    String label, {
+    Color? backgroundColor,
+    Color? textColor,
+    Color? borderColor,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(

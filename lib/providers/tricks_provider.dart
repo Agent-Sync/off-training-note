@@ -7,7 +7,9 @@ import 'package:uuid/uuid.dart';
 
 final uuid = Uuid();
 
-final tricksProvider = NotifierProvider<TricksNotifier, List<Trick>>(TricksNotifier.new);
+final tricksProvider = NotifierProvider<TricksNotifier, List<Trick>>(
+  TricksNotifier.new,
+);
 
 class TricksNotifier extends Notifier<List<Trick>> {
   static const _storageKey = 'tricks_data';
@@ -38,7 +40,9 @@ class TricksNotifier extends Notifier<List<Trick>> {
 
   Future<void> _saveTricks() async {
     final prefs = await SharedPreferences.getInstance();
-    final String jsonString = json.encode(state.map((e) => e.toJson()).toList());
+    final String jsonString = json.encode(
+      state.map((e) => e.toJson()).toList(),
+    );
     await prefs.setString(_storageKey, jsonString);
   }
 
@@ -83,10 +87,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
               ? updatedMemo.copyWith(updatedAt: DateTime.now())
               : memo;
         }).toList();
-        return trick.copyWith(
-          memos: newMemos,
-          updatedAt: DateTime.now(),
-        );
+        return trick.copyWith(memos: newMemos, updatedAt: DateTime.now());
       }
       return trick;
     }).toList();
@@ -96,11 +97,10 @@ class TricksNotifier extends Notifier<List<Trick>> {
   void deleteMemo(String trickId, String memoId) {
     state = state.map((trick) {
       if (trick.id == trickId) {
-        final newMemos = trick.memos.where((memo) => memo.id != memoId).toList();
-        return trick.copyWith(
-          memos: newMemos,
-          updatedAt: DateTime.now(),
-        );
+        final newMemos = trick.memos
+            .where((memo) => memo.id != memoId)
+            .toList();
+        return trick.copyWith(memos: newMemos, updatedAt: DateTime.now());
       }
       return trick;
     }).toList();

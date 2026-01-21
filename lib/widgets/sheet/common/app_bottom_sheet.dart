@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 const Color kBottomSheetBackgroundColor = Colors.white;
-const BorderRadius kBottomSheetBorderRadius =
-    BorderRadius.vertical(top: Radius.circular(24));
+const BorderRadius kBottomSheetBorderRadius = BorderRadius.vertical(
+  top: Radius.circular(24),
+);
 const EdgeInsets kBottomSheetContentPadding = EdgeInsets.only(
   top: 24,
   left: 24,
@@ -36,8 +37,9 @@ class AppBottomSheetContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset =
-        useKeyboardInset ? MediaQuery.of(context).viewInsets.bottom : 0.0;
+    final bottomInset = useKeyboardInset
+        ? MediaQuery.of(context).viewInsets.bottom
+        : 0.0;
     final content = child;
     return Container(
       padding: padding.add(EdgeInsets.only(bottom: bottomInset)),

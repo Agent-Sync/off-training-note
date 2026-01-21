@@ -10,7 +10,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Off Training Note',
-      theme: AppTheme.light(),
+      theme: AppTheme.theme,
       home: const HomeScreen(),
     );
   }

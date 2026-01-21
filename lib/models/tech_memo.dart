@@ -4,6 +4,7 @@ part 'tech_memo.freezed.dart';
 part 'tech_memo.g.dart';
 
 enum MemoCondition { none, snow, brush }
+
 enum MemoSize { none, small, middle, big }
 
 @freezed

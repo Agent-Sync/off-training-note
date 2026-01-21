@@ -16,35 +16,34 @@ Future<void> main() async {
   };
 
   // 未処理のエラーをキャッチ
-  runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    
-    // .envファイルの読み込み（オプショナル）
-    try {
-      await dotenv.load(fileName: 'assets/.env');
-    } catch (e) {
-      // .envファイルが存在しない場合は無視（デバッグモードでは問題なし）
-      debugPrint('Warning: Could not load .env file: $e');
-    }
-    
-    // Supabaseの初期化
-    // await Supabase.initialize(
-    //   url: dotenv.env['SUPABASE_URL'] ?? '',
-    //   anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
-    // );
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-    timeago.setLocaleMessages('ja', timeago.JaMessages());
-    timeago.setDefaultLocale('ja');
-    
-    runApp(
-      const ProviderScope(
-        child: MyApp(),
-      ),
-    );
-  }, (error, stack) {
-    debugPrint('Uncaught error: $error');
-    debugPrint('Stack trace: $stack');
-  });
+      // .envファイルの読み込み（オプショナル）
+      try {
+        await dotenv.load(fileName: 'assets/.env');
+      } catch (e) {
+        // .envファイルが存在しない場合は無視（デバッグモードでは問題なし）
+        debugPrint('Warning: Could not load .env file: $e');
+      }
+
+      // Supabaseの初期化
+      // await Supabase.initialize(
+      //   url: dotenv.env['SUPABASE_URL'] ?? '',
+      //   anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+      // );
+
+      timeago.setLocaleMessages('ja', timeago.JaMessages());
+      timeago.setDefaultLocale('ja');
+
+      runApp(const ProviderScope(child: MyApp()));
+    },
+    (error, stack) {
+      debugPrint('Uncaught error: $error');
+      debugPrint('Stack trace: $stack');
+    },
+  );
 }
 
 class MyApp extends StatelessWidget {

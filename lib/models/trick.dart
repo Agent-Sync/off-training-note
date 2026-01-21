@@ -5,8 +5,11 @@ part 'trick.freezed.dart';
 part 'trick.g.dart';
 
 enum TrickType { air, jib }
+
 enum Stance { regular, switchStance } // 'switch' is a keyword in Dart
+
 enum Takeoff { standard, carving }
+
 enum Direction { none, left, right }
 
 @freezed
@@ -25,7 +28,19 @@ abstract class Trick with _$Trick {
     required DateTime updatedAt,
   }) = _Trick;
 
-  static const spins = [0, 180, 360, 540, 720, 900, 1080, 1260, 1440, 1620, 1800];
+  static const spins = [
+    0,
+    180,
+    360,
+    540,
+    720,
+    900,
+    1080,
+    1260,
+    1440,
+    1620,
+    1800,
+  ];
 
   static const axes = [
     '平軸',
@@ -39,7 +54,7 @@ abstract class Trick with _$Trick {
     'アンダーフリップ',
     'ダブルコーク',
     'ダブルミスティ',
-    'ダブルロデオ'
+    'ダブルロデオ',
   ];
 
   static const grabs = [
@@ -58,9 +73,8 @@ abstract class Trick with _$Trick {
     'リードテール',
     'ブラント',
     'スクリーミンシーマン',
-    'タイパン'
+    'タイパン',
   ];
 
-  factory Trick.fromJson(Map<String, dynamic> json) =>
-      _$TrickFromJson(json);
+  factory Trick.fromJson(Map<String, dynamic> json) => _$TrickFromJson(json);
 }

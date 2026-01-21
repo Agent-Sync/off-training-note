@@ -61,7 +61,7 @@ class _ToggleButton extends StatelessWidget {
         ? (isSelected ? Colors.white : Colors.grey.shade100)
         : Colors.grey.shade50;
     final borderColor = buttonEnabled && isSelected
-        ? AppTheme.focusColor.withOpacity(0.5)
+        ? AppTheme.focusColor.withValues(alpha: 0.5)
         : Colors.transparent;
     final textColor = buttonEnabled
         ? (isSelected ? AppTheme.focusColor : AppTheme.textHint)
@@ -75,14 +75,11 @@ class _ToggleButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: borderColor,
-              width: 1,
-            ),
+            border: Border.all(color: borderColor, width: 1),
             boxShadow: buttonEnabled && isSelected
                 ? [
                     BoxShadow(
-                      color: AppTheme.focusColor.withOpacity(0.1),
+                      color: AppTheme.focusColor.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),

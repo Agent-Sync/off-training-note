@@ -57,7 +57,8 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
     return SafeArea(
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * widget.maxHeightFactor,
+          maxHeight:
+              MediaQuery.of(context).size.height * widget.maxHeightFactor,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -90,8 +91,10 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   filled: true,
                   fillColor: Colors.grey.shade50,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 16,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -104,7 +107,8 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
               child: ListView.separated(
                 padding: EdgeInsets.zero,
                 itemCount: _filteredOptions.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final option = _filteredOptions[index];
                   final isSelected =
@@ -114,12 +118,13 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
                     isSelected: isSelected,
                     onTap: () async {
                       setState(() => _pendingSelection = option);
+                      final navigator = Navigator.of(context);
                       await Future.delayed(_optionCloseDelay);
                       if (!mounted) {
                         return;
                       }
-                      if (Navigator.of(context).canPop()) {
-                        Navigator.pop(context, option);
+                      if (navigator.canPop()) {
+                        navigator.pop(option);
                       }
                     },
                   );
@@ -155,14 +160,14 @@ class _OptionItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
-                ? AppTheme.focusColor.withOpacity(0.5)
+                ? AppTheme.focusColor.withValues(alpha: 0.5)
                 : Colors.transparent,
             width: 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppTheme.focusColor.withOpacity(0.1),
+                    color: AppTheme.focusColor.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

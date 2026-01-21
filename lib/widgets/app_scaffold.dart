@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppScaffold extends StatelessWidget {
-  const AppScaffold({
-    super.key,
-    required this.title,
-    required this.child,
-  });
+  const AppScaffold({super.key, required this.title, required this.child});
 
   final String title;
   final Widget child;

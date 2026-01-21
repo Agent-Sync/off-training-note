@@ -22,9 +22,7 @@ extension TrickHelpers on Trick {
       parts.add(_takeoffCarvingLabel);
     }
 
-    if (type == TrickType.air &&
-        axis.isNotEmpty &&
-        axis != _axisFlatLabel) {
+    if (type == TrickType.air && axis.isNotEmpty && axis != _axisFlatLabel) {
       parts.add(axis);
     }
 
@@ -38,7 +36,7 @@ extension TrickHelpers on Trick {
   }
 
   String searchIndex() {
-    return '${spin} ${grab} ${axis}';
+    return '$spin $grab $axis';
   }
 
   bool matchesQuery(String query) {

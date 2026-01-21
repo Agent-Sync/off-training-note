@@ -104,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final allTricks = ref.watch(tricksProvider);
-    
+
     final filteredTricks = allTricks
         .where((t) => t.type == _activeTab)
         .where((t) => t.matchesQuery(_searchQuery))
@@ -120,9 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: CustomPaint(
-                painter: _DottedBackgroundPainter(),
-              ),
+              child: CustomPaint(painter: _DottedBackgroundPainter()),
             ),
             Column(
               children: [
@@ -181,10 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       itemCount: filteredTricks.length,
       itemBuilder: (context, index) {
         final trick = filteredTricks[index];
-        return TrickCard(
-          trick: trick,
-          onTap: () => _showTrickDetail(trick),
-        );
+        return TrickCard(trick: trick, onTap: () => _showTrickDetail(trick));
       },
     );
   }
@@ -221,15 +216,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         bottom: 10,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.background.withOpacity(0.95),
+        color: AppTheme.background.withValues(alpha: 0.95),
       ),
       child: Center(
         child: Container(
           width: 200,
           height: 40,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
           child: Stack(
             children: [
               AnimatedAlign(
@@ -263,7 +256,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      color: AppTheme.background.withOpacity(0),
+      color: AppTheme.background.withValues(alpha: 0),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
@@ -274,7 +267,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -296,8 +289,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   hintStyle: TextStyle(color: AppTheme.textHint),
                   prefixIcon: Icon(Icons.search, color: AppTheme.textHint),
                   border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                 ),
               ),
             ),
@@ -328,7 +323,7 @@ class _DottedBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final dotPaint = Paint()
-      ..color = Colors.grey.shade400.withOpacity(0.6);
+      ..color = Colors.grey.shade400.withValues(alpha: 0.6);
     const spacing = 20.0;
     const radius = 1.2;
 
