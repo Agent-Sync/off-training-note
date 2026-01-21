@@ -27,6 +27,18 @@ extension TrickHelpers on Trick {
       return parts.join(' ');
     }
 
+    if (stance == Stance.switchStance && spin == 0) {
+      parts.add(_stanceSwitchLabel);
+      if (takeoff == Takeoff.carving) {
+        parts.add(_takeoffCarvingLabel);
+      }
+      parts.add('0');
+      if (grab != _grabNoneLabel) {
+        parts.add(grab);
+      }
+      return parts.join(' ');
+    }
+
     if (stance == Stance.switchStance) {
       parts.add(_stanceSwitchLabel);
     }
