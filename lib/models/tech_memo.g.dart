@@ -10,20 +10,31 @@ _TechMemo _$TechMemoFromJson(Map<String, dynamic> json) => _TechMemo(
   id: json['id'] as String,
   focus: json['focus'] as String,
   outcome: json['outcome'] as String,
+  condition: $enumDecode(_$MemoConditionEnumMap, json['condition']),
+  size: $enumDecode(_$MemoSizeEnumMap, json['size']),
+  updatedAt: DateTime.parse(json['updatedAt'] as String),
   createdAt: DateTime.parse(json['createdAt'] as String),
-  condition: json['condition'] == null
-      ? MemoCondition.none
-      : const _MemoConditionConverter().fromJson(json['condition'] as String?),
-  size: json['size'] == null
-      ? MemoSize.none
-      : const _MemoSizeConverter().fromJson(json['size'] as String?),
 );
 
 Map<String, dynamic> _$TechMemoToJson(_TechMemo instance) => <String, dynamic>{
   'id': instance.id,
   'focus': instance.focus,
   'outcome': instance.outcome,
+  'condition': _$MemoConditionEnumMap[instance.condition]!,
+  'size': _$MemoSizeEnumMap[instance.size]!,
+  'updatedAt': instance.updatedAt.toIso8601String(),
   'createdAt': instance.createdAt.toIso8601String(),
-  'condition': const _MemoConditionConverter().toJson(instance.condition),
-  'size': const _MemoSizeConverter().toJson(instance.size),
+};
+
+const _$MemoConditionEnumMap = {
+  MemoCondition.none: 'none',
+  MemoCondition.snow: 'snow',
+  MemoCondition.brush: 'brush',
+};
+
+const _$MemoSizeEnumMap = {
+  MemoSize.none: 'none',
+  MemoSize.small: 'small',
+  MemoSize.middle: 'middle',
+  MemoSize.big: 'big',
 };

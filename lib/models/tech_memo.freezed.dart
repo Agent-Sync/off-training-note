@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TechMemo {
 
- String get id; String get focus; String get outcome; DateTime get createdAt;@_MemoConditionConverter() MemoCondition get condition;@_MemoSizeConverter() MemoSize get size;
+ String get id; String get focus; String get outcome; MemoCondition get condition; MemoSize get size; DateTime get updatedAt; DateTime get createdAt;
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $TechMemoCopyWith<TechMemo> get copyWith => _$TechMemoCopyWithImpl<TechMemo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,focus,outcome,createdAt,condition,size);
+int get hashCode => Object.hash(runtimeType,id,focus,outcome,condition,size,updatedAt,createdAt);
 
 @override
 String toString() {
-  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, createdAt: $createdAt, condition: $condition, size: $size)';
+  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, condition: $condition, size: $size, updatedAt: $updatedAt, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $TechMemoCopyWith<$Res>  {
   factory $TechMemoCopyWith(TechMemo value, $Res Function(TechMemo) _then) = _$TechMemoCopyWithImpl;
 @useResult
 $Res call({
- String id, String focus, String outcome, DateTime createdAt,@_MemoConditionConverter() MemoCondition condition,@_MemoSizeConverter() MemoSize size
+ String id, String focus, String outcome, MemoCondition condition, MemoSize size, DateTime updatedAt, DateTime createdAt
 });
 
 
@@ -65,15 +65,16 @@ class _$TechMemoCopyWithImpl<$Res>
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? createdAt = null,Object? condition = null,Object? size = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? condition = null,Object? size = null,Object? updatedAt = null,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
 as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,condition: null == condition ? _self.condition : condition // ignore: cast_nullable_to_non_nullable
+as String,condition: null == condition ? _self.condition : condition // ignore: cast_nullable_to_non_nullable
 as MemoCondition,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as MemoSize,
+as MemoSize,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String focus,  String outcome,  DateTime createdAt, @_MemoConditionConverter()  MemoCondition condition, @_MemoSizeConverter()  MemoSize size)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TechMemo() when $default != null:
-return $default(_that.id,_that.focus,_that.outcome,_that.createdAt,_that.condition,_that.size);case _:
+return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.id,_that.focus,_that.outcome,_that.createdAt,_that.conditi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String focus,  String outcome,  DateTime createdAt, @_MemoConditionConverter()  MemoCondition condition, @_MemoSizeConverter()  MemoSize size)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _TechMemo():
-return $default(_that.id,_that.focus,_that.outcome,_that.createdAt,_that.condition,_that.size);case _:
+return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.id,_that.focus,_that.outcome,_that.createdAt,_that.conditi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String focus,  String outcome,  DateTime createdAt, @_MemoConditionConverter()  MemoCondition condition, @_MemoSizeConverter()  MemoSize size)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _TechMemo() when $default != null:
-return $default(_that.id,_that.focus,_that.outcome,_that.createdAt,_that.condition,_that.size);case _:
+return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case _:
   return null;
 
 }
@@ -214,15 +215,16 @@ return $default(_that.id,_that.focus,_that.outcome,_that.createdAt,_that.conditi
 @JsonSerializable()
 
 class _TechMemo implements TechMemo {
-  const _TechMemo({required this.id, required this.focus, required this.outcome, required this.createdAt, @_MemoConditionConverter() this.condition = MemoCondition.none, @_MemoSizeConverter() this.size = MemoSize.none});
+  const _TechMemo({required this.id, required this.focus, required this.outcome, required this.condition, required this.size, required this.updatedAt, required this.createdAt});
   factory _TechMemo.fromJson(Map<String, dynamic> json) => _$TechMemoFromJson(json);
 
 @override final  String id;
 @override final  String focus;
 @override final  String outcome;
+@override final  MemoCondition condition;
+@override final  MemoSize size;
+@override final  DateTime updatedAt;
 @override final  DateTime createdAt;
-@override@JsonKey()@_MemoConditionConverter() final  MemoCondition condition;
-@override@JsonKey()@_MemoSizeConverter() final  MemoSize size;
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,focus,outcome,createdAt,condition,size);
+int get hashCode => Object.hash(runtimeType,id,focus,outcome,condition,size,updatedAt,createdAt);
 
 @override
 String toString() {
-  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, createdAt: $createdAt, condition: $condition, size: $size)';
+  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, condition: $condition, size: $size, updatedAt: $updatedAt, createdAt: $createdAt)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$TechMemoCopyWith<$Res> implements $TechMemoCopyWith<$Res>
   factory _$TechMemoCopyWith(_TechMemo value, $Res Function(_TechMemo) _then) = __$TechMemoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String focus, String outcome, DateTime createdAt,@_MemoConditionConverter() MemoCondition condition,@_MemoSizeConverter() MemoSize size
+ String id, String focus, String outcome, MemoCondition condition, MemoSize size, DateTime updatedAt, DateTime createdAt
 });
 
 
@@ -274,15 +276,16 @@ class __$TechMemoCopyWithImpl<$Res>
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? createdAt = null,Object? condition = null,Object? size = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? condition = null,Object? size = null,Object? updatedAt = null,Object? createdAt = null,}) {
   return _then(_TechMemo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
 as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,condition: null == condition ? _self.condition : condition // ignore: cast_nullable_to_non_nullable
+as String,condition: null == condition ? _self.condition : condition // ignore: cast_nullable_to_non_nullable
 as MemoCondition,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as MemoSize,
+as MemoSize,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
   ));
 }
 

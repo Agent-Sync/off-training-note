@@ -16,7 +16,7 @@ class NewTrickModal extends StatefulWidget {
     String axis,
     int spin,
     String grab,
-    Direction? direction,
+    Direction direction,
   ) onAdd;
 
   const NewTrickModal({
@@ -214,6 +214,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
                       _axisController.text = value;
                       if (_isBackOrFrontValue(value)) {
                         _spinController.text = '0';
+                        _direction = Direction.none;
+                      } else if (_direction == Direction.none) {
                         _direction = Direction.left;
                       }
                     });
@@ -322,7 +324,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
               }
               final spinValue =
                   _isBackOrFront ? 0 : int.tryParse(_spinController.text) ?? 0;
-              final directionValue = _isBackOrFront ? null : _direction;
+              final directionValue = _isBackOrFront
+                  ? Direction.none
+                  : (_direction == Direction.none ? Direction.left : _direction);
 
               widget.onAdd(
                 _stance,

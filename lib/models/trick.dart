@@ -7,7 +7,7 @@ part 'trick.g.dart';
 enum TrickType { air, jib }
 enum Stance { regular, switchStance } // 'switch' is a keyword in Dart
 enum Takeoff { standard, carving }
-enum Direction { left, right }
+enum Direction { none, left, right }
 
 @freezed
 class Trick with _$Trick {
@@ -19,7 +19,7 @@ class Trick with _$Trick {
     required String axis,
     required int spin,
     required String grab,
-    Direction? direction,
+    required Direction direction,
     required List<TechMemo> memos,
     required DateTime createdAt,
     required DateTime updatedAt,

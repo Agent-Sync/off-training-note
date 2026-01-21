@@ -56,8 +56,8 @@ extension TrickHelpers on Trick {
 
     labels.add(_stanceLabel(stance));
 
-    if (direction != null) {
-      labels.add(_directionLabel(direction!));
+    if (direction != Direction.none) {
+      labels.add(_directionLabel(direction));
     }
 
     labels.add(_takeoffLabel(takeoff));
