@@ -15,11 +15,18 @@ extension TrickHelpers on Trick {
     final parts = <String>[];
 
     if (stance == Stance.regular && spin == 0) {
+      final isFlatAxis = axis == _axisFlatLabel;
       if (takeoff == Takeoff.carving) {
         parts.add(_takeoffCarvingLabel);
+        if (isFlatAxis) {
+          parts.add(_takeoffStandardLabel);
+        }
+      } else if (isFlatAxis) {
         parts.add(_takeoffStandardLabel);
-      } else {
-        parts.add(_takeoffStandardLabel);
+      }
+      if (!isFlatAxis) {
+        parts.add(axis);
+        parts.add(spin.toString());
       }
       if (grab != _grabNoneLabel) {
         parts.add(grab);
@@ -28,11 +35,20 @@ extension TrickHelpers on Trick {
     }
 
     if (stance == Stance.switchStance && spin == 0) {
+      final isFlatAxis = axis == _axisFlatLabel;
       parts.add(_stanceSwitchLabel);
+      if (direction != Direction.none) {
+        parts.add(_directionLabel(direction));
+      }
       if (takeoff == Takeoff.carving) {
         parts.add(_takeoffCarvingLabel);
       }
-      parts.add('0');
+      if (!isFlatAxis) {
+        parts.add(axis);
+        parts.add(spin.toString());
+      } else {
+        parts.add('0');
+      }
       if (grab != _grabNoneLabel) {
         parts.add(grab);
       }

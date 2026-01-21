@@ -35,6 +35,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
   bool _showValidation = false;
 
   bool get _isSpinZero => int.tryParse(_spinController.text) == 0;
+  bool get _isDirectionDisabled =>
+      _isBackOrFront || (_isSpinZero && _stance != Stance.switchStance);
 
   Future<void> _showAxisSheet({
     required List<String> options,
@@ -255,7 +257,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                     onSelected: (value) {
                       setState(() {
                         _spinController.text = value;
-                        if (value == '0') {
+                        if (value == '0' && _stance != Stance.switchStance) {
                           _direction = Direction.none;
                         } else if (_direction == Direction.none) {
                           _direction = Direction.left;
@@ -304,14 +306,14 @@ class _NewTrickModalState extends State<NewTrickModal> {
             const SizedBox(height: 24),
 
             // Direction
-            _buildSectionLabel('方向', enabled: !_isBackOrFront && !_isSpinZero),
+            _buildSectionLabel('方向', enabled: !_isDirectionDisabled),
             TwoOptionToggle(
               leftLabel: 'レフト',
               rightLabel: 'ライト',
               isLeftSelected: _direction == Direction.left,
               onLeftTap: () => setState(() => _direction = Direction.left),
               onRightTap: () => setState(() => _direction = Direction.right),
-              enabled: !_isBackOrFront && !_isSpinZero,
+              enabled: !_isDirectionDisabled,
             ),
             const SizedBox(height: 24),
 
@@ -325,7 +327,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 final spinValue = _isBackOrFront
                     ? 0
                     : int.tryParse(_spinController.text) ?? 0;
-                final directionValue = _isBackOrFront || spinValue == 0
+                final directionValue =
+                    _isBackOrFront ||
+                        (spinValue == 0 && _stance != Stance.switchStance)
                     ? Direction.none
                     : (_direction == Direction.none
                           ? Direction.left
