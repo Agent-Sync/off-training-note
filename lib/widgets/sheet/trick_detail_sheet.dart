@@ -19,8 +19,11 @@ class TrickDetailSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final name = trick.displayName();
-    final tags = trick.tagLabels();
+    final currentTrick = ref
+        .watch(tricksProvider)
+        .firstWhere((item) => item.id == trick.id, orElse: () => trick);
+    final name = currentTrick.displayName();
+    final tags = currentTrick.tagLabels();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -61,7 +64,7 @@ class TrickDetailSheet extends ConsumerWidget {
 
               // Content List
               Expanded(
-                child: trick.memos.isEmpty
+                child: currentTrick.memos.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -100,12 +103,13 @@ class TrickDetailSheet extends ConsumerWidget {
                     : ListView.builder(
                         controller: scrollController,
                         padding: const EdgeInsets.only(top: 16, bottom: 24),
-                        itemCount: trick.memos.length + 1, // +1 for spacer
+                        itemCount:
+                            currentTrick.memos.length + 1, // +1 for spacer
                         itemBuilder: (context, index) {
-                          if (index == trick.memos.length) {
+                          if (index == currentTrick.memos.length) {
                             return const SizedBox(height: 80); // Fab spacer
                           }
-                          final memo = trick.memos[index];
+                          final memo = currentTrick.memos[index];
                           return IntrinsicHeight(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.stretch,

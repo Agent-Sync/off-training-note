@@ -18,20 +18,27 @@ extension TrickHelpers on Trick {
       parts.add(_stanceSwitchLabel);
     }
 
-    if (type == TrickType.air && takeoff == Takeoff.carving) {
+    if (direction != Direction.none) {
+      parts.add(_directionLabel(direction));
+    }
+
+    if (takeoff == Takeoff.carving) {
       parts.add(_takeoffCarvingLabel);
     }
 
-    if (type == TrickType.air && axis.isNotEmpty && axis != _axisFlatLabel) {
+    if (axis.isNotEmpty && axis != _axisFlatLabel) {
       parts.add(axis);
     }
 
-    if (spin > 0) parts.add(spin.toString());
+    if (spin > 0) {
+      parts.add(spin.toString());
+    }
 
-    if (grab != _grabNoneLabel) parts.add(grab);
+    if (grab != _grabNoneLabel) {
+      parts.add(grab);
+    }
 
     if (parts.isEmpty) return _defaultAirLabel;
-
     return parts.join(' ');
   }
 
