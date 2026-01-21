@@ -81,7 +81,8 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
               ],
             ),
             Divider(height: 1, color: Colors.grey.shade200),
-            if (widget.enableSearch)
+            const SizedBox(height: 12),
+            if (widget.enableSearch) ...[
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
@@ -97,6 +98,8 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+            ],
             Flexible(
               child: ListView.separated(
                 padding: EdgeInsets.zero,
