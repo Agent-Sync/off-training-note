@@ -7,7 +7,7 @@ enum MemoCondition { none, snow, brush }
 enum MemoSize { none, small, middle, big }
 
 @freezed
-class TechMemo with _$TechMemo {
+abstract class TechMemo with _$TechMemo {
   const factory TechMemo({
     required String id,
     required String focus,

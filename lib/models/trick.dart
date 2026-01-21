@@ -10,7 +10,7 @@ enum Takeoff { standard, carving }
 enum Direction { none, left, right }
 
 @freezed
-class Trick with _$Trick {
+abstract class Trick with _$Trick {
   const factory Trick({
     required String id,
     required TrickType type,
