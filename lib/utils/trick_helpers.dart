@@ -26,7 +26,7 @@ extension TrickHelpers on Trick {
       parts.add(_takeoffCarvingLabel);
     }
 
-    if (axis.isNotEmpty && axis != _axisFlatLabel) {
+    if (axis != _axisFlatLabel) {
       parts.add(axis);
     }
 
