@@ -127,6 +127,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           size: 'middle',
         ),
       ],
+      createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     ),
     Trick(
@@ -148,6 +149,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           size: 'big',
         ),
       ],
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
       updatedAt: DateTime.now().subtract(const Duration(hours: 12)),
     ),
     Trick(
@@ -169,6 +171,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           size: 'small',
         ),
       ],
+      createdAt: DateTime.now().subtract(const Duration(days: 3)),
       updatedAt: DateTime.now().subtract(const Duration(days: 3)),
     ),
     Trick(
@@ -177,6 +180,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       stance: Stance.switchStance,
       direction: Direction.right,
       takeoff: Takeoff.standard,
+      axis: TrickLabels.axisFlat,
       spin: 270,
       grab: TrickLabels.grabNone,
       memos: [
@@ -189,6 +193,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           size: 'small',
         ),
       ],
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
       updatedAt: DateTime.now(),
     ),
   ];

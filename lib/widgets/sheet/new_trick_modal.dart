@@ -14,8 +14,8 @@ class NewTrickModal extends StatefulWidget {
   final TrickType type;
   final Function(
     Stance stance,
-    Takeoff? takeoff,
-    String? axis,
+    Takeoff takeoff,
+    String axis,
     int spin,
     String grab,
     Direction? direction,
@@ -328,8 +328,10 @@ class _NewTrickModalState extends State<NewTrickModal> {
 
               widget.onAdd(
                 _stance,
-                widget.type == TrickType.air ? _takeoff : null,
-                _axisController.text.isEmpty ? null : _axisController.text,
+                _takeoff,
+                _axisController.text.trim().isEmpty
+                    ? TrickLabels.axisFlat
+                    : _axisController.text.trim(),
                 spinValue,
                 _grabController.text.isEmpty
                     ? TrickLabels.grabNone

@@ -14,9 +14,9 @@ extension TrickHelpers on Trick {
     }
 
     if (type == TrickType.air &&
-        axis != null &&
+        axis.isNotEmpty &&
         axis != TrickLabels.axisFlat) {
-      parts.add(axis!);
+      parts.add(axis);
     }
 
     if (spin > 0) parts.add(spin.toString());
@@ -29,7 +29,7 @@ extension TrickHelpers on Trick {
   }
 
   String searchIndex() {
-    return '${spin} ${grab} ${axis ?? ""}';
+    return '${spin} ${grab} ${axis}';
   }
 
   bool matchesQuery(String query) {
@@ -39,7 +39,7 @@ extension TrickHelpers on Trick {
     return name.contains(normalized) ||
         spin.toString().contains(normalized) ||
         grab.contains(normalized) ||
-        (axis?.contains(normalized) ?? false);
+        axis.contains(normalized);
   }
 
   List<String> tagLabels() {
@@ -51,11 +51,9 @@ extension TrickHelpers on Trick {
       labels.add(TrickLabels.direction(direction!));
     }
 
-    if (takeoff != null) {
-      labels.add(TrickLabels.takeoff(takeoff!));
-    }
+    labels.add(TrickLabels.takeoff(takeoff));
 
-    if (axis != null) labels.add(axis!);
+    if (axis.trim().isNotEmpty) labels.add(axis);
 
     if (spin > 0) labels.add(spin.toString());
 
