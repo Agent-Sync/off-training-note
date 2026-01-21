@@ -7,12 +7,12 @@ import 'package:uuid/uuid.dart';
 
 final uuid = Uuid();
 
-final tricksProvider = NotifierProvider<TricksNotifier, List<AirTrick>>(
-  TricksNotifier.new,
+final airTricksProvider = NotifierProvider<AirTricksNotifier, List<AirTrick>>(
+  AirTricksNotifier.new,
 );
 
-class TricksNotifier extends Notifier<List<AirTrick>> {
-  static const _storageKey = 'tricks_data';
+class AirTricksNotifier extends Notifier<List<AirTrick>> {
+  static const _storageKey = 'air_tricks_data';
 
   @override
   List<AirTrick> build() {

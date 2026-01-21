@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:off_training_note/models/jib_trick.dart';
 import 'package:off_training_note/models/air_trick.dart';
-import 'package:off_training_note/providers/jib_tricks_provider.dart';
-import 'package:off_training_note/providers/tricks_provider.dart';
+import 'package:off_training_note/providers/jib_air_tricks_provider.dart';
+import 'package:off_training_note/providers/air_tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/jib_trick_card.dart';
@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               memos: [],
               createdAt: DateTime.now(),
             );
-            ref.read(tricksProvider.notifier).addTrick(newTrick);
+            ref.read(airTricksProvider.notifier).addTrick(newTrick);
           },
         ),
       ).whenComplete(() {
@@ -121,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final allTricks = ref.watch(tricksProvider);
+    final allTricks = ref.watch(airTricksProvider);
     final allJibTricks = ref.watch(jibTricksProvider);
 
     final filteredTricks = allTricks

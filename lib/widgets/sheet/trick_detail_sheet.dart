@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/air_trick.dart';
-import 'package:off_training_note/providers/tricks_provider.dart';
+import 'package:off_training_note/providers/air_tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
@@ -20,7 +20,7 @@ class TrickDetailSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTrick = ref
-        .watch(tricksProvider)
+        .watch(airTricksProvider)
         .firstWhere((item) => item.id == trick.id, orElse: () => trick);
     final name = currentTrick.displayName();
     final tags = currentTrick.tagLabels();
@@ -351,7 +351,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       builder: (context) => LogFormSheet(
                         onAdd: (focus, outcome, condition, size) {
                           ref
-                              .read(tricksProvider.notifier)
+                              .read(airTricksProvider.notifier)
                               .addMemo(
                                 trick.id,
                                 focus,
@@ -413,7 +413,7 @@ class TrickDetailSheet extends ConsumerWidget {
                         size: size,
                       );
                       ref
-                          .read(tricksProvider.notifier)
+                          .read(airTricksProvider.notifier)
                           .updateMemo(trick.id, updatedMemo);
                     },
                   ),
@@ -497,7 +497,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       child: OutlinedButton(
                         onPressed: () {
                           ref
-                              .read(tricksProvider.notifier)
+                              .read(airTricksProvider.notifier)
                               .deleteMemo(trick.id, memo.id);
                           Navigator.pop(context);
                         },
