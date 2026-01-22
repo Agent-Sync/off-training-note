@@ -92,7 +92,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       builder: (context) => NewJibModal(
         onAdd: (customName) {
-          ref.read(tricksProvider.notifier).addJibTrick(customName);
+          final newJib = Trick.jib(
+            id: _uuid.v4(),
+            customName: customName,
+            memos: const [],
+            createdAt: DateTime.now(),
+          );
+          ref.read(tricksProvider.notifier).addTrick(newJib);
         },
       ),
     ).whenComplete(() {

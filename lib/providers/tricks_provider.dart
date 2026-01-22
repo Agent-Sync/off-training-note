@@ -44,16 +44,6 @@ class TricksNotifier extends Notifier<List<Trick>> {
     _saveTricks();
   }
 
-  void addJibTrick(String customName) {
-    addTrick(
-      Trick.jib(
-        id: _trickUuid.v4(),
-        customName: customName,
-        memos: const [],
-        createdAt: DateTime.now(),
-      ),
-    );
-  }
 
   void addMemo(
     String trickId,
