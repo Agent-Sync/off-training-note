@@ -15,6 +15,7 @@ import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -37,15 +38,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Session? _session;
   StreamSubscription<AuthState>? _authSub;
 
+  void _logAuth(String message) {
+    final timestamp = DateTime.now().toIso8601String();
+    debugPrint('[Auth][$timestamp] $message');
+  }
+
+  String _sessionSummary(Session? session) {
+    if (session == null) return 'session=null';
+    final user = session.user;
+    return 'session=${session.accessToken.isNotEmpty ? 'has_token' : 'no_token'} '
+        'userId=${user.id} email=${user.email ?? '-'}';
+  }
+
   @override
   void initState() {
     super.initState();
     _session = Supabase.instance.client.auth.currentSession;
+    _logAuth('initState: ${_sessionSummary(_session)}');
     _authSub = Supabase.instance.client.auth.onAuthStateChange.listen(
       (data) {
         if (!mounted) {
           return;
         }
+        _logAuth(
+          'onAuthStateChange: event=${data.event} ${_sessionSummary(data.session)}',
+        );
         setState(() {
           _session = data.session;
         });
@@ -144,14 +161,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _signInWithGoogle() async {
-    await Supabase.instance.client.auth.signInWithOAuth(
-      OAuthProvider.google,
-      redirectTo: 'com.kafu.offtrainingnote://login-callback/',
-    );
+    _logAuth('signIn: start');
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'com.kafu.offtrainingnote://login-callback/',
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+      _logAuth('signIn: browser opened for OAuth');
+    } catch (e, stack) {
+      _logAuth('signIn: error=$e');
+      debugPrint('$stack');
+      rethrow;
+    }
   }
 
   Future<void> _signOut() async {
-    await Supabase.instance.client.auth.signOut();
+    _logAuth('signOut: start');
+    try {
+      await Supabase.instance.client.auth.signOut();
+      _logAuth('signOut: success');
+    } catch (e, stack) {
+      _logAuth('signOut: error=$e');
+      debugPrint('$stack');
+      rethrow;
+    }
   }
 
   @override
