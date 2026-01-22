@@ -1,8 +1,8 @@
 SIM_NAME ?= iPhone 16 Plus
 
-.PHONY: sim-run
+.PHONY: run
 
-sim-run:
+run:
 	open -a Simulator
 	@xcrun simctl boot "$(SIM_NAME)" || true
 	@booted_id=$$(xcrun simctl list devices | grep Booted | awk -F '[()]' '{print $$2}' | head -n1); \

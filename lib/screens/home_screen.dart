@@ -13,6 +13,7 @@ import 'package:off_training_note/widgets/sheet/new_jib_modal.dart';
 import 'package:off_training_note/widgets/sheet/new_trick_modal.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -33,12 +34,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _uuid = const Uuid();
   Timer? _searchFocusTimer;
   bool _suppressSearchFocus = false;
+  Session? _session;
+  StreamSubscription<AuthState>? _authSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _session = Supabase.instance.client.auth.currentSession;
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen(
+      (data) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _session = data.session;
+        });
+      },
+    );
+  }
 
   @override
   void dispose() {
     _searchFocusTimer?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _authSub?.cancel();
     super.dispose();
   }
 
@@ -123,8 +143,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     FocusScope.of(context).unfocus();
   }
 
+  Future<void> _signInWithGoogle() async {
+    await Supabase.instance.client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: 'com.kafu.offtrainingnote://login-callback/',
+    );
+  }
+
+  Future<void> _signOut() async {
+    await Supabase.instance.client.auth.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_session == null) {
+      return _buildLoggedOutScreen();
+    }
+
     final allTricks = ref.watch(tricksProvider);
 
     final airTricks = allTricks.whereType<AirTrick>().toList();
@@ -207,6 +242,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildLoggedOutScreen() {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _DottedBackgroundPainter()),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'オフトレノート',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Googleでログインして開始',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: _signInWithGoogle,
+                    icon: const Icon(Icons.login),
+                    label: const Text('Googleでログイン'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTrickContent(List<Trick> filteredTricks) {
     if (filteredTricks.isEmpty) {
       return Padding(
@@ -283,38 +373,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       decoration: BoxDecoration(
         color: AppTheme.background.withValues(alpha: 0.95),
       ),
-      child: Center(
-        child: Container(
-          width: 200,
-          height: 40,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-          child: Stack(
-            children: [
-              AnimatedAlign(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-                alignment: _activeTab == _HomeTab.air
-                    ? Alignment.centerLeft
-                    : Alignment.centerRight,
-                child: Container(
-                  width: 100,
-                  height: 4,
-                  margin: const EdgeInsets.only(top: 30),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+      child: Row(
+        children: [
+          const SizedBox(width: 48),
+          Expanded(
+            child: Center(
+              child: Container(
+                width: 200,
+                height: 40,
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                child: Stack(
+                  children: [
+                    AnimatedAlign(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                      alignment: _activeTab == _HomeTab.air
+                          ? Alignment.centerLeft
+                          : Alignment.centerRight,
+                      child: Container(
+                        width: 100,
+                        height: 4,
+                        margin: const EdgeInsets.only(top: 30),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        _buildTabButton('AIR', _HomeTab.air),
+                        _buildTabButton('JIB', _HomeTab.jib),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              Row(
-                children: [
-                  _buildTabButton('AIR', _HomeTab.air),
-                  _buildTabButton('JIB', _HomeTab.jib),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+          IconButton(
+            tooltip: _session == null ? 'Googleでログイン' : 'ログアウト',
+            icon: Icon(
+              _session == null ? Icons.login : Icons.logout,
+              color: Colors.black,
+            ),
+            onPressed:
+                _session == null ? _signInWithGoogle : _signOut,
+          ),
+        ],
       ),
     );
   }

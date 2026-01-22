@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/screens/home_screen.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 Future<void> main() async {
@@ -29,10 +29,18 @@ Future<void> main() async {
       }
 
       // Supabaseの初期化
-      // await Supabase.initialize(
-      //   url: dotenv.env['SUPABASE_URL'] ?? '',
-      //   anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
-      // );
+      final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
+      final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
+      if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
+        await Supabase.initialize(
+          url: supabaseUrl,
+          anonKey: supabaseAnonKey,
+        );
+      } else {
+        debugPrint(
+          'Warning: SUPABASE_URL or SUPABASE_ANON_KEY is missing in assets/.env',
+        );
+      }
 
       timeago.setLocaleMessages('ja', timeago.JaMessages());
       timeago.setDefaultLocale('ja');
