@@ -222,12 +222,12 @@ class TricksNotifier extends Notifier<List<Trick>> {
     ),
     Trick.jib(
       id: _trickUuid.v4(),
-      customName: 'フロントボードスライド',
+      customName: '270オン 270オフ',
       memos: [
         TechMemo.jib(
           id: _trickUuid.v4(),
-          focus: '腰を真ん中に保つ',
-          outcome: '抜けが安定した',
+          focus: '目線と肩を先行させる',
+          outcome: '乗り込みがスムーズになった',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
           updatedAt: DateTime.now().subtract(const Duration(days: 1)),
         ),
@@ -236,12 +236,12 @@ class TricksNotifier extends Notifier<List<Trick>> {
     ),
     Trick.jib(
       id: _trickUuid.v4(),
-      customName: 'スイッチテールプレス',
+      customName: 'フロント450アウト',
       memos: [
         TechMemo.jib(
           id: _trickUuid.v4(),
-          focus: '肩のラインを進行方向に向ける',
-          outcome: '回り込みが減った',
+          focus: 'トップシートをフラットに保つ',
+          outcome: 'バタつきが減った',
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
           updatedAt: DateTime.now().subtract(const Duration(days: 3)),
         ),
