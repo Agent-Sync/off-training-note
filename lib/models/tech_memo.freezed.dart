@@ -11,11 +11,34 @@ part of 'tech_memo.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+TechMemo _$TechMemoFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['type']) {
+                  case 'air':
+          return AirTechMemo.fromJson(
+            json
+          );
+                case 'jib':
+          return JibTechMemo.fromJson(
+            json
+          );
+        
+          default:
+            throw CheckedFromJsonException(
+  json,
+  'type',
+  'TechMemo',
+  'Invalid union type "${json['type']}"!'
+);
+        }
+      
+}
 
 /// @nodoc
 mixin _$TechMemo {
 
- String get id; String get focus; String get outcome; MemoCondition get condition; MemoSize get size; DateTime get updatedAt; DateTime get createdAt;
+ String get id; String get focus; String get outcome; DateTime get updatedAt; DateTime get createdAt;
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +51,16 @@ $TechMemoCopyWith<TechMemo> get copyWith => _$TechMemoCopyWithImpl<TechMemo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,focus,outcome,condition,size,updatedAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,focus,outcome,updatedAt,createdAt);
 
 @override
 String toString() {
-  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, condition: $condition, size: $size, updatedAt: $updatedAt, createdAt: $createdAt)';
+  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, updatedAt: $updatedAt, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +71,7 @@ abstract mixin class $TechMemoCopyWith<$Res>  {
   factory $TechMemoCopyWith(TechMemo value, $Res Function(TechMemo) _then) = _$TechMemoCopyWithImpl;
 @useResult
 $Res call({
- String id, String focus, String outcome, MemoCondition condition, MemoSize size, DateTime updatedAt, DateTime createdAt
+ String id, String focus, String outcome, DateTime updatedAt, DateTime createdAt
 });
 
 
@@ -65,14 +88,12 @@ class _$TechMemoCopyWithImpl<$Res>
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? condition = null,Object? size = null,Object? updatedAt = null,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? updatedAt = null,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
 as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
-as String,condition: null == condition ? _self.condition : condition // ignore: cast_nullable_to_non_nullable
-as MemoCondition,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as MemoSize,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as String,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
@@ -95,11 +116,12 @@ extension TechMemoPatterns on TechMemo {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _TechMemo value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AirTechMemo value)?  air,TResult Function( JibTechMemo value)?  jib,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _TechMemo() when $default != null:
-return $default(_that);case _:
+case AirTechMemo() when air != null:
+return air(_that);case JibTechMemo() when jib != null:
+return jib(_that);case _:
   return orElse();
 
 }
@@ -117,11 +139,12 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _TechMemo value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AirTechMemo value)  air,required TResult Function( JibTechMemo value)  jib,}){
 final _that = this;
 switch (_that) {
-case _TechMemo():
-return $default(_that);case _:
+case AirTechMemo():
+return air(_that);case JibTechMemo():
+return jib(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -138,11 +161,12 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _TechMemo value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AirTechMemo value)?  air,TResult? Function( JibTechMemo value)?  jib,}){
 final _that = this;
 switch (_that) {
-case _TechMemo() when $default != null:
-return $default(_that);case _:
+case AirTechMemo() when air != null:
+return air(_that);case JibTechMemo() when jib != null:
+return jib(_that);case _:
   return null;
 
 }
@@ -159,10 +183,11 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  air,TResult Function( String id,  String focus,  String outcome,  DateTime updatedAt,  DateTime createdAt)?  jib,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _TechMemo() when $default != null:
-return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case _:
+case AirTechMemo() when air != null:
+return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case JibTechMemo() when jib != null:
+return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);case _:
   return orElse();
 
 }
@@ -180,10 +205,11 @@ return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)  air,required TResult Function( String id,  String focus,  String outcome,  DateTime updatedAt,  DateTime createdAt)  jib,}) {final _that = this;
 switch (_that) {
-case _TechMemo():
-return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case _:
+case AirTechMemo():
+return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case JibTechMemo():
+return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +226,11 @@ return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  air,TResult? Function( String id,  String focus,  String outcome,  DateTime updatedAt,  DateTime createdAt)?  jib,}) {final _that = this;
 switch (_that) {
-case _TechMemo() when $default != null:
-return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case _:
+case AirTechMemo() when air != null:
+return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case JibTechMemo() when jib != null:
+return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);case _:
   return null;
 
 }
@@ -214,32 +241,36 @@ return $default(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_t
 /// @nodoc
 @JsonSerializable()
 
-class _TechMemo implements TechMemo {
-  const _TechMemo({required this.id, required this.focus, required this.outcome, required this.condition, required this.size, required this.updatedAt, required this.createdAt});
-  factory _TechMemo.fromJson(Map<String, dynamic> json) => _$TechMemoFromJson(json);
+class AirTechMemo implements TechMemo {
+  const AirTechMemo({required this.id, required this.focus, required this.outcome, required this.condition, required this.size, required this.updatedAt, required this.createdAt, final  String? $type}): $type = $type ?? 'air';
+  factory AirTechMemo.fromJson(Map<String, dynamic> json) => _$AirTechMemoFromJson(json);
 
 @override final  String id;
 @override final  String focus;
 @override final  String outcome;
-@override final  MemoCondition condition;
-@override final  MemoSize size;
+ final  MemoCondition condition;
+ final  MemoSize size;
 @override final  DateTime updatedAt;
 @override final  DateTime createdAt;
+
+@JsonKey(name: 'type')
+final String $type;
+
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$TechMemoCopyWith<_TechMemo> get copyWith => __$TechMemoCopyWithImpl<_TechMemo>(this, _$identity);
+$AirTechMemoCopyWith<AirTechMemo> get copyWith => _$AirTechMemoCopyWithImpl<AirTechMemo>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$TechMemoToJson(this, );
+  return _$AirTechMemoToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AirTechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -248,15 +279,15 @@ int get hashCode => Object.hash(runtimeType,id,focus,outcome,condition,size,upda
 
 @override
 String toString() {
-  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, condition: $condition, size: $size, updatedAt: $updatedAt, createdAt: $createdAt)';
+  return 'TechMemo.air(id: $id, focus: $focus, outcome: $outcome, condition: $condition, size: $size, updatedAt: $updatedAt, createdAt: $createdAt)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$TechMemoCopyWith<$Res> implements $TechMemoCopyWith<$Res> {
-  factory _$TechMemoCopyWith(_TechMemo value, $Res Function(_TechMemo) _then) = __$TechMemoCopyWithImpl;
+abstract mixin class $AirTechMemoCopyWith<$Res> implements $TechMemoCopyWith<$Res> {
+  factory $AirTechMemoCopyWith(AirTechMemo value, $Res Function(AirTechMemo) _then) = _$AirTechMemoCopyWithImpl;
 @override @useResult
 $Res call({
  String id, String focus, String outcome, MemoCondition condition, MemoSize size, DateTime updatedAt, DateTime createdAt
@@ -267,23 +298,104 @@ $Res call({
 
 }
 /// @nodoc
-class __$TechMemoCopyWithImpl<$Res>
-    implements _$TechMemoCopyWith<$Res> {
-  __$TechMemoCopyWithImpl(this._self, this._then);
+class _$AirTechMemoCopyWithImpl<$Res>
+    implements $AirTechMemoCopyWith<$Res> {
+  _$AirTechMemoCopyWithImpl(this._self, this._then);
 
-  final _TechMemo _self;
-  final $Res Function(_TechMemo) _then;
+  final AirTechMemo _self;
+  final $Res Function(AirTechMemo) _then;
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? condition = null,Object? size = null,Object? updatedAt = null,Object? createdAt = null,}) {
-  return _then(_TechMemo(
+  return _then(AirTechMemo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
 as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
 as String,condition: null == condition ? _self.condition : condition // ignore: cast_nullable_to_non_nullable
 as MemoCondition,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
 as MemoSize,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class JibTechMemo implements TechMemo {
+  const JibTechMemo({required this.id, required this.focus, required this.outcome, required this.updatedAt, required this.createdAt, final  String? $type}): $type = $type ?? 'jib';
+  factory JibTechMemo.fromJson(Map<String, dynamic> json) => _$JibTechMemoFromJson(json);
+
+@override final  String id;
+@override final  String focus;
+@override final  String outcome;
+@override final  DateTime updatedAt;
+@override final  DateTime createdAt;
+
+@JsonKey(name: 'type')
+final String $type;
+
+
+/// Create a copy of TechMemo
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$JibTechMemoCopyWith<JibTechMemo> get copyWith => _$JibTechMemoCopyWithImpl<JibTechMemo>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$JibTechMemoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is JibTechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,focus,outcome,updatedAt,createdAt);
+
+@override
+String toString() {
+  return 'TechMemo.jib(id: $id, focus: $focus, outcome: $outcome, updatedAt: $updatedAt, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $JibTechMemoCopyWith<$Res> implements $TechMemoCopyWith<$Res> {
+  factory $JibTechMemoCopyWith(JibTechMemo value, $Res Function(JibTechMemo) _then) = _$JibTechMemoCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String focus, String outcome, DateTime updatedAt, DateTime createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$JibTechMemoCopyWithImpl<$Res>
+    implements $JibTechMemoCopyWith<$Res> {
+  _$JibTechMemoCopyWithImpl(this._self, this._then);
+
+  final JibTechMemo _self;
+  final $Res Function(JibTechMemo) _then;
+
+/// Create a copy of TechMemo
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? updatedAt = null,Object? createdAt = null,}) {
+  return _then(JibTechMemo(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
+as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
+as String,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));

@@ -13,7 +13,7 @@ final tricksProvider = NotifierProvider<TricksNotifier, List<Trick>>(
 );
 
 class TricksNotifier extends Notifier<List<Trick>> {
-  static const _storageKey = 'tricks_data_v2';
+  static const _storageKey = 'tricks_data_v3';
 
   @override
   List<Trick> build() {
@@ -59,8 +59,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
     String trickId,
     String focus,
     String outcome, {
-    MemoCondition condition = MemoCondition.none,
-    MemoSize size = MemoSize.none,
+    MemoCondition? condition,
+    MemoSize? size,
   }) {
     state = state.map((trick) {
       return trick.map(
@@ -68,12 +68,12 @@ class TricksNotifier extends Notifier<List<Trick>> {
           if (air.id != trickId) {
             return air;
           }
-          final newMemo = TechMemo(
+          final newMemo = TechMemo.air(
             id: _trickUuid.v4(),
             focus: focus,
             outcome: outcome,
-            condition: condition,
-            size: size,
+            condition: condition ?? MemoCondition.none,
+            size: size ?? MemoSize.none,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
@@ -83,12 +83,10 @@ class TricksNotifier extends Notifier<List<Trick>> {
           if (jib.id != trickId) {
             return jib;
           }
-          final newMemo = TechMemo(
+          final newMemo = TechMemo.jib(
             id: _trickUuid.v4(),
             focus: focus,
             outcome: outcome,
-            condition: condition,
-            size: size,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
@@ -106,10 +104,12 @@ class TricksNotifier extends Notifier<List<Trick>> {
           if (air.id != trickId) {
             return air;
           }
+          final refreshed = updatedMemo.map(
+            air: (memo) => memo.copyWith(updatedAt: DateTime.now()),
+            jib: (memo) => memo.copyWith(updatedAt: DateTime.now()),
+          );
           final newMemos = air.memos.map((memo) {
-            return memo.id == updatedMemo.id
-                ? updatedMemo.copyWith(updatedAt: DateTime.now())
-                : memo;
+            return memo.id == updatedMemo.id ? refreshed : memo;
           }).toList();
           return air.copyWith(memos: newMemos);
         },
@@ -117,10 +117,12 @@ class TricksNotifier extends Notifier<List<Trick>> {
           if (jib.id != trickId) {
             return jib;
           }
+          final refreshed = updatedMemo.map(
+            air: (memo) => memo.copyWith(updatedAt: DateTime.now()),
+            jib: (memo) => memo.copyWith(updatedAt: DateTime.now()),
+          );
           final newMemos = jib.memos.map((memo) {
-            return memo.id == updatedMemo.id
-                ? updatedMemo.copyWith(updatedAt: DateTime.now())
-                : memo;
+            return memo.id == updatedMemo.id ? refreshed : memo;
           }).toList();
           return jib.copyWith(memos: newMemos);
         },
@@ -165,7 +167,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       spin: 540,
       grab: 'ミュート',
       memos: [
-        TechMemo(
+        TechMemo.air(
           id: _trickUuid.v4(),
           focus: 'テイクオフで肩のラインを水平に保つ',
           outcome: '軸が安定して回転がスムーズになった',
@@ -174,7 +176,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
           updatedAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
-        TechMemo(
+        TechMemo.air(
           id: _trickUuid.v4(),
           focus: '360の時点でランディングを見る',
           outcome: '着地が完璧に決まった',
@@ -195,7 +197,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       spin: 720,
       grab: 'セーフティ',
       memos: [
-        TechMemo(
+        TechMemo.air(
           id: _trickUuid.v4(),
           focus: '右肩を下げながら抜ける',
           outcome: 'しっかり軸が入った',
@@ -216,7 +218,7 @@ class TricksNotifier extends Notifier<List<Trick>> {
       spin: 540,
       grab: 'ジャパン',
       memos: [
-        TechMemo(
+        TechMemo.air(
           id: _trickUuid.v4(),
           focus: '目線を先行させる',
           outcome: '回転不足が解消',
@@ -232,12 +234,10 @@ class TricksNotifier extends Notifier<List<Trick>> {
       id: _trickUuid.v4(),
       customName: 'フロントボードスライド',
       memos: [
-        TechMemo(
+        TechMemo.jib(
           id: _trickUuid.v4(),
           focus: '腰を真ん中に保つ',
           outcome: '抜けが安定した',
-          condition: MemoCondition.snow,
-          size: MemoSize.middle,
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
           updatedAt: DateTime.now().subtract(const Duration(days: 1)),
         ),
@@ -248,12 +248,10 @@ class TricksNotifier extends Notifier<List<Trick>> {
       id: _trickUuid.v4(),
       customName: 'スイッチテールプレス',
       memos: [
-        TechMemo(
+        TechMemo.jib(
           id: _trickUuid.v4(),
           focus: '肩のラインを進行方向に向ける',
           outcome: '回り込みが減った',
-          condition: MemoCondition.brush,
-          size: MemoSize.small,
           createdAt: DateTime.now().subtract(const Duration(days: 3)),
           updatedAt: DateTime.now().subtract(const Duration(days: 3)),
         ),

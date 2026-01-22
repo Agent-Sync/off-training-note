@@ -6,7 +6,7 @@ part of 'tech_memo.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_TechMemo _$TechMemoFromJson(Map<String, dynamic> json) => _TechMemo(
+AirTechMemo _$AirTechMemoFromJson(Map<String, dynamic> json) => AirTechMemo(
   id: json['id'] as String,
   focus: json['focus'] as String,
   outcome: json['outcome'] as String,
@@ -14,17 +14,20 @@ _TechMemo _$TechMemoFromJson(Map<String, dynamic> json) => _TechMemo(
   size: $enumDecode(_$MemoSizeEnumMap, json['size']),
   updatedAt: DateTime.parse(json['updatedAt'] as String),
   createdAt: DateTime.parse(json['createdAt'] as String),
+  $type: json['type'] as String?,
 );
 
-Map<String, dynamic> _$TechMemoToJson(_TechMemo instance) => <String, dynamic>{
-  'id': instance.id,
-  'focus': instance.focus,
-  'outcome': instance.outcome,
-  'condition': _$MemoConditionEnumMap[instance.condition]!,
-  'size': _$MemoSizeEnumMap[instance.size]!,
-  'updatedAt': instance.updatedAt.toIso8601String(),
-  'createdAt': instance.createdAt.toIso8601String(),
-};
+Map<String, dynamic> _$AirTechMemoToJson(AirTechMemo instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'focus': instance.focus,
+      'outcome': instance.outcome,
+      'condition': _$MemoConditionEnumMap[instance.condition]!,
+      'size': _$MemoSizeEnumMap[instance.size]!,
+      'updatedAt': instance.updatedAt.toIso8601String(),
+      'createdAt': instance.createdAt.toIso8601String(),
+      'type': instance.$type,
+    };
 
 const _$MemoConditionEnumMap = {
   MemoCondition.none: 'none',
@@ -38,3 +41,22 @@ const _$MemoSizeEnumMap = {
   MemoSize.middle: 'middle',
   MemoSize.big: 'big',
 };
+
+JibTechMemo _$JibTechMemoFromJson(Map<String, dynamic> json) => JibTechMemo(
+  id: json['id'] as String,
+  focus: json['focus'] as String,
+  outcome: json['outcome'] as String,
+  updatedAt: DateTime.parse(json['updatedAt'] as String),
+  createdAt: DateTime.parse(json['createdAt'] as String),
+  $type: json['type'] as String?,
+);
+
+Map<String, dynamic> _$JibTechMemoToJson(JibTechMemo instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'focus': instance.focus,
+      'outcome': instance.outcome,
+      'updatedAt': instance.updatedAt.toIso8601String(),
+      'createdAt': instance.createdAt.toIso8601String(),
+      'type': instance.$type,
+    };

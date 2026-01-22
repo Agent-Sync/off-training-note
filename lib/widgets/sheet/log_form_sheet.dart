@@ -5,16 +5,22 @@ import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
 class LogFormSheet extends StatefulWidget {
-  final Function(
+  final void Function(
     String focus,
-    String outcome,
-    MemoCondition condition,
-    MemoSize size,
-  )
+    String outcome, {
+    MemoCondition? condition,
+    MemoSize? size,
+  })
   onAdd;
   final TechMemo? initialMemo;
+  final bool showAirFields;
 
-  const LogFormSheet({super.key, required this.onAdd, this.initialMemo});
+  const LogFormSheet({
+    super.key,
+    required this.onAdd,
+    this.initialMemo,
+    required this.showAirFields,
+  });
 
   @override
   State<LogFormSheet> createState() => _LogFormSheetState();
@@ -37,8 +43,15 @@ class _LogFormSheetState extends State<LogFormSheet> {
     _outcomeController = TextEditingController(
       text: widget.initialMemo?.outcome ?? '',
     );
-    _selectedCondition = widget.initialMemo?.condition ?? MemoCondition.none;
-    _selectedSize = widget.initialMemo?.size ?? MemoSize.none;
+    if (widget.initialMemo != null) {
+      widget.initialMemo!.map(
+        air: (memo) {
+          _selectedCondition = memo.condition;
+          _selectedSize = memo.size;
+        },
+        jib: (_) {},
+      );
+    }
   }
 
   bool get _isValid =>
@@ -125,89 +138,91 @@ class _LogFormSheetState extends State<LogFormSheet> {
 
               const SizedBox(height: 24),
 
-              // Condition Tags
-              const Text(
-                '状況タグ（任意）',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textSecondary,
+              if (widget.showAirFields) ...[
+                // Condition Tags
+                const Text(
+                  '状況タグ（任意）',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textSecondary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _buildConditionChip(
-                    MemoCondition.snow,
-                    _selectedCondition == MemoCondition.snow,
-                    () {
-                      setState(() {
-                        _selectedCondition =
-                            _selectedCondition == MemoCondition.snow
-                            ? MemoCondition.none
-                            : MemoCondition.snow;
-                      });
-                    },
-                  ),
-                  _buildConditionChip(
-                    MemoCondition.brush,
-                    _selectedCondition == MemoCondition.brush,
-                    () {
-                      setState(() {
-                        _selectedCondition =
-                            _selectedCondition == MemoCondition.brush
-                            ? MemoCondition.none
-                            : MemoCondition.brush;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _buildChoiceChip(
-                    'スモール(~5m)',
-                    _selectedSize == MemoSize.small,
-                    () {
-                      setState(() {
-                        _selectedSize = _selectedSize == MemoSize.small
-                            ? MemoSize.none
-                            : MemoSize.small;
-                      });
-                    },
-                  ),
-                  _buildChoiceChip(
-                    'ミドル(~9m)',
-                    _selectedSize == MemoSize.middle,
-                    () {
-                      setState(() {
-                        _selectedSize = _selectedSize == MemoSize.middle
-                            ? MemoSize.none
-                            : MemoSize.middle;
-                      });
-                    },
-                  ),
-                  _buildChoiceChip(
-                    'ビッグ(10m~)',
-                    _selectedSize == MemoSize.big,
-                    () {
-                      setState(() {
-                        _selectedSize = _selectedSize == MemoSize.big
-                            ? MemoSize.none
-                            : MemoSize.big;
-                      });
-                    },
-                  ),
-                ],
-              ),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildConditionChip(
+                      MemoCondition.snow,
+                      _selectedCondition == MemoCondition.snow,
+                      () {
+                        setState(() {
+                          _selectedCondition =
+                              _selectedCondition == MemoCondition.snow
+                              ? MemoCondition.none
+                              : MemoCondition.snow;
+                        });
+                      },
+                    ),
+                    _buildConditionChip(
+                      MemoCondition.brush,
+                      _selectedCondition == MemoCondition.brush,
+                      () {
+                        setState(() {
+                          _selectedCondition =
+                              _selectedCondition == MemoCondition.brush
+                              ? MemoCondition.none
+                              : MemoCondition.brush;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildChoiceChip(
+                      'スモール(~5m)',
+                      _selectedSize == MemoSize.small,
+                      () {
+                        setState(() {
+                          _selectedSize = _selectedSize == MemoSize.small
+                              ? MemoSize.none
+                              : MemoSize.small;
+                        });
+                      },
+                    ),
+                    _buildChoiceChip(
+                      'ミドル(~9m)',
+                      _selectedSize == MemoSize.middle,
+                      () {
+                        setState(() {
+                          _selectedSize = _selectedSize == MemoSize.middle
+                              ? MemoSize.none
+                              : MemoSize.middle;
+                        });
+                      },
+                    ),
+                    _buildChoiceChip(
+                      'ビッグ(10m~)',
+                      _selectedSize == MemoSize.big,
+                      () {
+                        setState(() {
+                          _selectedSize = _selectedSize == MemoSize.big
+                              ? MemoSize.none
+                              : MemoSize.big;
+                        });
+                      },
+                    ),
+                  ],
+                ),
 
-              const SizedBox(height: 32),
+                const SizedBox(height: 32),
+              ],
 
               // Buttons
               Row(
@@ -239,8 +254,11 @@ class _LogFormSheetState extends State<LogFormSheet> {
                               widget.onAdd(
                                 _focusController.text,
                                 _outcomeController.text,
-                                _selectedCondition,
-                                _selectedSize,
+                                condition: widget.showAirFields
+                                    ? _selectedCondition
+                                    : null,
+                                size:
+                                    widget.showAirFields ? _selectedSize : null,
                               );
                               Navigator.pop(context);
                             }

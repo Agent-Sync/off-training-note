@@ -31,6 +31,7 @@ class TrickDetailSheet extends ConsumerWidget {
     );
     final name = currentTrick.displayName();
     final tags = currentTrick.tagLabels();
+    final showAirFields = currentTrick is AirTrick;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -184,13 +185,21 @@ class TrickDetailSheet extends ConsumerWidget {
                                                 Builder(
                                                   builder: (context) {
                                                     final conditionStyle =
-                                                        _getConditionStyle(
-                                                          memo.condition,
+                                                        memo.map(
+                                                          air: (airMemo) =>
+                                                              _getConditionStyle(
+                                                                airMemo
+                                                                    .condition,
+                                                              ),
+                                                          jib: (_) => null,
                                                         );
-                                                    final sizeLabel =
-                                                        _getSizeLabel(
-                                                          memo.size,
-                                                        );
+                                                    final sizeLabel = memo.map(
+                                                      air: (airMemo) =>
+                                                          _getSizeLabel(
+                                                            airMemo.size,
+                                                          ),
+                                                      jib: (_) => null,
+                                                    );
                                                     return Wrap(
                                                       spacing: 4,
                                                       children: [
@@ -358,7 +367,8 @@ class TrickDetailSheet extends ConsumerWidget {
                     showAppBottomSheet(
                       context: context,
                       builder: (context) => LogFormSheet(
-                        onAdd: (focus, outcome, condition, size) {
+                        showAirFields: showAirFields,
+                        onAdd: (focus, outcome, {condition, size}) {
                           ref
                               .read(tricksProvider.notifier)
                               .addMemo(
@@ -414,12 +424,19 @@ class TrickDetailSheet extends ConsumerWidget {
                   context: context,
                   builder: (context) => LogFormSheet(
                     initialMemo: memo,
-                    onAdd: (focus, outcome, condition, size) {
-                      final updatedMemo = memo.copyWith(
-                        focus: focus,
-                        outcome: outcome,
-                        condition: condition,
-                        size: size,
+                    showAirFields: memo is AirTechMemo,
+                    onAdd: (focus, outcome, {condition, size}) {
+                      final updatedMemo = memo.map(
+                        air: (airMemo) => airMemo.copyWith(
+                          focus: focus,
+                          outcome: outcome,
+                          condition: condition ?? MemoCondition.none,
+                          size: size ?? MemoSize.none,
+                        ),
+                        jib: (jibMemo) => jibMemo.copyWith(
+                          focus: focus,
+                          outcome: outcome,
+                        ),
                       );
                       ref
                           .read(tricksProvider.notifier)

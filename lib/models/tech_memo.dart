@@ -7,9 +7,9 @@ enum MemoCondition { none, snow, brush }
 
 enum MemoSize { none, small, middle, big }
 
-@freezed
+@Freezed(unionKey: 'type')
 abstract class TechMemo with _$TechMemo {
-  const factory TechMemo({
+  const factory TechMemo.air({
     required String id,
     required String focus,
     required String outcome,
@@ -17,7 +17,15 @@ abstract class TechMemo with _$TechMemo {
     required MemoSize size,
     required DateTime updatedAt,
     required DateTime createdAt,
-  }) = _TechMemo;
+  }) = AirTechMemo;
+
+  const factory TechMemo.jib({
+    required String id,
+    required String focus,
+    required String outcome,
+    required DateTime updatedAt,
+    required DateTime createdAt,
+  }) = JibTechMemo;
 
   factory TechMemo.fromJson(Map<String, dynamic> json) =>
       _$TechMemoFromJson(json);
