@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:off_training_note/models/air_trick.dart';
+import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/form/two_option_toggle.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
@@ -202,7 +202,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               style: const TextStyle(fontWeight: FontWeight.w600),
               onTap: () {
                 _showAxisSheet(
-                  options: AirTrick.axes,
+                  options: Trick.axes,
                   selectedValue: _axisController.text.isEmpty
                       ? null
                       : _axisController.text,
@@ -247,7 +247,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 ),
                 onTap: () {
                   _showSpinSheet(
-                    options: AirTrick.spins.map((e) => e.toString()).toList(),
+                    options: Trick.spins.map((e) => e.toString()).toList(),
                     selectedValue: _spinController.text.isEmpty
                         ? null
                         : _spinController.text,
@@ -286,7 +286,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
               onTap: () {
                 _showSearchableOptionSheet(
                   title: 'グラブを選択',
-                  options: AirTrick.grabs,
+                  options: Trick.grabs,
                   selectedValue: _grabController.text.isEmpty
                       ? null
                       : _grabController.text,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:off_training_note/models/air_trick.dart';
+import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class TrickCard extends StatelessWidget {
-  final AirTrick trick;
+  final Trick trick;
   final VoidCallback onTap;
 
   const TrickCard({super.key, required this.trick, required this.onTap});

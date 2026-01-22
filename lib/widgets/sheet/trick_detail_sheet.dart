@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_memo.dart';
-import 'package:off_training_note/models/air_trick.dart';
-import 'package:off_training_note/providers/air_tricks_provider.dart';
+import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
@@ -13,15 +13,22 @@ import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class TrickDetailSheet extends ConsumerWidget {
-  final AirTrick trick;
+  final Trick trick;
 
   const TrickDetailSheet({super.key, required this.trick});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTrick = ref
-        .watch(airTricksProvider)
-        .firstWhere((item) => item.id == trick.id, orElse: () => trick);
+    final currentTrick = trick.map(
+      air: (air) => ref
+          .watch(tricksProvider)
+          .whereType<AirTrick>()
+          .firstWhere((item) => item.id == air.id, orElse: () => air),
+      jib: (jib) => ref
+          .watch(tricksProvider)
+          .whereType<JibTrick>()
+          .firstWhere((item) => item.id == jib.id, orElse: () => jib),
+    );
     final name = currentTrick.displayName();
     final tags = currentTrick.tagLabels();
 
@@ -49,14 +56,16 @@ class TrickDetailSheet extends ConsumerWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 12),
-                  // Tags
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: tags.map(_buildTag).toList(),
-                  ),
+                  if (tags.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    // Tags
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: tags.map(_buildTag).toList(),
+                    ),
+                  ],
                 ],
               ),
               const SizedBox(height: 24),
@@ -351,7 +360,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       builder: (context) => LogFormSheet(
                         onAdd: (focus, outcome, condition, size) {
                           ref
-                              .read(airTricksProvider.notifier)
+                              .read(tricksProvider.notifier)
                               .addMemo(
                                 trick.id,
                                 focus,
@@ -413,7 +422,7 @@ class TrickDetailSheet extends ConsumerWidget {
                         size: size,
                       );
                       ref
-                          .read(airTricksProvider.notifier)
+                          .read(tricksProvider.notifier)
                           .updateMemo(trick.id, updatedMemo);
                     },
                   ),
@@ -497,7 +506,7 @@ class TrickDetailSheet extends ConsumerWidget {
                       child: OutlinedButton(
                         onPressed: () {
                           ref
-                              .read(airTricksProvider.notifier)
+                              .read(tricksProvider.notifier)
                               .deleteMemo(trick.id, memo.id);
                           Navigator.pop(context);
                         },

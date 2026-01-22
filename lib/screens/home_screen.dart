@@ -3,13 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:off_training_note/models/jib_trick.dart';
-import 'package:off_training_note/models/air_trick.dart';
-import 'package:off_training_note/providers/jib_air_tricks_provider.dart';
-import 'package:off_training_note/providers/air_tricks_provider.dart';
+import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
-import 'package:off_training_note/widgets/jib_trick_card.dart';
+import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/new_jib_modal.dart';
 import 'package:off_training_note/widgets/sheet/new_trick_modal.dart';
@@ -69,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         context: context,
         builder: (context) => NewTrickModal(
           onAdd: (stance, takeoff, axis, spin, grab, direction) {
-            final newTrick = AirTrick(
+            final newTrick = Trick.air(
               id: _uuid.v4(),
               stance: stance,
               takeoff: takeoff,
@@ -80,7 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               memos: [],
               createdAt: DateTime.now(),
             );
-            ref.read(airTricksProvider.notifier).addTrick(newTrick);
+            ref.read(tricksProvider.notifier).addTrick(newTrick);
           },
         ),
       ).whenComplete(() {
@@ -94,7 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       builder: (context) => NewJibModal(
         onAdd: (customName) {
-          ref.read(jibTricksProvider.notifier).addJibTrick(customName);
+          ref.read(tricksProvider.notifier).addJibTrick(customName);
         },
       ),
     ).whenComplete(() {
@@ -103,7 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  void _showTrickDetail(AirTrick trick) {
+  void _showTrickDetail(Trick trick) {
     _dismissSearchFocus();
     _lockSearchFocus();
     showAppBottomSheet(
@@ -121,21 +119,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final allTricks = ref.watch(airTricksProvider);
-    final allJibTricks = ref.watch(jibTricksProvider);
+    final allTricks = ref.watch(tricksProvider);
 
-    final filteredTricks = allTricks
+    final airTricks = allTricks.whereType<AirTrick>().toList();
+    final jibTricks = allTricks.whereType<JibTrick>().toList();
+
+    final filteredTricks = airTricks
         .where((t) => t.matchesQuery(_searchQuery))
         .toList();
 
-    final filteredJibTricks = allJibTricks
+    final filteredJibTricks = jibTricks
         .where(
           (jib) =>
               jib.customName.toLowerCase().contains(_searchQuery.toLowerCase()),
         )
         .toList();
 
-    DateTime latestMemoAt(AirTrick trick) {
+    DateTime latestMemoAt(Trick trick) {
       if (trick.memos.isEmpty) return trick.createdAt;
       return trick.memos
           .map((memo) => memo.updatedAt)
@@ -144,7 +144,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // Sort by latest memo desc, fall back to createdAt
     filteredTricks.sort((a, b) => latestMemoAt(b).compareTo(latestMemoAt(a)));
-    filteredJibTricks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    filteredJibTricks
+        .sort((a, b) => latestMemoAt(b).compareTo(latestMemoAt(a)));
 
     final content = _activeTab == _HomeTab.air
         ? _buildTrickContent(filteredTricks)
@@ -200,7 +201,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildTrickContent(List<AirTrick> filteredTricks) {
+  Widget _buildTrickContent(List<Trick> filteredTricks) {
     if (filteredTricks.isEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: _searchBarOverlap),
@@ -221,7 +222,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildJibContent(List<JibTrick> filteredJibTricks) {
+  Widget _buildJibContent(List<Trick> filteredJibTricks) {
     if (filteredJibTricks.isEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: _searchBarOverlap),
@@ -237,7 +238,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       itemCount: filteredJibTricks.length,
       itemBuilder: (context, index) {
         final jib = filteredJibTricks[index];
-        return JibTrickCard(jibTrick: jib);
+        return TrickCard(trick: jib, onTap: () => _showTrickDetail(jib));
       },
     );
   }
