@@ -1,4 +1,7 @@
 import 'package:off_training_note/models/community_memo.dart';
+import 'package:off_training_note/models/profile.dart';
+import 'package:off_training_note/models/tech_memo.dart';
+import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/repositories/community_like_repository.dart';
 import 'package:off_training_note/services/supabase_client_service.dart';
 
@@ -43,7 +46,7 @@ class CommunityRepository {
 
     final rowList = rows as List<dynamic>;
     final memoIds = rowList
-        .map((row) => row['memo_id'] as String)
+        .map((row) => row['id'] as String)
         .toList();
 
     final likedMemoIds = userId != null
@@ -55,47 +58,158 @@ class CommunityRepository {
 
     return rowList.map((row) {
       final memoId = row['id'] as String;
-      return _memoFromRow(
+      return _communityMemoFromRow(
         row as Map<String, dynamic>,
         likedByMe: likedMemoIds.contains(memoId),
       );
     }).toList();
   }
 
-  CommunityMemo _memoFromRow(
+  CommunityMemo _communityMemoFromRow(
     Map<String, dynamic> row, {
     required bool likedByMe,
   }) {
     return CommunityMemo(
-      id: row['id'] as String,
-      trickId: row['trick_id'] as String,
-      memoType: row['type'] as String,
-      focus: row['focus'] as String,
-      outcome: row['outcome'] as String,
-      condition: row['condition'] as String?,
-      size: row['size'] as String?,
-      createdAt: DateTime.parse(row['created_at'] as String),
-      updatedAt: DateTime.parse(row['updated_at'] as String),
-      trickType: (row['tricks'] as Map<String, dynamic>)['type'] as String,
-      customName:
-          (row['tricks'] as Map<String, dynamic>)['custom_name'] as String?,
-      stance: (row['tricks'] as Map<String, dynamic>)['stance'] as String?,
-      takeoff: (row['tricks'] as Map<String, dynamic>)['takeoff'] as String?,
-      axis: (row['tricks'] as Map<String, dynamic>)['axis'] as String?,
-      spin: ((row['tricks'] as Map<String, dynamic>)['spin'] as num?)?.toInt(),
-      grab: (row['tricks'] as Map<String, dynamic>)['grab'] as String?,
-      direction:
-          (row['tricks'] as Map<String, dynamic>)['direction'] as String?,
-      trickCreatedAt: DateTime.parse(
-        (row['tricks'] as Map<String, dynamic>)['created_at'] as String,
+      memo: _techMemoFromRow(row),
+      trick: _trickFromRow(
+        row['trick_id'] as String,
+        row['tricks'] as Map<String, dynamic>,
       ),
-      userId: row['user_id'] as String,
-      displayName:
-          (row['profiles'] as Map<String, dynamic>)['display_name'] as String?,
-      avatarUrl:
-          (row['profiles'] as Map<String, dynamic>)['avatar_url'] as String?,
+      profile: _profileFromRow(
+        row['user_id'] as String,
+        row['profiles'] as Map<String, dynamic>,
+      ),
       likeCount: (row['like_count'] as num?)?.toInt() ?? 0,
       likedByMe: likedByMe,
     );
+  }
+
+  Profile _profileFromRow(String userId, Map<String, dynamic> row) {
+    return Profile(
+      userId: userId,
+      displayName: row['display_name'] as String?,
+      avatarUrl: row['avatar_url'] as String?,
+    );
+  }
+
+  Trick _trickFromRow(String trickId, Map<String, dynamic> row) {
+    final type = row['type'] as String;
+    if (type == 'jib') {
+      return Trick.jib(
+        id: trickId,
+        customName: row['custom_name'] as String? ?? '',
+        memos: const [],
+        isPublic: row['is_public'] as bool? ?? true,
+        createdAt: DateTime.parse(row['created_at'] as String),
+      );
+    }
+
+    return Trick.air(
+      id: trickId,
+      stance: _stanceFromDb(row['stance'] as String?),
+      takeoff: _takeoffFromDb(row['takeoff'] as String?),
+      axis: _axisFromDb(row['axis'] as String?),
+      spin: (row['spin'] as num?)?.toInt() ?? 0,
+      grab: _grabFromDb(row['grab'] as String?),
+      direction: _directionFromDb(row['direction'] as String?),
+      memos: const [],
+      isPublic: row['is_public'] as bool? ?? true,
+      createdAt: DateTime.parse(row['created_at'] as String),
+    );
+  }
+
+  TechMemo _techMemoFromRow(Map<String, dynamic> row) {
+    final type = row['type'] as String;
+    if (type == 'jib') {
+      return TechMemo.jib(
+        id: row['id'] as String,
+        focus: row['focus'] as String,
+        outcome: row['outcome'] as String,
+        updatedAt: DateTime.parse(row['updated_at'] as String),
+        createdAt: DateTime.parse(row['created_at'] as String),
+      );
+    }
+
+    return TechMemo.air(
+      id: row['id'] as String,
+      focus: row['focus'] as String,
+      outcome: row['outcome'] as String,
+      condition: _conditionFromDb(row['condition'] as String?),
+      size: _sizeFromDb(row['size'] as String?),
+      updatedAt: DateTime.parse(row['updated_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String),
+    );
+  }
+
+  MemoCondition _conditionFromDb(String? value) {
+    switch (value) {
+      case 'snow':
+        return MemoCondition.snow;
+      case 'brush':
+        return MemoCondition.brush;
+      case 'none':
+      default:
+        return MemoCondition.none;
+    }
+  }
+
+  MemoSize _sizeFromDb(String? value) {
+    switch (value) {
+      case 'small':
+        return MemoSize.small;
+      case 'middle':
+        return MemoSize.middle;
+      case 'big':
+        return MemoSize.big;
+      case 'none':
+      default:
+        return MemoSize.none;
+    }
+  }
+
+  Stance _stanceFromDb(String? value) {
+    switch (value) {
+      case 'switchStance':
+        return Stance.switchStance;
+      case 'regular':
+      default:
+        return Stance.regular;
+    }
+  }
+
+  Takeoff _takeoffFromDb(String? value) {
+    switch (value) {
+      case 'carving':
+        return Takeoff.carving;
+      case 'standard':
+      default:
+        return Takeoff.standard;
+    }
+  }
+
+  Direction _directionFromDb(String? value) {
+    switch (value) {
+      case 'left':
+        return Direction.left;
+      case 'right':
+        return Direction.right;
+      case 'none':
+      default:
+        return Direction.none;
+    }
+  }
+
+  Axis _axisFromDb(String? value) {
+    if (value == null) {
+      return Axis.upright;
+    }
+    return Axis.fromDb(value);
+  }
+
+  Grab _grabFromDb(String? value) {
+    if (value == null) {
+      return Grab.none;
+    }
+    return Grab.fromDb(value);
   }
 }

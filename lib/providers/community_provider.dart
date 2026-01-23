@@ -103,21 +103,21 @@ class CommunityNotifier extends Notifier<CommunityFeedState> {
     state = state.copyWith(
       items: [
         for (final item in state.items)
-          if (item.id == memo.id) updated else item
+          if (item.memo.id == memo.memo.id) updated else item
       ],
     );
     try {
       final likeRepo = ref.read(communityLikeRepositoryProvider);
       if (memo.likedByMe) {
-        await likeRepo.unlikeMemo(memoId: memo.id, userId: userId);
+        await likeRepo.unlikeMemo(memoId: memo.memo.id, userId: userId);
       } else {
-        await likeRepo.likeMemo(memoId: memo.id, userId: userId);
+        await likeRepo.likeMemo(memoId: memo.memo.id, userId: userId);
       }
     } catch (e) {
       state = state.copyWith(
         items: [
           for (final item in state.items)
-            if (item.id == memo.id) memo else item
+            if (item.memo.id == memo.memo.id) memo else item
         ],
         errorMessage: 'いいねの更新に失敗しました',
       );

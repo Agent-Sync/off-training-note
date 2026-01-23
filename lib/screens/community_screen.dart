@@ -323,12 +323,12 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               CircleAvatar(
                 radius: 18,
                 backgroundColor: Colors.grey.shade200,
-                backgroundImage: (memo.avatarUrl != null &&
-                        memo.avatarUrl!.trim().isNotEmpty)
-                    ? NetworkImage(memo.avatarUrl!)
+                backgroundImage: (memo.profile.avatarUrl != null &&
+                        memo.profile.avatarUrl!.trim().isNotEmpty)
+                    ? NetworkImage(memo.profile.avatarUrl!)
                     : null,
-                child: (memo.avatarUrl == null ||
-                        memo.avatarUrl!.trim().isEmpty)
+                child: (memo.profile.avatarUrl == null ||
+                        memo.profile.avatarUrl!.trim().isEmpty)
                     ? const Icon(Icons.person, color: Colors.white, size: 18)
                     : null,
               ),
@@ -357,7 +357,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 ),
               ),
               Text(
-                timeago.format(memo.createdAt, locale: 'ja'),
+                timeago.format(memo.memo.createdAt, locale: 'ja'),
                 style: const TextStyle(
                   fontSize: 10,
                   color: AppTheme.textSecondary,
@@ -387,7 +387,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  memo.focus,
+                  memo.memo.focus,
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppTheme.textMain,
@@ -432,7 +432,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  memo.outcome,
+                  memo.memo.outcome,
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppTheme.textMain,
