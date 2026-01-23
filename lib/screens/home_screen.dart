@@ -1,23 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:off_training_note/models/profile.dart';
-import 'package:off_training_note/models/trick.dart';
-import 'package:off_training_note/providers/profile_provider.dart';
-import 'package:off_training_note/providers/tricks_provider.dart';
+import 'package:off_training_note/screens/community_screen.dart';
+import 'package:off_training_note/screens/note_screen.dart';
 import 'package:off_training_note/theme/app_theme.dart';
-import 'package:off_training_note/utils/trick_helpers.dart';
-import 'package:off_training_note/widgets/dotted_background.dart';
-import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
-import 'package:off_training_note/widgets/trick_card.dart';
-import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
-import 'package:off_training_note/widgets/sheet/new_jib_modal.dart';
-import 'package:off_training_note/widgets/sheet/new_trick_modal.dart';
-import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -26,497 +11,86 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-enum _HomeTab { air, jib }
-
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  static const double _searchBarOverlap = 72;
-  _HomeTab _activeTab = _HomeTab.air;
-  String _searchQuery = '';
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
-  final _uuid = const Uuid();
-  Timer? _searchFocusTimer;
-  bool _suppressSearchFocus = false;
-  @override
-  void dispose() {
-    _searchFocusTimer?.cancel();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    super.dispose();
-  }
+  int _currentIndex = 0;
 
-  void _lockSearchFocus() {
-    if (_suppressSearchFocus) {
-      return;
-    }
-    setState(() => _suppressSearchFocus = true);
-  }
-
-  void _unlockSearchFocusWithDelay() {
-    _searchFocusTimer?.cancel();
-    _searchFocusTimer = Timer(const Duration(milliseconds: 150), () {
-      if (!mounted) {
-        return;
-      }
-      setState(() => _suppressSearchFocus = false);
-    });
-  }
-
-  void _showNewTrickModal() {
-    _dismissSearchFocus();
-    _lockSearchFocus();
-    if (_activeTab == _HomeTab.air) {
-      showAppBottomSheet(
-        context: context,
-        builder: (context) => NewTrickModal(
-          onAdd: (stance, takeoff, axis, spin, grab, direction) {
-            final newTrick = Trick.air(
-              id: _uuid.v4(),
-              stance: stance,
-              takeoff: takeoff,
-              axis: axis,
-              spin: spin,
-              grab: grab,
-              direction: direction,
-              memos: [],
-              createdAt: DateTime.now(),
-            );
-            ref.read(tricksProvider.notifier).addTrick(newTrick);
-          },
-        ),
-      ).whenComplete(() {
-        _dismissSearchFocus();
-        _unlockSearchFocusWithDelay();
-      });
-      return;
-    }
-
-    showAppBottomSheet(
-      context: context,
-      builder: (context) => NewJibModal(
-        onAdd: (customName) {
-          final newJib = Trick.jib(
-            id: _uuid.v4(),
-            customName: customName,
-            memos: const [],
-            createdAt: DateTime.now(),
-          );
-          ref.read(tricksProvider.notifier).addTrick(newJib);
-        },
-      ),
-    ).whenComplete(() {
-      _dismissSearchFocus();
-      _unlockSearchFocusWithDelay();
-    });
-  }
-
-  void _showTrickDetail(Trick trick) {
-    _dismissSearchFocus();
-    _lockSearchFocus();
-    showAppBottomSheet(
-      context: context,
-      builder: (context) => TrickDetailSheet(trick: trick),
-    ).whenComplete(() {
-      _dismissSearchFocus();
-      _unlockSearchFocusWithDelay();
-    });
-  }
-
-  void _dismissSearchFocus() {
-    FocusScope.of(context).unfocus();
-  }
-
-  Future<void> _signOut() async {
-    try {
-      await Supabase.instance.client.auth.signOut();
-    } catch (e, stack) {
-      debugPrint('$stack');
-      rethrow;
-    }
-  }
+  final List<Widget> _screens = const [
+    NoteScreen(),
+    CommunityScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final allTricks = ref.watch(tricksProvider);
-
-    final airTricks = allTricks.whereType<AirTrick>().toList();
-    final jibTricks = allTricks.whereType<JibTrick>().toList();
-
-    final filteredTricks = airTricks
-        .where((t) => t.matchesQuery(_searchQuery))
-        .toList();
-
-    final filteredJibTricks = jibTricks
-        .where(
-          (jib) =>
-              jib.customName.toLowerCase().contains(_searchQuery.toLowerCase()),
-        )
-        .toList();
-
-    DateTime latestMemoAt(Trick trick) {
-      if (trick.memos.isEmpty) return trick.createdAt;
-      return trick.memos
-          .map((memo) => memo.updatedAt)
-          .reduce((a, b) => a.isAfter(b) ? a : b);
-    }
-
-    // Sort by latest memo desc, fall back to createdAt
-    filteredTricks.sort((a, b) => latestMemoAt(b).compareTo(latestMemoAt(a)));
-    filteredJibTricks
-        .sort((a, b) => latestMemoAt(b).compareTo(latestMemoAt(a)));
-
-    final content = _activeTab == _HomeTab.air
-        ? _buildTrickContent(filteredTricks)
-        : _buildJibContent(filteredJibTricks);
-
     return Scaffold(
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: _dismissSearchFocus,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: CustomPaint(painter: DottedBackgroundPainter()),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey.shade200,
+              width: 1,
             ),
-            Column(
-              children: [
-                _buildHeaderTabs(context),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      content,
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: _buildSearchBar(),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            // FAB
-            Positioned(
-              bottom: 24,
-              right: 24,
-              child: FloatingActionButton.extended(
-                onPressed: _showNewTrickModal,
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                elevation: 4,
-                icon: const Icon(Icons.add),
-                label: const Text(
-                  '新しいトリック',
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
-              ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTrickContent(List<Trick> filteredTricks) {
-    if (filteredTricks.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(top: _searchBarOverlap),
-        child: _buildEmptyState(),
-      );
-    }
-
-    return MasonryGridView.count(
-      padding: const EdgeInsets.fromLTRB(16, 8 + _searchBarOverlap, 16, 100),
-      crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      itemCount: filteredTricks.length,
-      itemBuilder: (context, index) {
-        final trick = filteredTricks[index];
-        return TrickCard(trick: trick, onTap: () => _showTrickDetail(trick));
-      },
-    );
-  }
-
-  Widget _buildJibContent(List<Trick> filteredJibTricks) {
-    if (filteredJibTricks.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(top: _searchBarOverlap),
-        child: _buildEmptyState(),
-      );
-    }
-
-    return MasonryGridView.count(
-      padding: const EdgeInsets.fromLTRB(16, 8 + _searchBarOverlap, 16, 100),
-      crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      itemCount: filteredJibTricks.length,
-      itemBuilder: (context, index) {
-        final jib = filteredJibTricks[index];
-        return TrickCard(trick: jib, onTap: () => _showTrickDetail(jib));
-      },
-    );
-  }
-
-  Widget _buildTabButton(String label, _HomeTab type) {
-    final isActive = _activeTab == type;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _activeTab = type),
-        behavior: HitTestBehavior.opaque,
-        child: Center(
-          child: AnimatedScale(
-            scale: isActive ? 1.05 : 1.0,
-            duration: const Duration(milliseconds: 200),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: isActive ? Colors.black : Colors.grey.shade400,
-                letterSpacing: 1.2,
-              ),
-            ),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            indicatorColor: Colors.transparent,
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                );
+              }
+              return TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade400,
+              );
+            }),
+            iconTheme: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const IconThemeData(color: Colors.black, size: 26);
+              }
+              return IconThemeData(color: Colors.grey.shade400, size: 26);
+            }),
           ),
-        ),
-      ),
-    );
-  }
-
-  void _showProfileActions() {
-    showAppBottomSheet(
-      context: context,
-      builder: (context) {
-        return AppBottomSheetContainer(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildActionItem(
-                context,
-                icon: Icons.settings,
-                label: '設定',
-                enabled: false,
-                onTap: () {},
+          child: NavigationBar(
+            height: 65,
+            backgroundColor: Colors.white,
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.sticky_note_2_outlined),
+                selectedIcon: Icon(Icons.sticky_note_2),
+                label: 'Note',
               ),
-              const SizedBox(height: 8),
-              _buildActionItem(
-                context,
-                icon: Icons.edit,
-                label: '編集',
-                enabled: false,
-                onTap: () {},
+              NavigationDestination(
+                icon: Icon(Icons.people_outline),
+                selectedIcon: Icon(Icons.people),
+                label: 'みんな',
               ),
-              const SizedBox(height: 8),
-              _buildActionItem(
-                context,
-                icon: Icons.logout,
-                label: 'ログアウト',
-                isDestructive: true,
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  await _signOut();
-                },
-              ),
-              const SizedBox(height: 16),
             ],
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildActionItem(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool isDestructive = false,
-    bool enabled = true,
-  }) {
-    final color = isDestructive ? Colors.red : AppTheme.textMain;
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: enabled ? color : Colors.grey.shade400,
-              size: 24,
-            ),
-            const SizedBox(width: 16),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: enabled ? color : Colors.grey.shade400,
-              ),
-            ),
-            const Spacer(),
-          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAvatarButton(AsyncValue<Profile?> profileAsync) {
-    final avatar = profileAsync.when(
-      data: (profile) {
-        final url = profile?.avatarUrl;
-        if (url != null && url.isNotEmpty) {
-          return CircleAvatar(
-            radius: 16,
-            backgroundImage: NetworkImage(url),
-          );
-        }
-        return CircleAvatar(
-          radius: 16,
-          backgroundColor: Colors.grey.shade200,
-          child: Icon(Icons.person, size: 18, color: Colors.grey.shade600),
-        );
-      },
-      loading: () => const SizedBox(
-        width: 32,
-        height: 32,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      ),
-      error: (_, __) => CircleAvatar(
-        radius: 16,
-        backgroundColor: Colors.grey.shade200,
-        child: Icon(Icons.person, size: 18, color: Colors.grey.shade600),
-      ),
-    );
-
-    return GestureDetector(
-      onTap: _showProfileActions,
-      child: SizedBox(
-        width: 40,
-        height: 40,
-        child: Center(child: avatar),
-      ),
-    );
-  }
-
-  Widget _buildHeaderTabs(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 10,
-        bottom: 10,
-      ),
-      decoration: BoxDecoration(
-        color: AppTheme.background.withValues(alpha: 0.95),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 48),
-          Expanded(
-            child: Center(
-              child: Container(
-                width: 200,
-                height: 40,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(20)),
-                child: Stack(
-                  children: [
-                    AnimatedAlign(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                      alignment: _activeTab == _HomeTab.air
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      child: Container(
-                        width: 100,
-                        height: 4,
-                        margin: const EdgeInsets.only(top: 30),
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        _buildTabButton('AIR', _HomeTab.air),
-                        _buildTabButton('JIB', _HomeTab.jib),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          _buildAvatarButton(ref.watch(profileProvider)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      color: AppTheme.background.withValues(alpha: 0),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                focusNode: _searchFocusNode,
-                canRequestFocus: !_suppressSearchFocus,
-                textAlignVertical: TextAlignVertical.center,
-                onChanged: (val) {
-                  setState(() {
-                    _searchQuery = val;
-                  });
-                },
-                decoration: const InputDecoration(
-                  isDense: true,
-                  hintText: 'トリックを検索...',
-                  hintStyle: TextStyle(color: AppTheme.textHint),
-                  prefixIcon: Icon(Icons.search, color: AppTheme.textHint),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.search_off, size: 48, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
-          const Text(
-            'トリックが見つかりません',
-            style: TextStyle(color: AppTheme.textHint),
-          ),
-        ],
       ),
     );
   }
