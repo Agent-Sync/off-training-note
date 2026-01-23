@@ -8,7 +8,7 @@ insert into public.profiles (
 (
   '38df4b07-e015-4d61-ab23-c65bf9d835c8',
   'Kazuki Fujikawa',
-  'https://lh3.googleusercontent.com/a/ACg8ocJc0xmTuRqRwHl6icu5D494q3oOw0tw3wsXe70B2sbM92CJYxw0=s96-c',
+  null,
   '2026-01-22 08:52:57.438833+00',
   '2026-01-23 02:01:03.249488+00'
 )
