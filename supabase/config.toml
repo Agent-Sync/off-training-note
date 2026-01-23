@@ -65,6 +65,7 @@ sql_paths = [
   "./seeds/01_profiles.sql",
   "./seeds/02_tricks.sql",
   "./seeds/03_memos.sql",
+  "./seeds/04_memo_likes.sql",
 ]
 
 [db.network_restrictions]

@@ -89,3 +89,110 @@ insert into public.tricks (
   now() - interval '4 days'
 )
 on conflict (id) do nothing;
+
+insert into public.tricks (
+  id,
+  user_id,
+  type,
+  custom_name,
+  stance,
+  takeoff,
+  axis,
+  spin,
+  grab,
+  direction,
+  is_public,
+  created_at,
+  updated_at
+) values
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4',
+  '7c1d4e2e-5f6a-4b7e-8f2c-6f2d1b2a3c4d',
+  'air',
+  null,
+  'regular',
+  'carving',
+  'ダブルコーク',
+  1080,
+  'ミュート',
+  'left',
+  true,
+  now() - interval '6 days',
+  now() - interval '6 days'
+),
+(
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb3',
+  '7c1d4e2e-5f6a-4b7e-8f2c-6f2d1b2a3c4d',
+  'jib',
+  'フロント270オン 450オフ',
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  true,
+  now() - interval '5 days',
+  now() - interval '5 days'
+),
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5',
+  '9a3c2b1d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
+  'air',
+  null,
+  'switchStance',
+  'standard',
+  'コーク',
+  720,
+  'ジャパン',
+  'right',
+  true,
+  now() - interval '9 days',
+  now() - interval '9 days'
+),
+(
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb4',
+  '9a3c2b1d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
+  'jib',
+  'スイッチテールプレス 270オフ',
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  true,
+  now() - interval '8 days',
+  now() - interval '8 days'
+),
+(
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6',
+  '2b4c6d8e-1f3a-5b7c-9d0e-1f2a3b4c5d6e',
+  'air',
+  null,
+  'regular',
+  'standard',
+  '平軸',
+  900,
+  'セーフティ',
+  'left',
+  true,
+  now() - interval '12 days',
+  now() - interval '12 days'
+),
+(
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb5',
+  '2b4c6d8e-1f3a-5b7c-9d0e-1f2a3b4c5d6e',
+  'jib',
+  'スイッチノーズプレス 360オフ',
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  true,
+  now() - interval '11 days',
+  now() - interval '11 days'
+)
+on conflict (id) do nothing;
