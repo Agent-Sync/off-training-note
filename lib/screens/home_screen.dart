@@ -290,44 +290,78 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showAppBottomSheet(
       context: context,
       builder: (context) {
-        return SafeArea(
-          child: AppBottomSheetContainer(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Text('設定'),
-                  enabled: false,
-                ),
-                const ListTile(
-                  leading: Icon(Icons.edit),
-                  title: Text('編集'),
-                  enabled: false,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: const Text('ログアウト'),
-                  onTap: () async {
-                    Navigator.of(context).pop();
-                    await _signOut();
-                  },
-                ),
-              ],
-            ),
+        return AppBottomSheetContainer(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildActionItem(
+                context,
+                icon: Icons.settings,
+                label: '設定',
+                enabled: false,
+                onTap: () {},
+              ),
+              const SizedBox(height: 8),
+              _buildActionItem(
+                context,
+                icon: Icons.edit,
+                label: '編集',
+                enabled: false,
+                onTap: () {},
+              ),
+              const SizedBox(height: 8),
+              _buildActionItem(
+                context,
+                icon: Icons.logout,
+                label: 'ログアウト',
+                isDestructive: true,
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await _signOut();
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildActionItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+    bool enabled = true,
+  }) {
+    final color = isDestructive ? Colors.red : AppTheme.textMain;
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: enabled ? color : Colors.grey.shade400,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: enabled ? color : Colors.grey.shade400,
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -359,10 +393,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
 
-    return IconButton(
-      tooltip: 'プロフィール',
-      icon: avatar,
-      onPressed: _showProfileActions,
+    return GestureDetector(
+      onTap: _showProfileActions,
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Center(child: avatar),
+      ),
     );
   }
 
