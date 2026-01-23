@@ -1,10 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:off_training_note/repositories/profile_repository.dart';
 import 'package:off_training_note/models/profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final authSessionProvider = StreamProvider<Session?>((ref) {
   return Supabase.instance.client.auth.onAuthStateChange
       .map((data) => data.session);
+});
+
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
+  return const ProfileRepository();
 });
 
 final profileProvider = FutureProvider<Profile?>((ref) async {
@@ -15,15 +20,6 @@ final profileProvider = FutureProvider<Profile?>((ref) async {
     return null;
   }
 
-  final data = await Supabase.instance.client
-      .from('profiles')
-      .select('id, display_name, avatar_url')
-      .eq('id', user.id)
-      .maybeSingle();
-
-  if (data == null) {
-    return null;
-  }
-
-  return Profile.fromMap(data);
+  final repo = ref.read(profileRepositoryProvider);
+  return repo.fetchProfile(userId: user.id);
 });
