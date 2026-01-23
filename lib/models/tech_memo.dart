@@ -15,6 +15,8 @@ abstract class TechMemo with _$TechMemo {
     required String outcome,
     required MemoCondition condition,
     required MemoSize size,
+    required int likeCount,
+    required bool likedByMe,
     required DateTime updatedAt,
     required DateTime createdAt,
   }) = AirTechMemo;
@@ -23,6 +25,8 @@ abstract class TechMemo with _$TechMemo {
     required String id,
     required String focus,
     required String outcome,
+    required int likeCount,
+    required bool likedByMe,
     required DateTime updatedAt,
     required DateTime createdAt,
   }) = JibTechMemo;

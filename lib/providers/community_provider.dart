@@ -96,10 +96,12 @@ class CommunityNotifier extends Notifier<CommunityFeedState> {
     if (userId == null) {
       return;
     }
-    final updated = memo.copyWith(
-      likedByMe: !memo.likedByMe,
-      likeCount: memo.likedByMe ? memo.likeCount - 1 : memo.likeCount + 1,
+    final updatedMemo = memo.memo.copyWith(
+      likedByMe: !memo.memo.likedByMe,
+      likeCount:
+          memo.memo.likedByMe ? memo.memo.likeCount - 1 : memo.memo.likeCount + 1,
     );
+    final updated = memo.copyWith(memo: updatedMemo);
     state = state.copyWith(
       items: [
         for (final item in state.items)
@@ -108,7 +110,7 @@ class CommunityNotifier extends Notifier<CommunityFeedState> {
     );
     try {
       final likeRepo = ref.read(communityLikeRepositoryProvider);
-      if (memo.likedByMe) {
+      if (memo.memo.likedByMe) {
         await likeRepo.unlikeMemo(memoId: memo.memo.id, userId: userId);
       } else {
         await likeRepo.likeMemo(memoId: memo.memo.id, userId: userId);

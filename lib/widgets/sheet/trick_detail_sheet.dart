@@ -253,7 +253,34 @@ class TrickDetailSheet extends ConsumerWidget {
                                                     );
                                                   },
                                                 ),
-                                                const SizedBox(width: 4),
+                                                const SizedBox(width: 8),
+                                                if (memo.likeCount > 0) ...[
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        memo.likedByMe
+                                                            ? Icons.favorite
+                                                            : Icons
+                                                                .favorite_border,
+                                                        size: 14,
+                                                        color: memo.likedByMe
+                                                            ? Colors.redAccent
+                                                            : Colors.grey,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '${memo.likeCount}',
+                                                        style: const TextStyle(
+                                                          fontSize: 11,
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                const SizedBox(width: 0),
+                                                ],
                                                 IconButton(
                                                   icon: const Icon(
                                                     Icons.more_vert,

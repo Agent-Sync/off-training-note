@@ -8,15 +8,11 @@ class CommunityMemo {
     required this.memo,
     required this.trick,
     required this.profile,
-    required this.likeCount,
-    required this.likedByMe,
   });
 
   final TechMemo memo;
   final Trick trick;
   final Profile profile;
-  final int likeCount;
-  final bool likedByMe;
 
   String displayUserName() {
     final name = profile.displayName;
@@ -29,15 +25,14 @@ class CommunityMemo {
   String trickName() => trick.displayName();
 
   CommunityMemo copyWith({
-    int? likeCount,
-    bool? likedByMe,
+    TechMemo? memo,
+    Trick? trick,
+    Profile? profile,
   }) {
     return CommunityMemo(
-      memo: memo,
-      trick: trick,
-      profile: profile,
-      likeCount: likeCount ?? this.likeCount,
-      likedByMe: likedByMe ?? this.likedByMe,
+      memo: memo ?? this.memo,
+      trick: trick ?? this.trick,
+      profile: profile ?? this.profile,
     );
   }
 }

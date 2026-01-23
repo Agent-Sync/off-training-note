@@ -70,7 +70,10 @@ class CommunityRepository {
     required bool likedByMe,
   }) {
     return CommunityMemo(
-      memo: _techMemoFromRow(row),
+      memo: _techMemoFromRow(
+        row,
+        likedByMe: likedByMe,
+      ),
       trick: _trickFromRow(
         row['trick_id'] as String,
         row['tricks'] as Map<String, dynamic>,
@@ -79,8 +82,6 @@ class CommunityRepository {
         row['user_id'] as String,
         row['profiles'] as Map<String, dynamic>,
       ),
-      likeCount: (row['like_count'] as num?)?.toInt() ?? 0,
-      likedByMe: likedByMe,
     );
   }
 
@@ -118,13 +119,19 @@ class CommunityRepository {
     );
   }
 
-  TechMemo _techMemoFromRow(Map<String, dynamic> row) {
+  TechMemo _techMemoFromRow(
+    Map<String, dynamic> row, {
+    required bool likedByMe,
+  }) {
+    final likeCount = (row['like_count'] as num?)?.toInt() ?? 0;
     final type = row['type'] as String;
     if (type == 'jib') {
       return TechMemo.jib(
         id: row['id'] as String,
         focus: row['focus'] as String,
         outcome: row['outcome'] as String,
+        likeCount: likeCount,
+        likedByMe: likedByMe,
         updatedAt: DateTime.parse(row['updated_at'] as String),
         createdAt: DateTime.parse(row['created_at'] as String),
       );
@@ -136,6 +143,8 @@ class CommunityRepository {
       outcome: row['outcome'] as String,
       condition: _conditionFromDb(row['condition'] as String?),
       size: _sizeFromDb(row['size'] as String?),
+      likeCount: likeCount,
+      likedByMe: likedByMe,
       updatedAt: DateTime.parse(row['updated_at'] as String),
       createdAt: DateTime.parse(row['created_at'] as String),
     );

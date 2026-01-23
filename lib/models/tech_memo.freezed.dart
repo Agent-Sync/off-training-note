@@ -38,7 +38,7 @@ TechMemo _$TechMemoFromJson(
 /// @nodoc
 mixin _$TechMemo {
 
- String get id; String get focus; String get outcome; DateTime get updatedAt; DateTime get createdAt;
+ String get id; String get focus; String get outcome; int get likeCount; bool get likedByMe; DateTime get updatedAt; DateTime get createdAt;
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -51,16 +51,16 @@ $TechMemoCopyWith<TechMemo> get copyWith => _$TechMemoCopyWithImpl<TechMemo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.likeCount, likeCount) || other.likeCount == likeCount)&&(identical(other.likedByMe, likedByMe) || other.likedByMe == likedByMe)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,focus,outcome,updatedAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,focus,outcome,likeCount,likedByMe,updatedAt,createdAt);
 
 @override
 String toString() {
-  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, updatedAt: $updatedAt, createdAt: $createdAt)';
+  return 'TechMemo(id: $id, focus: $focus, outcome: $outcome, likeCount: $likeCount, likedByMe: $likedByMe, updatedAt: $updatedAt, createdAt: $createdAt)';
 }
 
 
@@ -71,7 +71,7 @@ abstract mixin class $TechMemoCopyWith<$Res>  {
   factory $TechMemoCopyWith(TechMemo value, $Res Function(TechMemo) _then) = _$TechMemoCopyWithImpl;
 @useResult
 $Res call({
- String id, String focus, String outcome, DateTime updatedAt, DateTime createdAt
+ String id, String focus, String outcome, int likeCount, bool likedByMe, DateTime updatedAt, DateTime createdAt
 });
 
 
@@ -88,12 +88,14 @@ class _$TechMemoCopyWithImpl<$Res>
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? updatedAt = null,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? likeCount = null,Object? likedByMe = null,Object? updatedAt = null,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
 as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
-as String,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as String,likeCount: null == likeCount ? _self.likeCount : likeCount // ignore: cast_nullable_to_non_nullable
+as int,likedByMe: null == likedByMe ? _self.likedByMe : likedByMe // ignore: cast_nullable_to_non_nullable
+as bool,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
@@ -183,11 +185,11 @@ return jib(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  air,TResult Function( String id,  String focus,  String outcome,  DateTime updatedAt,  DateTime createdAt)?  jib,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  int likeCount,  bool likedByMe,  DateTime updatedAt,  DateTime createdAt)?  air,TResult Function( String id,  String focus,  String outcome,  int likeCount,  bool likedByMe,  DateTime updatedAt,  DateTime createdAt)?  jib,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case AirTechMemo() when air != null:
-return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case JibTechMemo() when jib != null:
-return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);case _:
+return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.likeCount,_that.likedByMe,_that.updatedAt,_that.createdAt);case JibTechMemo() when jib != null:
+return jib(_that.id,_that.focus,_that.outcome,_that.likeCount,_that.likedByMe,_that.updatedAt,_that.createdAt);case _:
   return orElse();
 
 }
@@ -205,11 +207,11 @@ return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)  air,required TResult Function( String id,  String focus,  String outcome,  DateTime updatedAt,  DateTime createdAt)  jib,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  int likeCount,  bool likedByMe,  DateTime updatedAt,  DateTime createdAt)  air,required TResult Function( String id,  String focus,  String outcome,  int likeCount,  bool likedByMe,  DateTime updatedAt,  DateTime createdAt)  jib,}) {final _that = this;
 switch (_that) {
 case AirTechMemo():
-return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case JibTechMemo():
-return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);case _:
+return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.likeCount,_that.likedByMe,_that.updatedAt,_that.createdAt);case JibTechMemo():
+return jib(_that.id,_that.focus,_that.outcome,_that.likeCount,_that.likedByMe,_that.updatedAt,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -226,11 +228,11 @@ return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  DateTime updatedAt,  DateTime createdAt)?  air,TResult? Function( String id,  String focus,  String outcome,  DateTime updatedAt,  DateTime createdAt)?  jib,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  String focus,  String outcome,  MemoCondition condition,  MemoSize size,  int likeCount,  bool likedByMe,  DateTime updatedAt,  DateTime createdAt)?  air,TResult? Function( String id,  String focus,  String outcome,  int likeCount,  bool likedByMe,  DateTime updatedAt,  DateTime createdAt)?  jib,}) {final _that = this;
 switch (_that) {
 case AirTechMemo() when air != null:
-return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.updatedAt,_that.createdAt);case JibTechMemo() when jib != null:
-return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);case _:
+return air(_that.id,_that.focus,_that.outcome,_that.condition,_that.size,_that.likeCount,_that.likedByMe,_that.updatedAt,_that.createdAt);case JibTechMemo() when jib != null:
+return jib(_that.id,_that.focus,_that.outcome,_that.likeCount,_that.likedByMe,_that.updatedAt,_that.createdAt);case _:
   return null;
 
 }
@@ -242,7 +244,7 @@ return jib(_that.id,_that.focus,_that.outcome,_that.updatedAt,_that.createdAt);c
 @JsonSerializable()
 
 class AirTechMemo implements TechMemo {
-  const AirTechMemo({required this.id, required this.focus, required this.outcome, required this.condition, required this.size, required this.updatedAt, required this.createdAt, final  String? $type}): $type = $type ?? 'air';
+  const AirTechMemo({required this.id, required this.focus, required this.outcome, required this.condition, required this.size, required this.likeCount, required this.likedByMe, required this.updatedAt, required this.createdAt, final  String? $type}): $type = $type ?? 'air';
   factory AirTechMemo.fromJson(Map<String, dynamic> json) => _$AirTechMemoFromJson(json);
 
 @override final  String id;
@@ -250,6 +252,8 @@ class AirTechMemo implements TechMemo {
 @override final  String outcome;
  final  MemoCondition condition;
  final  MemoSize size;
+@override final  int likeCount;
+@override final  bool likedByMe;
 @override final  DateTime updatedAt;
 @override final  DateTime createdAt;
 
@@ -270,16 +274,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AirTechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AirTechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.condition, condition) || other.condition == condition)&&(identical(other.size, size) || other.size == size)&&(identical(other.likeCount, likeCount) || other.likeCount == likeCount)&&(identical(other.likedByMe, likedByMe) || other.likedByMe == likedByMe)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,focus,outcome,condition,size,updatedAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,focus,outcome,condition,size,likeCount,likedByMe,updatedAt,createdAt);
 
 @override
 String toString() {
-  return 'TechMemo.air(id: $id, focus: $focus, outcome: $outcome, condition: $condition, size: $size, updatedAt: $updatedAt, createdAt: $createdAt)';
+  return 'TechMemo.air(id: $id, focus: $focus, outcome: $outcome, condition: $condition, size: $size, likeCount: $likeCount, likedByMe: $likedByMe, updatedAt: $updatedAt, createdAt: $createdAt)';
 }
 
 
@@ -290,7 +294,7 @@ abstract mixin class $AirTechMemoCopyWith<$Res> implements $TechMemoCopyWith<$Re
   factory $AirTechMemoCopyWith(AirTechMemo value, $Res Function(AirTechMemo) _then) = _$AirTechMemoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String focus, String outcome, MemoCondition condition, MemoSize size, DateTime updatedAt, DateTime createdAt
+ String id, String focus, String outcome, MemoCondition condition, MemoSize size, int likeCount, bool likedByMe, DateTime updatedAt, DateTime createdAt
 });
 
 
@@ -307,14 +311,16 @@ class _$AirTechMemoCopyWithImpl<$Res>
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? condition = null,Object? size = null,Object? updatedAt = null,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? condition = null,Object? size = null,Object? likeCount = null,Object? likedByMe = null,Object? updatedAt = null,Object? createdAt = null,}) {
   return _then(AirTechMemo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
 as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
 as String,condition: null == condition ? _self.condition : condition // ignore: cast_nullable_to_non_nullable
 as MemoCondition,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as MemoSize,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as MemoSize,likeCount: null == likeCount ? _self.likeCount : likeCount // ignore: cast_nullable_to_non_nullable
+as int,likedByMe: null == likedByMe ? _self.likedByMe : likedByMe // ignore: cast_nullable_to_non_nullable
+as bool,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
@@ -327,12 +333,14 @@ as DateTime,
 @JsonSerializable()
 
 class JibTechMemo implements TechMemo {
-  const JibTechMemo({required this.id, required this.focus, required this.outcome, required this.updatedAt, required this.createdAt, final  String? $type}): $type = $type ?? 'jib';
+  const JibTechMemo({required this.id, required this.focus, required this.outcome, required this.likeCount, required this.likedByMe, required this.updatedAt, required this.createdAt, final  String? $type}): $type = $type ?? 'jib';
   factory JibTechMemo.fromJson(Map<String, dynamic> json) => _$JibTechMemoFromJson(json);
 
 @override final  String id;
 @override final  String focus;
 @override final  String outcome;
+@override final  int likeCount;
+@override final  bool likedByMe;
 @override final  DateTime updatedAt;
 @override final  DateTime createdAt;
 
@@ -353,16 +361,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is JibTechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is JibTechMemo&&(identical(other.id, id) || other.id == id)&&(identical(other.focus, focus) || other.focus == focus)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.likeCount, likeCount) || other.likeCount == likeCount)&&(identical(other.likedByMe, likedByMe) || other.likedByMe == likedByMe)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,focus,outcome,updatedAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,focus,outcome,likeCount,likedByMe,updatedAt,createdAt);
 
 @override
 String toString() {
-  return 'TechMemo.jib(id: $id, focus: $focus, outcome: $outcome, updatedAt: $updatedAt, createdAt: $createdAt)';
+  return 'TechMemo.jib(id: $id, focus: $focus, outcome: $outcome, likeCount: $likeCount, likedByMe: $likedByMe, updatedAt: $updatedAt, createdAt: $createdAt)';
 }
 
 
@@ -373,7 +381,7 @@ abstract mixin class $JibTechMemoCopyWith<$Res> implements $TechMemoCopyWith<$Re
   factory $JibTechMemoCopyWith(JibTechMemo value, $Res Function(JibTechMemo) _then) = _$JibTechMemoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String focus, String outcome, DateTime updatedAt, DateTime createdAt
+ String id, String focus, String outcome, int likeCount, bool likedByMe, DateTime updatedAt, DateTime createdAt
 });
 
 
@@ -390,12 +398,14 @@ class _$JibTechMemoCopyWithImpl<$Res>
 
 /// Create a copy of TechMemo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? updatedAt = null,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? focus = null,Object? outcome = null,Object? likeCount = null,Object? likedByMe = null,Object? updatedAt = null,Object? createdAt = null,}) {
   return _then(JibTechMemo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,focus: null == focus ? _self.focus : focus // ignore: cast_nullable_to_non_nullable
 as String,outcome: null == outcome ? _self.outcome : outcome // ignore: cast_nullable_to_non_nullable
-as String,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as String,likeCount: null == likeCount ? _self.likeCount : likeCount // ignore: cast_nullable_to_non_nullable
+as int,likedByMe: null == likedByMe ? _self.likedByMe : likedByMe // ignore: cast_nullable_to_non_nullable
+as bool,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));

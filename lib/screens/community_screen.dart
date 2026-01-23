@@ -298,8 +298,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   }
 
   Widget _buildMemoCard(CommunityMemo memo) {
-    final likeColor =
-        memo.likedByMe ? Colors.redAccent : AppTheme.textSecondary;
+    final likeColor = memo.memo.likedByMe
+        ? Colors.redAccent
+        : AppTheme.textSecondary;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -458,7 +459,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        memo.likedByMe
+                        memo.memo.likedByMe
                             ? Icons.favorite
                             : Icons.favorite_border,
                         size: 18,
@@ -466,7 +467,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '${memo.likeCount}',
+                        '${memo.memo.likeCount}',
                         style: TextStyle(
                           fontSize: 12,
                           color: likeColor,

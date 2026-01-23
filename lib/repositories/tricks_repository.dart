@@ -1,3 +1,4 @@
+import 'package:off_training_note/repositories/community_like_repository.dart';
 import 'package:off_training_note/services/supabase_client_service.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
@@ -14,14 +15,32 @@ class TricksRepository {
         .select(
           'id, type, custom_name, stance, takeoff, axis, spin, grab, direction, is_public, '
           'created_at, updated_at, memos(id, trick_id, type, focus, outcome, '
-          'condition, size, created_at, updated_at)',
+          'condition, size, like_count, created_at, updated_at)',
         )
         .eq('user_id', userId)
         .order('created_at', ascending: false)
         .order('updated_at', referencedTable: 'memos', ascending: false);
 
-    return (rows as List<dynamic>)
-        .map((row) => _trickFromRow(row as Map<String, dynamic>))
+    final rowList = rows as List<dynamic>;
+    final memoIds = rowList
+        .expand((row) => (row['memos'] as List<dynamic>? ?? []))
+        .map((memo) => memo['id'] as String)
+        .toList();
+
+    final likedMemoIds = memoIds.isEmpty
+        ? <String>{}
+        : await const CommunityLikeRepository().fetchLikedMemoIds(
+            userId: userId,
+            memoIds: memoIds,
+          );
+
+    return rowList
+        .map(
+          (row) => _trickFromRow(
+            row as Map<String, dynamic>,
+            likedMemoIds: likedMemoIds,
+          ),
+        )
         .toList();
   }
 
@@ -139,9 +158,17 @@ class TricksRepository {
         .eq('id', memoId);
   }
 
-  Trick _trickFromRow(Map<String, dynamic> row) {
+  Trick _trickFromRow(
+    Map<String, dynamic> row, {
+    required Set<String> likedMemoIds,
+  }) {
     final memos = (row['memos'] as List<dynamic>? ?? [])
-        .map((memo) => _memoFromRow(memo as Map<String, dynamic>))
+        .map(
+          (memo) => _memoFromRow(
+            memo as Map<String, dynamic>,
+            likedByMe: likedMemoIds.contains(memo['id'] as String),
+          ),
+        )
         .toList();
     memos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
     final isPublic = row['is_public'] as bool? ?? true;
@@ -171,13 +198,19 @@ class TricksRepository {
     );
   }
 
-  TechMemo _memoFromRow(Map<String, dynamic> row) {
+  TechMemo _memoFromRow(
+    Map<String, dynamic> row, {
+    required bool likedByMe,
+  }) {
+    final likeCount = (row['like_count'] as num?)?.toInt() ?? 0;
     final type = row['type'] as String;
     if (type == 'jib') {
       return TechMemo.jib(
         id: row['id'] as String,
         focus: row['focus'] as String,
         outcome: row['outcome'] as String,
+        likeCount: likeCount,
+        likedByMe: likedByMe,
         updatedAt: DateTime.parse(row['updated_at'] as String),
         createdAt: DateTime.parse(row['created_at'] as String),
       );
@@ -189,6 +222,8 @@ class TricksRepository {
       outcome: row['outcome'] as String,
       condition: _conditionFromDb(row['condition'] as String?),
       size: _sizeFromDb(row['size'] as String?),
+      likeCount: likeCount,
+      likedByMe: likedByMe,
       updatedAt: DateTime.parse(row['updated_at'] as String),
       createdAt: DateTime.parse(row['created_at'] as String),
     );
