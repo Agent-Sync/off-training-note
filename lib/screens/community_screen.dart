@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/community_memo.dart';
 import 'package:off_training_note/models/profile.dart';
+import 'package:off_training_note/navigation/route_observer.dart';
 import 'package:off_training_note/providers/community_provider.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/screens/profile_screen.dart';
@@ -18,13 +19,31 @@ class CommunityScreen extends ConsumerStatefulWidget {
   ConsumerState<CommunityScreen> createState() => _CommunityScreenState();
 }
 
-class _CommunityScreenState extends ConsumerState<CommunityScreen> {
+class _CommunityScreenState extends ConsumerState<CommunityScreen>
+    with RouteAware {
   static const double _searchBarOverlap = 72;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  bool _routeSubscribed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      if (_routeSubscribed) {
+        routeObserver.unsubscribe(this);
+      }
+      routeObserver.subscribe(this, route);
+      _routeSubscribed = true;
+    }
+  }
 
   @override
   void dispose() {
+    if (_routeSubscribed) {
+      routeObserver.unsubscribe(this);
+    }
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
@@ -32,6 +51,16 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
 
   void _dismissSearchFocus() {
     FocusScope.of(context).unfocus();
+  }
+
+  @override
+  void didPopNext() {
+    _dismissSearchFocus();
+  }
+
+  @override
+  void didPush() {
+    _dismissSearchFocus();
   }
 
   @override
@@ -104,6 +133,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   }
 
   void _showProfileActions() {
+    _dismissSearchFocus();
     showAppBottomSheet(
       context: context,
       builder: (context) {
@@ -321,6 +351,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         children: [
           GestureDetector(
             onTap: () {
+              _dismissSearchFocus();
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ProfileScreen(profile: memo.profile),

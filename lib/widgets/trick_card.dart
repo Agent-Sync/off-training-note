@@ -19,7 +19,7 @@ class TrickCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: trick.isPublic ? Colors.white : Colors.grey.shade200,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -28,7 +28,6 @@ class TrickCard extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(color: Colors.grey.shade100),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -40,10 +39,12 @@ class TrickCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: AppTheme.textMain,
+                      color: trick.isPublic
+                          ? AppTheme.textMain
+                          : Colors.grey.shade400,
                     ),
                   ),
                 ),
@@ -66,7 +67,6 @@ class TrickCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade100),
                 ),
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -160,11 +160,10 @@ class TrickCard extends StatelessWidget {
                       horizontal: 8,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade100),
-                    ),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
                     child: Text(
                       '${trick.memos.length} memo',
                       style: const TextStyle(
@@ -183,10 +182,6 @@ class TrickCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.grey.shade100,
-                    style: BorderStyle.solid,
-                  ),
                 ),
                 child: const Center(
                   child: Text(

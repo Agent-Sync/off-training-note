@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:off_training_note/navigation/route_observer.dart';
 import 'package:off_training_note/screens/login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,6 +16,7 @@ class App extends StatelessWidget {
       theme: AppTheme.theme,
       home: const AuthGate(),
       debugShowCheckedModeBanner: false,
+      navigatorObservers: [routeObserver],
       onGenerateRoute: (settings) {
         return MaterialPageRoute(builder: (_) => const AuthGate());
       },
