@@ -81,7 +81,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               NavigationDestination(
                 icon: Icon(Icons.sticky_note_2_outlined),
                 selectedIcon: Icon(Icons.sticky_note_2),
-                label: 'Note',
+                label: 'ノート',
               ),
               NavigationDestination(
                 icon: Icon(Icons.people_outline),

@@ -450,7 +450,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
               ),
             ),
           ),
-          _buildAvatarButton(ref.watch(profileProvider)),
+          const SizedBox(width: 40),
         ],
       ),
     );

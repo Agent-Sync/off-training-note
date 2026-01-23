@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/community_memo.dart';
+import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/providers/community_provider.dart';
+import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
+import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class CommunityScreen extends ConsumerStatefulWidget {
@@ -82,12 +86,135 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               ),
             ),
             const Spacer(),
-            Icon(
-              Icons.dynamic_feed,
-              color: Colors.grey.shade500,
-            ),
+            _buildAvatarButton(ref.watch(profileProvider)),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await Supabase.instance.client.auth.signOut();
+    } catch (e, stack) {
+      debugPrint('$stack');
+      rethrow;
+    }
+  }
+
+  void _showProfileActions() {
+    showAppBottomSheet(
+      context: context,
+      builder: (context) {
+        return AppBottomSheetContainer(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildActionItem(
+                context,
+                icon: Icons.settings,
+                label: '設定',
+                enabled: false,
+                onTap: () {},
+              ),
+              const SizedBox(height: 8),
+              _buildActionItem(
+                context,
+                icon: Icons.edit,
+                label: '編集',
+                enabled: false,
+                onTap: () {},
+              ),
+              const SizedBox(height: 8),
+              _buildActionItem(
+                context,
+                icon: Icons.logout,
+                label: 'ログアウト',
+                isDestructive: true,
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await _signOut();
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildActionItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+    bool enabled = true,
+  }) {
+    final color = isDestructive ? Colors.red : AppTheme.textMain;
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: enabled ? color : Colors.grey.shade400,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: enabled ? color : Colors.grey.shade400,
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvatarButton(AsyncValue<Profile?> profileAsync) {
+    final avatar = profileAsync.when(
+      data: (profile) {
+        final url = profile?.avatarUrl;
+        if (url != null && url.isNotEmpty) {
+          return CircleAvatar(
+            radius: 16,
+            backgroundImage: NetworkImage(url),
+          );
+        }
+        return CircleAvatar(
+          radius: 16,
+          backgroundColor: Colors.grey.shade200,
+          child: Icon(Icons.person, size: 18, color: Colors.grey.shade600),
+        );
+      },
+      loading: () => const SizedBox(
+        width: 32,
+        height: 32,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      error: (_, __) => CircleAvatar(
+        radius: 16,
+        backgroundColor: Colors.grey.shade200,
+        child: Icon(Icons.person, size: 18, color: Colors.grey.shade600),
+      ),
+    );
+
+    return GestureDetector(
+      onTap: _showProfileActions,
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Center(child: avatar),
       ),
     );
   }

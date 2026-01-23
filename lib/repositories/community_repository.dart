@@ -27,6 +27,8 @@ class CommunityRepository {
         'display_name.ilike.$pattern,'
         'trick_search.ilike.$pattern',
       );
+    } else if (userId != null) {
+      request = request.neq('user_id', userId);
     }
 
     final rows = await request
