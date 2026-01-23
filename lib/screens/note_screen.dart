@@ -61,6 +61,10 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     });
   }
 
+  Future<void> _reloadTricks() async {
+    await ref.read(tricksProvider.notifier).refresh();
+  }
+
   void _showNewTrickModal() {
     _dismissSearchFocus();
     _lockSearchFocus();
@@ -164,9 +168,12 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     filteredJibTricks
         .sort((a, b) => latestMemoAt(b).compareTo(latestMemoAt(a)));
 
-    final content = _activeTab == _HomeTab.air
-        ? _buildTrickContent(filteredTricks)
-        : _buildJibContent(filteredJibTricks);
+    final content = RefreshIndicator(
+      onRefresh: _reloadTricks,
+      child: _activeTab == _HomeTab.air
+          ? _buildTrickContent(filteredTricks)
+          : _buildJibContent(filteredJibTricks),
+    );
 
     return Scaffold(
       body: GestureDetector(
@@ -220,15 +227,22 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   Widget _buildTrickContent(List<Trick> filteredTricks) {
     if (filteredTricks.isEmpty) {
-      return Padding(
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(top: _searchBarOverlap),
-        child: _buildEmptyState(),
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: _buildEmptyState(),
+          ),
+        ],
       );
     }
 
     return MasonryGridView.count(
       padding: const EdgeInsets.fromLTRB(16, 8 + _searchBarOverlap, 16, 100),
       crossAxisCount: 2,
+      physics: const AlwaysScrollableScrollPhysics(),
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
       itemCount: filteredTricks.length,
@@ -241,15 +255,22 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   Widget _buildJibContent(List<Trick> filteredJibTricks) {
     if (filteredJibTricks.isEmpty) {
-      return Padding(
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(top: _searchBarOverlap),
-        child: _buildEmptyState(),
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: _buildEmptyState(),
+          ),
+        ],
       );
     }
 
     return MasonryGridView.count(
       padding: const EdgeInsets.fromLTRB(16, 8 + _searchBarOverlap, 16, 100),
       crossAxisCount: 2,
+      physics: const AlwaysScrollableScrollPhysics(),
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
       itemCount: filteredJibTricks.length,
@@ -409,7 +430,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         bottom: 10,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.background.withValues(alpha: 0.95),
+        color: Colors.transparent,
       ),
       child: Row(
         children: [

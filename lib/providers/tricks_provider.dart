@@ -91,4 +91,8 @@ class TricksNotifier extends Notifier<List<Trick>> {
     await repo.deleteMemo(memoId: memoId);
     await _loadTricks();
   }
+
+  Future<void> refresh() async {
+    await _loadTricks();
+  }
 }
