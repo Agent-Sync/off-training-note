@@ -194,7 +194,10 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
             },
             decoration: InputDecoration(
               labelText: '表示名',
-              labelStyle: TextStyle(color: Colors.grey.shade600),
+              labelStyle: TextStyle(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w600,
+              ),
               errorText: _nameError,
               filled: true,
               fillColor: Colors.grey.shade50,
@@ -203,6 +206,9 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
                 borderSide: BorderSide.none,
               ),
               contentPadding: const EdgeInsets.all(16),
+            ),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 32),
