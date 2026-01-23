@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/widgets/dialog/app_confirm_dialog.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/sheet/log_form_sheet.dart';
@@ -464,92 +463,22 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  void _showDeleteMemoConfirmDialog(
+  Future<void> _showDeleteMemoConfirmDialog(
     BuildContext context,
     WidgetRef ref,
     TechMemo memo,
-  ) {
-    showGeneralDialog(
+  ) async {
+    final shouldDelete = await showAppConfirmDialog(
       context: context,
-      barrierDismissible: true,
-      barrierLabel: 'delete_memo_dialog',
-      barrierColor: Colors.black.withValues(alpha: 0.1),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Center(
-            child: AlertDialog(
-              backgroundColor: Colors.white,
-              title: const Text(
-                '本当に削除しますか？',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              content: const Text(
-                '削除すると元に戻せません。',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              actionsPadding: const EdgeInsets.only(
-                bottom: 16,
-                left: 16,
-                right: 16,
-              ),
-              actions: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.grey.shade300),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text(
-                          'キャンセル',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          ref
-                              .read(tricksProvider.notifier)
-                              .deleteMemo(trick.id, memo.id);
-                          Navigator.pop(context);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.red.shade200),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text(
-                          '削除',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      title: '本当に削除しますか？',
+      message: '削除すると元に戻せません。',
+      confirmLabel: '削除',
+      cancelLabel: 'キャンセル',
+      isDestructive: true,
     );
+    if (shouldDelete == true) {
+      ref.read(tricksProvider.notifier).deleteMemo(trick.id, memo.id);
+    }
   }
 
   Widget _buildActionItem(

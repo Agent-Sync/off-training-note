@@ -10,6 +10,7 @@ import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
+import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/new_jib_modal.dart';
@@ -285,6 +286,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void _showProfileActions() {
+    showAppBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: AppBottomSheetContainer(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text('設定'),
+                  enabled: false,
+                ),
+                const ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('編集'),
+                  enabled: false,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text('ログアウト'),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _signOut();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildAvatarButton(AsyncValue<Profile?> profileAsync) {
     final avatar = profileAsync.when(
       data: (profile) {
@@ -314,9 +360,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     return IconButton(
-      tooltip: 'ログアウト',
+      tooltip: 'プロフィール',
       icon: avatar,
-      onPressed: _signOut,
+      onPressed: _showProfileActions,
     );
   }
 
