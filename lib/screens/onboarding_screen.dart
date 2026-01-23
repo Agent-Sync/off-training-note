@@ -99,7 +99,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     setState(() => _isCompleted = true);
 
     // アニメーションを見せるために少し待機
-    await Future.delayed(const Duration(milliseconds: 2000));
+    await Future.delayed(const Duration(milliseconds: 1000));
 
     if (!mounted) return;
 
