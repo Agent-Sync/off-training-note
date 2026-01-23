@@ -202,7 +202,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         height: 32,
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
-      error: (_, __) => CircleAvatar(
+      error: (error, stackTrace) => CircleAvatar(
         radius: 16,
         backgroundColor: Colors.grey.shade200,
         child: Icon(Icons.person, size: 18, color: Colors.grey.shade600),
@@ -288,7 +288,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           24,
         ),
         itemCount: state.items.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final memo = state.items[index];
           return _buildMemoCard(memo);

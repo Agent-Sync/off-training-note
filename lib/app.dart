@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/screens/login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';

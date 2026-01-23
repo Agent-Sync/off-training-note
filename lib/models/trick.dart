@@ -43,7 +43,6 @@ enum Axis {
 
   static Axis fromLabel(String label) {
     final trimmed = label.trim();
-    final normalized = trimmed.toLowerCase();
     for (final axis in Axis.values) {
       if (axis.label == trimmed) {
         return axis;

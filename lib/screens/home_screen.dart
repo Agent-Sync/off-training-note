@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/screens/community_screen.dart';
 import 'package:off_training_note/screens/note_screen.dart';
-import 'package:off_training_note/theme/app_theme.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});

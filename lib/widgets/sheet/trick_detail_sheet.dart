@@ -503,7 +503,7 @@ class TrickDetailSheet extends ConsumerWidget {
           const Spacer(),
           Switch.adaptive(
             value: trick.isPublic,
-            activeColor: Colors.black,
+            activeThumbColor: Colors.black,
             onChanged: (val) {
               ref
                   .read(tricksProvider.notifier)
