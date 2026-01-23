@@ -90,6 +90,7 @@ class CommunityRepository {
       userId: userId,
       displayName: row['display_name'] as String?,
       avatarUrl: row['avatar_url'] as String?,
+      onboarded: row['onboarded'] as bool? ?? false,
     );
   }
 

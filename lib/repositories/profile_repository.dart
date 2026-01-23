@@ -7,7 +7,7 @@ class ProfileRepository {
   Future<Profile?> fetchProfile({required String userId}) async {
     final data = await SupabaseClientProvider.client
         .from('profiles')
-        .select('id, display_name, avatar_url')
+        .select('id, display_name, avatar_url, onboarded')
         .eq('id', userId)
         .maybeSingle();
 
@@ -22,6 +22,7 @@ class ProfileRepository {
     required String userId,
     String? displayName,
     String? avatarUrl,
+    bool? onboarded,
   }) async {
     final updates = <String, dynamic>{
       'updated_at': DateTime.now().toIso8601String(),
@@ -31,6 +32,9 @@ class ProfileRepository {
     }
     if (avatarUrl != null) {
       updates['avatar_url'] = avatarUrl;
+    }
+    if (onboarded != null) {
+      updates['onboarded'] = onboarded;
     }
 
     await SupabaseClientProvider.client

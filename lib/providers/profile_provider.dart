@@ -33,6 +33,7 @@ class ProfileNotifier extends AsyncNotifier<Profile?> {
   Future<void> updateProfile({
     String? displayName,
     String? avatarUrl,
+    bool? onboarded,
   }) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
@@ -46,6 +47,7 @@ class ProfileNotifier extends AsyncNotifier<Profile?> {
         userId: user.id,
         displayName: displayName,
         avatarUrl: avatarUrl,
+        onboarded: onboarded,
       );
       return repo.fetchProfile(userId: user.id);
     });

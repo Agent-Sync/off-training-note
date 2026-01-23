@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/navigation/route_observer.dart';
+import 'package:off_training_note/providers/profile_provider.dart';
+import 'package:off_training_note/screens/onboarding_screen.dart';
 import 'package:off_training_note/screens/login_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'screens/home_screen.dart';
@@ -27,7 +30,7 @@ class App extends StatelessWidget {
   }
 }
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
   Future<void> _signInWithGoogle() async {
@@ -45,19 +48,38 @@ class AuthGate extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final authStream = Supabase.instance.client.auth.onAuthStateChange
-        .map((data) => data.session);
-    return StreamBuilder<Session?>(
-      stream: authStream,
-      initialData: Supabase.instance.client.auth.currentSession,
-      builder: (context, snapshot) {
-        final session = snapshot.data;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionAsync = ref.watch(authSessionProvider);
+    return sessionAsync.when(
+      data: (session) {
         if (session == null) {
           return LoginScreen(onSignIn: _signInWithGoogle);
         }
-        return const HomeScreen();
+        final profileAsync = ref.watch(profileProvider);
+        return profileAsync.when(
+          data: (profile) {
+            if (profile == null) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.black),
+              );
+            }
+            if (!profile.onboarded) {
+              return const OnboardingScreen();
+            }
+            return const HomeScreen();
+          },
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: Colors.black),
+          ),
+          error: (error, stackTrace) => const Center(
+            child: CircularProgressIndicator(color: Colors.black),
+          ),
+        );
       },
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: Colors.black),
+      ),
+      error: (error, stackTrace) => LoginScreen(onSignIn: _signInWithGoogle),
     );
   }
 }

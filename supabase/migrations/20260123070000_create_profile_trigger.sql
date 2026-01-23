@@ -6,11 +6,12 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, display_name, avatar_url, created_at, updated_at)
+  insert into public.profiles (id, display_name, avatar_url, onboarded, created_at, updated_at)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
-    new.raw_user_meta_data->>'avatar_url',
+    null,
+    null,
+    false,
     now(),
     now()
   )
