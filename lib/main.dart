@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:off_training_note/screens/home_screen.dart';
-import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -47,31 +46,11 @@ Future<void> main() async {
       timeago.setLocaleMessages('ja', timeago.JaMessages());
       timeago.setDefaultLocale('ja');
 
-      runApp(const ProviderScope(child: MyApp()));
+      runApp(const ProviderScope(child: App()));
     },
     (error, stack) {
       debugPrint('Uncaught error: $error');
       debugPrint('Stack trace: $stack');
     },
   );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Freeski Tech Note',
-      theme: AppTheme.theme,
-      home: const HomeScreen(),
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: (settings) {
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
-      },
-      onUnknownRoute: (settings) {
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
-      },
-    );
-  }
 }

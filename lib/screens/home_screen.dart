@@ -7,15 +7,14 @@ import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
+import 'package:off_training_note/widgets/dotted_background.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/new_jib_modal.dart';
 import 'package:off_training_note/widgets/sheet/new_trick_modal.dart';
-import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -35,47 +34,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _uuid = const Uuid();
   Timer? _searchFocusTimer;
   bool _suppressSearchFocus = false;
-  Session? _session;
-  StreamSubscription<AuthState>? _authSub;
-
-  void _logAuth(String message) {
-    final timestamp = DateTime.now().toIso8601String();
-    debugPrint('[Auth][$timestamp] $message');
-  }
-
-  String _sessionSummary(Session? session) {
-    if (session == null) return 'session=null';
-    final user = session.user;
-    return 'session=${session.accessToken.isNotEmpty ? 'has_token' : 'no_token'} '
-        'userId=${user.id} email=${user.email ?? '-'}';
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _session = Supabase.instance.client.auth.currentSession;
-    _logAuth('initState: ${_sessionSummary(_session)}');
-    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen(
-      (data) {
-        if (!mounted) {
-          return;
-        }
-        _logAuth(
-          'onAuthStateChange: event=${data.event} ${_sessionSummary(data.session)}',
-        );
-        setState(() {
-          _session = data.session;
-        });
-      },
-    );
-  }
-
   @override
   void dispose() {
     _searchFocusTimer?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
-    _authSub?.cancel();
     super.dispose();
   }
 
@@ -160,29 +123,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     FocusScope.of(context).unfocus();
   }
 
-  Future<void> _signInWithGoogle() async {
-    _logAuth('signIn: start');
-    try {
-      await Supabase.instance.client.auth.signInWithOAuth(
-        OAuthProvider.google,
-        redirectTo: 'com.kafu.offtrainingnote://login-callback/',
-        authScreenLaunchMode: LaunchMode.externalApplication,
-      );
-      _logAuth('signIn: browser opened for OAuth');
-    } catch (e, stack) {
-      _logAuth('signIn: error=$e');
-      debugPrint('$stack');
-      rethrow;
-    }
-  }
-
   Future<void> _signOut() async {
-    _logAuth('signOut: start');
     try {
       await Supabase.instance.client.auth.signOut();
-      _logAuth('signOut: success');
     } catch (e, stack) {
-      _logAuth('signOut: error=$e');
       debugPrint('$stack');
       rethrow;
     }
@@ -190,10 +134,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_session == null) {
-      return _buildLoggedOutScreen();
-    }
-
     final allTricks = ref.watch(tricksProvider);
 
     final airTricks = allTricks.whereType<AirTrick>().toList();
@@ -233,7 +173,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: CustomPaint(painter: _DottedBackgroundPainter()),
+              child: CustomPaint(painter: DottedBackgroundPainter()),
             ),
             Column(
               children: [
@@ -272,61 +212,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildLoggedOutScreen() {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(painter: _DottedBackgroundPainter()),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'オフトレノート',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Googleでログインして開始',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: _signInWithGoogle,
-                    icon: const Icon(Icons.login),
-                    label: const Text('Googleでログイン'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -447,13 +332,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           IconButton(
-            tooltip: _session == null ? 'Googleでログイン' : 'ログアウト',
-            icon: Icon(
-              _session == null ? Icons.login : Icons.logout,
-              color: Colors.black,
-            ),
-            onPressed:
-                _session == null ? _signInWithGoogle : _signOut,
+            tooltip: 'ログアウト',
+            icon: const Icon(Icons.logout, color: Colors.black),
+            onPressed: _signOut,
           ),
         ],
       ),
@@ -523,23 +404,4 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
-}
-
-class _DottedBackgroundPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final dotPaint = Paint()
-      ..color = Colors.grey.shade400.withValues(alpha: 0.6);
-    const spacing = 20.0;
-    const radius = 1.2;
-
-    for (double y = 0; y <= size.height; y += spacing) {
-      for (double x = 0; x <= size.width; x += spacing) {
-        canvas.drawCircle(Offset(x, y), radius, dotPaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
