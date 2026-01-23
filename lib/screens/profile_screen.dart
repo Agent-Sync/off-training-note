@@ -143,6 +143,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         return TrickCard(
                           trick: trick,
                           onTap: () => _showTrickDetail(trick),
+                          showPrivacyBadge: true,
                         );
                       },
                     ),

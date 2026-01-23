@@ -7,8 +7,14 @@ import 'package:timeago/timeago.dart' as timeago;
 class TrickCard extends StatelessWidget {
   final Trick trick;
   final VoidCallback onTap;
+  final bool showPrivacyBadge;
 
-  const TrickCard({super.key, required this.trick, required this.onTap});
+  const TrickCard({
+    super.key,
+    required this.trick,
+    required this.onTap,
+    this.showPrivacyBadge = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,13 +48,13 @@ class TrickCard extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: trick.isPublic
-                          ? AppTheme.textMain
-                          : Colors.grey.shade400,
+                      color: showPrivacyBadge && !trick.isPublic
+                          ? Colors.grey.shade400
+                          : AppTheme.textMain,
                     ),
                   ),
                 ),
-                if (!trick.isPublic)
+                if (showPrivacyBadge && !trick.isPublic)
                   const Padding(
                     padding: EdgeInsets.only(left: 8),
                     child: Icon(
