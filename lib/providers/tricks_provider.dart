@@ -39,6 +39,22 @@ class TricksNotifier extends Notifier<List<Trick>> {
     await _loadTricks();
   }
 
+  Future<void> updateTrickStatus(String trickId, bool isPublic) async {
+    final repo = ref.read(tricksRepositoryProvider);
+    await repo.updateTrickStatus(trickId: trickId, isPublic: isPublic);
+
+    state = [
+      for (final trick in state)
+        if (trick.id == trickId)
+          trick.map(
+            air: (air) => air.copyWith(isPublic: isPublic),
+            jib: (jib) => jib.copyWith(isPublic: isPublic),
+          )
+        else
+          trick
+    ];
+  }
+
   Future<void> addMemo(
     String trickId,
     String focus,

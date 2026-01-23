@@ -34,7 +34,6 @@ class TrickCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
             Text(
               name,
               style: const TextStyle(
@@ -186,4 +185,5 @@ class TrickCard extends StatelessWidget {
       ),
     );
   }
+
 }

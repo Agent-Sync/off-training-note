@@ -12,7 +12,7 @@ class TricksRepository {
     final rows = await SupabaseClientProvider.client
         .from('tricks')
         .select(
-          'id, type, custom_name, stance, takeoff, axis, spin, grab, direction, '
+          'id, type, custom_name, stance, takeoff, axis, spin, grab, direction, is_public, '
           'created_at, updated_at, memos(id, trick_id, type, focus, outcome, '
           'condition, size, created_at, updated_at)',
         )
@@ -40,6 +40,7 @@ class TricksRepository {
           'spin': air.spin,
           'grab': air.grab,
           'direction': _directionToDb(air.direction),
+          'is_public': air.isPublic,
           'created_at': air.createdAt.toIso8601String(),
           'updated_at': now,
         },
@@ -54,11 +55,22 @@ class TricksRepository {
           'spin': null,
           'grab': null,
           'direction': null,
+          'is_public': jib.isPublic,
           'created_at': jib.createdAt.toIso8601String(),
           'updated_at': now,
         },
       ),
     );
+  }
+
+  Future<void> updateTrickStatus({
+    required String trickId,
+    required bool isPublic,
+  }) async {
+    await SupabaseClientProvider.client.from('tricks').update({
+      'is_public': isPublic,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', trickId);
   }
 
   Future<void> addMemo({
@@ -132,6 +144,7 @@ class TricksRepository {
         .map((memo) => _memoFromRow(memo as Map<String, dynamic>))
         .toList();
     memos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    final isPublic = row['is_public'] as bool? ?? true;
 
     final type = row['type'] as String;
     if (type == 'jib') {
@@ -139,6 +152,7 @@ class TricksRepository {
         id: row['id'] as String,
         customName: row['custom_name'] as String? ?? '',
         memos: memos,
+        isPublic: isPublic,
         createdAt: DateTime.parse(row['created_at'] as String),
       );
     }
@@ -152,6 +166,7 @@ class TricksRepository {
       grab: row['grab'] as String,
       direction: _directionFromDb(row['direction'] as String),
       memos: memos,
+      isPublic: isPublic,
       createdAt: DateTime.parse(row['created_at'] as String),
     );
   }

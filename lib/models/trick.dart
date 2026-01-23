@@ -21,6 +21,7 @@ abstract class Trick with _$Trick {
     required String grab,
     required Direction direction,
     required List<TechMemo> memos,
+    @Default(true) bool isPublic,
     required DateTime createdAt,
   }) = AirTrick;
 
@@ -28,6 +29,7 @@ abstract class Trick with _$Trick {
     required String id,
     required String customName,
     required List<TechMemo> memos,
+    @Default(true) bool isPublic,
     required DateTime createdAt,
   }) = JibTrick;
 

@@ -9,6 +9,7 @@ insert into public.tricks (
   spin,
   grab,
   direction,
+  is_public,
   created_at,
   updated_at
 ) values
@@ -23,6 +24,7 @@ insert into public.tricks (
   540,
   'ミュート',
   'left',
+  true,
   now(),
   now()
 ),
@@ -37,6 +39,7 @@ insert into public.tricks (
   720,
   'セーフティ',
   'right',
+  false,
   now() - interval '1 day',
   now() - interval '1 day'
 ),
@@ -51,6 +54,7 @@ insert into public.tricks (
   540,
   'ジャパン',
   'left',
+  true,
   now() - interval '3 days',
   now() - interval '3 days'
 ),
@@ -65,6 +69,7 @@ insert into public.tricks (
   null,
   null,
   null,
+  true,
   now() - interval '2 days',
   now() - interval '2 days'
 ),
@@ -79,6 +84,7 @@ insert into public.tricks (
   null,
   null,
   null,
+  false,
   now() - interval '4 days',
   now() - interval '4 days'
 )

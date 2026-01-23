@@ -66,6 +66,8 @@ class TrickDetailSheet extends ConsumerWidget {
                       children: tags.map(_buildTag).toList(),
                     ),
                   ],
+                  const SizedBox(height: 16),
+                  _buildPublicToggle(context, ref, currentTrick),
                 ],
               ),
               const SizedBox(height: 24),
@@ -403,6 +405,56 @@ class TrickDetailSheet extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildPublicToggle(BuildContext context, WidgetRef ref, Trick trick) {
+    return GestureDetector(
+      onTap: () {
+        final newStatus = !trick.isPublic;
+        ref.read(tricksProvider.notifier).updateTrickStatus(trick.id, newStatus);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: trick.isPublic
+              ? Colors.black.withValues(alpha: 0.05)
+              : Colors.grey.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: trick.isPublic
+                ? Colors.transparent
+                : Colors.grey.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              trick.isPublic ? Icons.public : Icons.lock_outline,
+              size: 16,
+              color: trick.isPublic ? Colors.black87 : Colors.grey,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              trick.isPublic ? '公開中' : '非公開',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: trick.isPublic ? Colors.black87 : Colors.grey,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.swap_horiz,
+              size: 16,
+              color: trick.isPublic
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.grey.withValues(alpha: 0.5),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
