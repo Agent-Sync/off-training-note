@@ -43,31 +43,57 @@ class TrickDetailSheet extends ConsumerWidget {
           child: Column(
             children: [
               // Title Header
-              Column(
+              Stack(
+                alignment: Alignment.center,
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textMain,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 48),
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textMain,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (tags.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        // Tags
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: tags.map(_buildTag).toList(),
+                        ),
+                      ],
+                    ],
                   ),
-                  if (tags.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    // Tags
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: tags.map(_buildTag).toList(),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      onPressed: () => _showTrickActionMenu(
+                        context,
+                        ref,
+                        currentTrick,
+                      ),
+                      style: ButtonStyle(
+                        overlayColor:
+                            WidgetStateProperty.all(Colors.transparent),
+                      ),
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: Colors.grey,
+                        size: 28,
+                      ),
                     ),
-                  ],
-                  const SizedBox(height: 16),
-                  _buildPublicToggle(context, ref, currentTrick),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -237,6 +263,12 @@ class TrickDetailSheet extends ConsumerWidget {
                                                   padding: EdgeInsets.zero,
                                                   constraints:
                                                       const BoxConstraints(),
+                                                  style: ButtonStyle(
+                                                    overlayColor:
+                                                        WidgetStateProperty.all(
+                                                      Colors.transparent,
+                                                    ),
+                                                  ),
                                                   splashRadius: 20,
                                                   onPressed: () =>
                                                       _showMemoActionMenu(
@@ -408,52 +440,77 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildPublicToggle(BuildContext context, WidgetRef ref, Trick trick) {
-    return GestureDetector(
-      onTap: () {
-        final newStatus = !trick.isPublic;
-        ref.read(tricksProvider.notifier).updateTrickStatus(trick.id, newStatus);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: trick.isPublic
-              ? Colors.black.withValues(alpha: 0.05)
-              : Colors.grey.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: trick.isPublic
-                ? Colors.transparent
-                : Colors.grey.withValues(alpha: 0.3),
+  void _showTrickActionMenu(BuildContext context, WidgetRef ref, Trick trick) {
+    showAppBottomSheet(
+      context: context,
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final currentTrick = ref
+              .watch(tricksProvider)
+              .firstWhere((t) => t.id == trick.id, orElse: () => trick);
+
+          return AppBottomSheetContainer(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildPublicSwitchItem(context, ref, currentTrick),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPublicSwitchItem(
+    BuildContext context,
+    WidgetRef ref,
+    Trick trick,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.85, end: 1.0)
+                      .animate(animation),
+                  child: child,
+                ),
+              );
+            },
+            child: Icon(
+              trick.isPublic ? Icons.lock_open : Icons.lock,
+              key: ValueKey<bool>(trick.isPublic),
+              color: AppTheme.textMain,
+              size: 24,
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              trick.isPublic ? Icons.public : Icons.lock_outline,
-              size: 16,
-              color: trick.isPublic ? Colors.black87 : Colors.grey,
+          const SizedBox(width: 16),
+          const Text(
+            '公開設定',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textMain,
             ),
-            const SizedBox(width: 8),
-            Text(
-              trick.isPublic ? '公開中' : '非公開',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: trick.isPublic ? Colors.black87 : Colors.grey,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.swap_horiz,
-              size: 16,
-              color: trick.isPublic
-                  ? Colors.black.withValues(alpha: 0.3)
-                  : Colors.grey.withValues(alpha: 0.5),
-            ),
-          ],
-        ),
+          ),
+          const Spacer(),
+          Switch.adaptive(
+            value: trick.isPublic,
+            activeColor: Colors.black,
+            onChanged: (val) {
+              ref
+                  .read(tricksProvider.notifier)
+                  .updateTrickStatus(trick.id, val);
+            },
+          ),
+        ],
       ),
     );
   }
