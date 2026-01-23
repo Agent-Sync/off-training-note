@@ -9,7 +9,10 @@ const _trickUuid = Uuid();
 class TricksRepository {
   const TricksRepository();
 
-  Future<List<Trick>> fetchTricks({required String userId}) async {
+  Future<List<Trick>> fetchTricks({
+    required String userId,
+    String? viewerUserId,
+  }) async {
     final rows = await SupabaseClientProvider.client
         .from('tricks')
         .select(
@@ -27,10 +30,11 @@ class TricksRepository {
         .map((memo) => memo['id'] as String)
         .toList();
 
+    final likeUserId = viewerUserId ?? userId;
     final likedMemoIds = memoIds.isEmpty
         ? <String>{}
         : await const CommunityLikeRepository().fetchLikedMemoIds(
-            userId: userId,
+            userId: likeUserId,
             memoIds: memoIds,
           );
 

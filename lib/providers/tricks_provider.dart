@@ -12,9 +12,11 @@ final tricksRepositoryProvider = Provider<TricksRepository>((ref) {
   return const TricksRepository();
 });
 
-final userTricksProvider = FutureProvider.family<List<Trick>, String>((ref, userId) async {
+final userTricksProvider =
+    FutureProvider.family<List<Trick>, String>((ref, userId) async {
   final repo = ref.read(tricksRepositoryProvider);
-  return repo.fetchTricks(userId: userId);
+  final viewerUserId = Supabase.instance.client.auth.currentUser?.id;
+  return repo.fetchTricks(userId: userId, viewerUserId: viewerUserId);
 });
 
 class TricksNotifier extends Notifier<List<Trick>> {

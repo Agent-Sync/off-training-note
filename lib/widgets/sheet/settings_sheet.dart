@@ -169,7 +169,7 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
-                      Icons.camera_alt,
+                      Icons.image_outlined,
                       size: 16,
                       color: Colors.white,
                     ),
