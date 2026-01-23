@@ -4,22 +4,25 @@ import 'package:image_picker/image_picker.dart';
 import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 
-class ProfileEditSheet extends ConsumerStatefulWidget {
-  const ProfileEditSheet({super.key, this.profile});
+class SettingsSheet extends ConsumerStatefulWidget {
+  const SettingsSheet({super.key, this.profile});
 
   final Profile? profile;
 
   @override
-  ConsumerState<ProfileEditSheet> createState() => _ProfileEditSheetState();
+  ConsumerState<SettingsSheet> createState() => _SettingsSheetState();
 }
 
-class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
+class _SettingsSheetState extends ConsumerState<SettingsSheet> {
   late final TextEditingController _nameController;
   final _picker = ImagePicker();
   bool _isLoading = false;
+  bool _didSetInitialName = false;
+  String? _nameError;
 
   @override
   void initState() {
@@ -76,7 +79,13 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
     
     final newName = _nameController.text.trim();
     if (newName.isEmpty) {
+      if (!mounted) return;
+      setState(() => _nameError = '表示名を入力してください');
       return;
+    }
+
+    if (_nameError != null) {
+      setState(() => _nameError = null);
     }
 
     setState(() => _isLoading = true);
@@ -96,15 +105,20 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(profileProvider).value;
+    if (!_didSetInitialName) {
+      final displayName = profile?.displayName ?? widget.profile?.displayName;
+      if (_nameController.text.isEmpty &&
+          displayName != null &&
+          displayName.isNotEmpty) {
+        _nameController.text = displayName;
+        _didSetInitialName = true;
+      } else if (_nameController.text.isNotEmpty) {
+        _didSetInitialName = true;
+      }
+    }
     final avatarUrl = profile?.avatarUrl;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 20,
-        right: 20,
-        top: 20,
-      ),
+    return AppBottomSheetContainer(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -112,7 +126,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'プロフィール設定',
+                '設定',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -173,9 +187,15 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
           const SizedBox(height: 24),
           TextField(
             controller: _nameController,
+            onChanged: (_) {
+              if (_nameError != null) {
+                setState(() => _nameError = null);
+              }
+            },
             decoration: InputDecoration(
               labelText: '表示名',
               labelStyle: TextStyle(color: Colors.grey.shade600),
+              errorText: _nameError,
               filled: true,
               fillColor: Colors.grey.shade50,
               border: OutlineInputBorder(

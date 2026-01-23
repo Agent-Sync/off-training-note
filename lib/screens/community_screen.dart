@@ -9,7 +9,7 @@ import 'package:off_training_note/screens/profile_screen.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
-import 'package:off_training_note/widgets/sheet/profile_edit_sheet.dart';
+import 'package:off_training_note/widgets/sheet/settings_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -144,6 +144,20 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
             children: [
               _buildActionItem(
                 context,
+                icon: Icons.settings_outlined,
+                label: '設定',
+                enabled: true,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showAppBottomSheet(
+                    context: context,
+                    builder: (context) => const SettingsSheet(),
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+              _buildActionItem(
+                context,
                 icon: Icons.person_outline,
                 label: 'プロフィール',
                 enabled: true,
@@ -153,20 +167,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                     MaterialPageRoute(
                       builder: (context) => const ProfileScreen(),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-              _buildActionItem(
-                context,
-                icon: Icons.settings_outlined,
-                label: '設定',
-                enabled: true,
-                onTap: () {
-                  Navigator.of(context).pop();
-                  showAppBottomSheet(
-                    context: context,
-                    builder: (context) => const ProfileEditSheet(),
                   );
                 },
               ),
