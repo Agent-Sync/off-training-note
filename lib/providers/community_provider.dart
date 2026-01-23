@@ -2,12 +2,17 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/community_memo.dart';
+import 'package:off_training_note/repositories/community_like_repository.dart';
 import 'package:off_training_note/repositories/community_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
   return const CommunityRepository();
 });
+
+final communityLikeRepositoryProvider = Provider<CommunityLikeRepository>(
+  (ref) => const CommunityLikeRepository(),
+);
 
 final communityProvider =
     NotifierProvider<CommunityNotifier, CommunityFeedState>(
@@ -102,11 +107,11 @@ class CommunityNotifier extends Notifier<CommunityFeedState> {
       ],
     );
     try {
-      final repo = ref.read(communityRepositoryProvider);
+      final likeRepo = ref.read(communityLikeRepositoryProvider);
       if (memo.likedByMe) {
-        await repo.unlikeMemo(memoId: memo.id, userId: userId);
+        await likeRepo.unlikeMemo(memoId: memo.id, userId: userId);
       } else {
-        await repo.likeMemo(memoId: memo.id, userId: userId);
+        await likeRepo.likeMemo(memoId: memo.id, userId: userId);
       }
     } catch (e) {
       state = state.copyWith(
