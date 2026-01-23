@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:off_training_note/models/profile.dart';
-import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/models/trick.dart' as trick_model;
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
@@ -72,8 +72,15 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       showAppBottomSheet(
         context: context,
         builder: (context) => NewTrickModal(
-          onAdd: (stance, takeoff, axis, spin, grab, direction) {
-            final newTrick = Trick.air(
+          onAdd: (
+            trick_model.Stance stance,
+            trick_model.Takeoff takeoff,
+            trick_model.Axis axis,
+            int spin,
+            trick_model.Grab grab,
+            trick_model.Direction direction,
+          ) {
+            final newTrick = trick_model.Trick.air(
               id: _uuid.v4(),
               stance: stance,
               takeoff: takeoff,
@@ -98,7 +105,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       context: context,
       builder: (context) => NewJibModal(
         onAdd: (customName) {
-          final newJib = Trick.jib(
+          final newJib = trick_model.Trick.jib(
             id: _uuid.v4(),
             customName: customName,
             memos: const [],
@@ -113,7 +120,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     });
   }
 
-  void _showTrickDetail(Trick trick) {
+  void _showTrickDetail(trick_model.Trick trick) {
     _dismissSearchFocus();
     _lockSearchFocus();
     showAppBottomSheet(
@@ -142,8 +149,8 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   Widget build(BuildContext context) {
     final allTricks = ref.watch(tricksProvider);
 
-    final airTricks = allTricks.whereType<AirTrick>().toList();
-    final jibTricks = allTricks.whereType<JibTrick>().toList();
+    final airTricks = allTricks.whereType<trick_model.AirTrick>().toList();
+    final jibTricks = allTricks.whereType<trick_model.JibTrick>().toList();
 
     final filteredTricks = airTricks
         .where((t) => t.matchesQuery(_searchQuery))
@@ -156,7 +163,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         )
         .toList();
 
-    DateTime latestMemoAt(Trick trick) {
+    DateTime latestMemoAt(trick_model.Trick trick) {
       if (trick.memos.isEmpty) return trick.createdAt;
       return trick.memos
           .map((memo) => memo.updatedAt)
@@ -225,7 +232,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     );
   }
 
-  Widget _buildTrickContent(List<Trick> filteredTricks) {
+  Widget _buildTrickContent(List<trick_model.Trick> filteredTricks) {
     if (filteredTricks.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -253,7 +260,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     );
   }
 
-  Widget _buildJibContent(List<Trick> filteredJibTricks) {
+  Widget _buildJibContent(List<trick_model.Trick> filteredJibTricks) {
     if (filteredJibTricks.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
