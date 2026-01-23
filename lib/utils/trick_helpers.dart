@@ -3,6 +3,8 @@ import 'package:off_training_note/models/trick.dart';
 const _stanceSwitchLabel = 'スイッチ';
 const _takeoffCarvingLabel = 'カービング';
 const _axisFlatLabel = '平軸';
+const _axisBackflipLabel = 'バックフリップ';
+const _axisFrontflipLabel = 'フロントフリップ';
 const _grabNoneLabel = 'なし';
 const _defaultAirLabel = 'ストレート';
 const _stanceRegularLabel = 'レギュラー';
@@ -55,7 +57,9 @@ String _airDisplayName(AirTrick air) {
     }
     if (!isFlatAxis) {
       parts.add(air.axis);
-      parts.add(air.spin.toString());
+      if (!_isFlipAxis(air.axis)) {
+        parts.add(air.spin.toString());
+      }
     }
     if (air.grab != _grabNoneLabel) {
       parts.add(air.grab);
@@ -74,7 +78,9 @@ String _airDisplayName(AirTrick air) {
     }
     if (!isFlatAxis) {
       parts.add(air.axis);
-      parts.add(air.spin.toString());
+      if (!_isFlipAxis(air.axis)) {
+        parts.add(air.spin.toString());
+      }
     } else {
       parts.add('0');
     }
@@ -100,7 +106,7 @@ String _airDisplayName(AirTrick air) {
     parts.add(air.axis);
   }
 
-  if (air.spin > 0) {
+  if (air.spin > 0 && !_isFlipAxis(air.axis)) {
     parts.add(air.spin.toString());
   }
 
@@ -125,7 +131,9 @@ List<String> _airTagLabels(AirTrick air) {
 
   if (air.axis.trim().isNotEmpty) labels.add(air.axis);
 
-  if (air.spin > 0) labels.add(air.spin.toString());
+  if (air.spin > 0 && !_isFlipAxis(air.axis)) {
+    labels.add(air.spin.toString());
+  }
 
   return labels;
 }
@@ -138,3 +146,6 @@ String _directionLabel(Direction direction) =>
 
 String _takeoffLabel(Takeoff takeoff) =>
     takeoff == Takeoff.standard ? _takeoffStandardLabel : _takeoffCarvingLabel;
+
+bool _isFlipAxis(String axis) =>
+    axis == _axisBackflipLabel || axis == _axisFrontflipLabel;

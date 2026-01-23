@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 final _trickUuid = Uuid();
@@ -13,240 +11,312 @@ final tricksProvider = NotifierProvider<TricksNotifier, List<Trick>>(
 );
 
 class TricksNotifier extends Notifier<List<Trick>> {
-  static const _storageKey = 'tricks_data_v3';
-
   @override
   List<Trick> build() {
     _loadTricks();
-    return _initialTricks;
+    return const [];
   }
 
   Future<void> _loadTricks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString(_storageKey);
-
-    if (jsonString != null) {
-      final List<dynamic> jsonList = json.decode(jsonString);
-      state = jsonList.map((e) => Trick.fromJson(e)).toList();
-    } else {
-      _saveTricks();
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      state = const [];
+      return;
     }
+
+    final rows = await Supabase.instance.client
+        .from('tricks')
+        .select(
+          'id, type, custom_name, stance, takeoff, axis, spin, grab, direction, '
+          'created_at, updated_at, memos(id, trick_id, type, focus, outcome, '
+          'condition, size, created_at, updated_at)',
+        )
+        .eq('user_id', userId)
+        .order('created_at', ascending: false)
+        .order('updated_at', referencedTable: 'memos', ascending: false);
+
+    final tricks = (rows as List<dynamic>)
+        .map((row) => _trickFromRow(row as Map<String, dynamic>))
+        .toList();
+    state = tricks;
   }
 
-  Future<void> _saveTricks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = json.encode(state.map((e) => e.toJson()).toList());
-    await prefs.setString(_storageKey, jsonString);
+  Future<void> addTrick(Trick trick) async {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      return;
+    }
+
+    final now = DateTime.now().toIso8601String();
+    await Supabase.instance.client.from('tricks').insert(
+      trick.map(
+        air: (air) => {
+          'id': air.id,
+          'user_id': userId,
+          'type': 'air',
+          'custom_name': null,
+          'stance': _stanceToDb(air.stance),
+          'takeoff': _takeoffToDb(air.takeoff),
+          'axis': air.axis,
+          'spin': air.spin,
+          'grab': air.grab,
+          'direction': _directionToDb(air.direction),
+          'created_at': air.createdAt.toIso8601String(),
+          'updated_at': now,
+        },
+        jib: (jib) => {
+          'id': jib.id,
+          'user_id': userId,
+          'type': 'jib',
+          'custom_name': jib.customName,
+          'stance': null,
+          'takeoff': null,
+          'axis': null,
+          'spin': null,
+          'grab': null,
+          'direction': null,
+          'created_at': jib.createdAt.toIso8601String(),
+          'updated_at': now,
+        },
+      ),
+    );
+    await _loadTricks();
   }
 
-  void addTrick(Trick trick) {
-    state = [trick, ...state];
-    _saveTricks();
-  }
-
-
-  void addMemo(
+  Future<void> addMemo(
     String trickId,
     String focus,
     String outcome, {
     MemoCondition? condition,
     MemoSize? size,
-  }) {
-    state = state.map((trick) {
-      return trick.map(
-        air: (air) {
-          if (air.id != trickId) {
-            return air;
-          }
-          final newMemo = TechMemo.air(
-            id: _trickUuid.v4(),
-            focus: focus,
-            outcome: outcome,
-            condition: condition ?? MemoCondition.none,
-            size: size ?? MemoSize.none,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          );
-          return air.copyWith(memos: [newMemo, ...air.memos]);
+  }) async {
+    final target = state.cast<Trick?>().firstWhere(
+          (trick) => trick?.id == trickId,
+          orElse: () => null,
+        );
+    if (target == null) {
+      return;
+    }
+
+    final now = DateTime.now();
+    final memoId = _trickUuid.v4();
+    await Supabase.instance.client.from('memos').insert(
+      target.map(
+        air: (_) => {
+          'id': memoId,
+          'trick_id': trickId,
+          'type': 'air',
+          'focus': focus,
+          'outcome': outcome,
+          'condition': _conditionToDb(condition ?? MemoCondition.none),
+          'size': _sizeToDb(size ?? MemoSize.none),
+          'created_at': now.toIso8601String(),
+          'updated_at': now.toIso8601String(),
         },
-        jib: (jib) {
-          if (jib.id != trickId) {
-            return jib;
-          }
-          final newMemo = TechMemo.jib(
-            id: _trickUuid.v4(),
-            focus: focus,
-            outcome: outcome,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          );
-          return jib.copyWith(memos: [newMemo, ...jib.memos]);
+        jib: (_) => {
+          'id': memoId,
+          'trick_id': trickId,
+          'type': 'jib',
+          'focus': focus,
+          'outcome': outcome,
+          'condition': null,
+          'size': null,
+          'created_at': now.toIso8601String(),
+          'updated_at': now.toIso8601String(),
         },
-      );
-    }).toList();
-    _saveTricks();
+      ),
+    );
+    await _loadTricks();
   }
 
-  void updateMemo(String trickId, TechMemo updatedMemo) {
-    state = state.map((trick) {
-      return trick.map(
-        air: (air) {
-          if (air.id != trickId) {
-            return air;
-          }
-          final refreshed = updatedMemo.map(
-            air: (memo) => memo.copyWith(updatedAt: DateTime.now()),
-            jib: (memo) => memo.copyWith(updatedAt: DateTime.now()),
-          );
-          final newMemos = air.memos.map((memo) {
-            return memo.id == updatedMemo.id ? refreshed : memo;
-          }).toList();
-          return air.copyWith(memos: newMemos);
+  Future<void> updateMemo(String trickId, TechMemo updatedMemo) async {
+    final now = DateTime.now().toIso8601String();
+    await Supabase.instance.client.from('memos').update(
+      updatedMemo.map(
+        air: (memo) => {
+          'focus': memo.focus,
+          'outcome': memo.outcome,
+          'condition': _conditionToDb(memo.condition),
+          'size': _sizeToDb(memo.size),
+          'updated_at': now,
         },
-        jib: (jib) {
-          if (jib.id != trickId) {
-            return jib;
-          }
-          final refreshed = updatedMemo.map(
-            air: (memo) => memo.copyWith(updatedAt: DateTime.now()),
-            jib: (memo) => memo.copyWith(updatedAt: DateTime.now()),
-          );
-          final newMemos = jib.memos.map((memo) {
-            return memo.id == updatedMemo.id ? refreshed : memo;
-          }).toList();
-          return jib.copyWith(memos: newMemos);
+        jib: (memo) => {
+          'focus': memo.focus,
+          'outcome': memo.outcome,
+          'condition': null,
+          'size': null,
+          'updated_at': now,
         },
-      );
-    }).toList();
-    _saveTricks();
+      ),
+    ).eq('id', updatedMemo.id);
+    await _loadTricks();
   }
 
-  void deleteMemo(String trickId, String memoId) {
-    state = state.map((trick) {
-      return trick.map(
-        air: (air) {
-          if (air.id != trickId) {
-            return air;
-          }
-          final newMemos = air.memos
-              .where((memo) => memo.id != memoId)
-              .toList();
-          return air.copyWith(memos: newMemos);
-        },
-        jib: (jib) {
-          if (jib.id != trickId) {
-            return jib;
-          }
-          final newMemos = jib.memos
-              .where((memo) => memo.id != memoId)
-              .toList();
-          return jib.copyWith(memos: newMemos);
-        },
-      );
-    }).toList();
-    _saveTricks();
+  Future<void> deleteMemo(String trickId, String memoId) async {
+    await Supabase.instance.client.from('memos').delete().eq('id', memoId);
+    await _loadTricks();
   }
 
-  static final List<Trick> _initialTricks = [
-    Trick.air(
-      id: _trickUuid.v4(),
-      stance: Stance.regular,
-      direction: Direction.left,
-      takeoff: Takeoff.carving,
-      axis: '平軸',
-      spin: 540,
-      grab: 'ミュート',
-      memos: [
-        TechMemo.air(
-          id: _trickUuid.v4(),
-          focus: 'テイクオフで肩のラインを水平に保つ',
-          outcome: '軸が安定して回転がスムーズになった',
-          condition: MemoCondition.snow,
-          size: MemoSize.big,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-        ),
-        TechMemo.air(
-          id: _trickUuid.v4(),
-          focus: '360の時点でランディングを見る',
-          outcome: '着地が完璧に決まった',
-          condition: MemoCondition.snow,
-          size: MemoSize.middle,
-          createdAt: DateTime.now().subtract(const Duration(days: 5)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-        ),
-      ],
-      createdAt: DateTime.now(),
-    ),
-    Trick.air(
-      id: _trickUuid.v4(),
-      stance: Stance.regular,
-      direction: Direction.right,
-      takeoff: Takeoff.standard,
-      axis: 'コーク',
-      spin: 720,
-      grab: 'セーフティ',
-      memos: [
-        TechMemo.air(
-          id: _trickUuid.v4(),
-          focus: '右肩を下げながら抜ける',
-          outcome: 'しっかり軸が入った',
-          condition: MemoCondition.snow,
-          size: MemoSize.big,
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-      ],
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    Trick.air(
-      id: _trickUuid.v4(),
-      stance: Stance.switchStance,
-      direction: Direction.left,
-      takeoff: Takeoff.standard,
-      axis: '平軸',
-      spin: 540,
-      grab: 'ジャパン',
-      memos: [
-        TechMemo.air(
-          id: _trickUuid.v4(),
-          focus: '目線を先行させる',
-          outcome: '回転不足が解消',
-          condition: MemoCondition.brush,
-          size: MemoSize.small,
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-      ],
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    Trick.jib(
-      id: _trickUuid.v4(),
-      customName: '270オン 270オフ',
-      memos: [
-        TechMemo.jib(
-          id: _trickUuid.v4(),
-          focus: '目線と肩を先行させる',
-          outcome: '乗り込みがスムーズになった',
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-      ],
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    Trick.jib(
-      id: _trickUuid.v4(),
-      customName: 'フロント450アウト',
-      memos: [
-        TechMemo.jib(
-          id: _trickUuid.v4(),
-          focus: 'トップシートをフラットに保つ',
-          outcome: 'バタつきが減った',
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-      ],
-      createdAt: DateTime.now().subtract(const Duration(days: 4)),
-    ),
-  ];
+  Trick _trickFromRow(Map<String, dynamic> row) {
+    final memos = (row['memos'] as List<dynamic>? ?? [])
+        .map((memo) => _memoFromRow(memo as Map<String, dynamic>))
+        .toList();
+    memos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
+    final type = row['type'] as String;
+    if (type == 'jib') {
+      return Trick.jib(
+        id: row['id'] as String,
+        customName: row['custom_name'] as String? ?? '',
+        memos: memos,
+        createdAt: DateTime.parse(row['created_at'] as String),
+      );
+    }
+
+    return Trick.air(
+      id: row['id'] as String,
+      stance: _stanceFromDb(row['stance'] as String),
+      takeoff: _takeoffFromDb(row['takeoff'] as String),
+      axis: row['axis'] as String,
+      spin: (row['spin'] as num).toInt(),
+      grab: row['grab'] as String,
+      direction: _directionFromDb(row['direction'] as String),
+      memos: memos,
+      createdAt: DateTime.parse(row['created_at'] as String),
+    );
+  }
+
+  TechMemo _memoFromRow(Map<String, dynamic> row) {
+    final type = row['type'] as String;
+    if (type == 'jib') {
+      return TechMemo.jib(
+        id: row['id'] as String,
+        focus: row['focus'] as String,
+        outcome: row['outcome'] as String,
+        updatedAt: DateTime.parse(row['updated_at'] as String),
+        createdAt: DateTime.parse(row['created_at'] as String),
+      );
+    }
+
+    return TechMemo.air(
+      id: row['id'] as String,
+      focus: row['focus'] as String,
+      outcome: row['outcome'] as String,
+      condition: _conditionFromDb(row['condition'] as String?),
+      size: _sizeFromDb(row['size'] as String?),
+      updatedAt: DateTime.parse(row['updated_at'] as String),
+      createdAt: DateTime.parse(row['created_at'] as String),
+    );
+  }
+
+  Stance _stanceFromDb(String value) {
+    switch (value) {
+      case 'switchStance':
+        return Stance.switchStance;
+      case 'regular':
+      default:
+        return Stance.regular;
+    }
+  }
+
+  String _stanceToDb(Stance value) {
+    switch (value) {
+      case Stance.switchStance:
+        return 'switchStance';
+      case Stance.regular:
+        return 'regular';
+    }
+  }
+
+  Takeoff _takeoffFromDb(String value) {
+    switch (value) {
+      case 'carving':
+        return Takeoff.carving;
+      case 'standard':
+      default:
+        return Takeoff.standard;
+    }
+  }
+
+  String _takeoffToDb(Takeoff value) {
+    switch (value) {
+      case Takeoff.carving:
+        return 'carving';
+      case Takeoff.standard:
+        return 'standard';
+    }
+  }
+
+  Direction _directionFromDb(String value) {
+    switch (value) {
+      case 'left':
+        return Direction.left;
+      case 'right':
+        return Direction.right;
+      case 'none':
+      default:
+        return Direction.none;
+    }
+  }
+
+  String _directionToDb(Direction value) {
+    switch (value) {
+      case Direction.left:
+        return 'left';
+      case Direction.right:
+        return 'right';
+      case Direction.none:
+        return 'none';
+    }
+  }
+
+  MemoCondition _conditionFromDb(String? value) {
+    switch (value) {
+      case 'snow':
+        return MemoCondition.snow;
+      case 'brush':
+        return MemoCondition.brush;
+      case 'none':
+      default:
+        return MemoCondition.none;
+    }
+  }
+
+  String _conditionToDb(MemoCondition value) {
+    switch (value) {
+      case MemoCondition.snow:
+        return 'snow';
+      case MemoCondition.brush:
+        return 'brush';
+      case MemoCondition.none:
+        return 'none';
+    }
+  }
+
+  MemoSize _sizeFromDb(String? value) {
+    switch (value) {
+      case 'small':
+        return MemoSize.small;
+      case 'middle':
+        return MemoSize.middle;
+      case 'big':
+        return MemoSize.big;
+      case 'none':
+      default:
+        return MemoSize.none;
+    }
+  }
+
+  String _sizeToDb(MemoSize value) {
+    switch (value) {
+      case MemoSize.small:
+        return 'small';
+      case MemoSize.middle:
+        return 'middle';
+      case MemoSize.big:
+        return 'big';
+      case MemoSize.none:
+        return 'none';
+    }
+  }
 }
