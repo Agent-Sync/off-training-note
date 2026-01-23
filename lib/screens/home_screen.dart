@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
@@ -283,6 +285,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildAvatarButton(AsyncValue<Profile?> profileAsync) {
+    final avatar = profileAsync.when(
+      data: (profile) {
+        final url = profile?.avatarUrl;
+        if (url != null && url.isNotEmpty) {
+          return CircleAvatar(
+            radius: 16,
+            backgroundImage: NetworkImage(url),
+          );
+        }
+        return CircleAvatar(
+          radius: 16,
+          backgroundColor: Colors.grey.shade200,
+          child: Icon(Icons.person, size: 18, color: Colors.grey.shade600),
+        );
+      },
+      loading: () => const SizedBox(
+        width: 32,
+        height: 32,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      error: (_, __) => CircleAvatar(
+        radius: 16,
+        backgroundColor: Colors.grey.shade200,
+        child: Icon(Icons.person, size: 18, color: Colors.grey.shade600),
+      ),
+    );
+
+    return IconButton(
+      tooltip: 'ログアウト',
+      icon: avatar,
+      onPressed: _signOut,
+    );
+  }
+
   Widget _buildHeaderTabs(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
@@ -331,11 +368,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-          IconButton(
-            tooltip: 'ログアウト',
-            icon: const Icon(Icons.logout, color: Colors.black),
-            onPressed: _signOut,
-          ),
+          _buildAvatarButton(ref.watch(profileProvider)),
         ],
       ),
     );
