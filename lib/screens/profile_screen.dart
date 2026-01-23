@@ -13,9 +13,10 @@ import 'package:off_training_note/widgets/trick_card.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
-  const ProfileScreen({super.key, this.profile});
+  const ProfileScreen({super.key, this.profile, this.initialTrickId});
 
   final Profile? profile;
+  final String? initialTrickId;
 
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
@@ -25,6 +26,7 @@ enum _ProfileTab { air, jib }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   _ProfileTab _activeTab = _ProfileTab.air;
+  bool _didOpenInitial = false;
 
   void _showTrickDetail(Trick trick) {
     showAppBottomSheet(
@@ -79,6 +81,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     jibTricks.sort((a, b) => latestMemoAt(b).compareTo(latestMemoAt(a)));
 
     final currentList = _activeTab == _ProfileTab.air ? airTricks : jibTricks;
+
+    _maybeOpenInitialTrick(displayTricks);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -219,6 +223,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
       ],
     );
+  }
+
+  void _maybeOpenInitialTrick(List<Trick> displayTricks) {
+    if (_didOpenInitial) return;
+    final targetId = widget.initialTrickId;
+    if (targetId == null) return;
+    final target = displayTricks.cast<Trick?>().firstWhere(
+          (trick) => trick?.id == targetId,
+          orElse: () => null,
+        );
+    if (target == null) return;
+    _didOpenInitial = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _showTrickDetail(target);
+    });
   }
 
   Widget _buildStatItem(String label, String value) {

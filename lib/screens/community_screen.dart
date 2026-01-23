@@ -56,12 +56,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
 
   @override
   void didPopNext() {
-    _dismissSearchFocus();
   }
 
   @override
   void didPush() {
-    _dismissSearchFocus();
   }
 
   @override
@@ -69,34 +67,30 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
     final state = ref.watch(communityProvider);
 
     return Scaffold(
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: _dismissSearchFocus,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: CustomPaint(painter: DottedBackgroundPainter()),
-            ),
-            Column(
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      _buildFeed(state),
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: _buildSearchBar(),
-                      ),
-                    ],
-                  ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: DottedBackgroundPainter()),
+          ),
+          Column(
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: Stack(
+                  children: [
+                    _buildFeed(state),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: _buildSearchBar(),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -134,7 +128,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
   }
 
   void _showProfileActions() {
-    _dismissSearchFocus();
     showAppBottomSheet(
       context: context,
       builder: (context) {
@@ -265,46 +258,49 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
   }
 
   Widget _buildSearchBar() {
-    return Container(
-      color: AppTheme.background.withValues(alpha: 0),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                focusNode: _searchFocusNode,
-                textAlignVertical: TextAlignVertical.center,
-                onChanged: (val) {
-                  ref.read(communityProvider.notifier).updateQuery(val);
-                },
-                decoration: const InputDecoration(
-                  isDense: true,
-                  hintText: 'メモやトリックを検索...',
-                  hintStyle: TextStyle(color: AppTheme.textHint),
-                  prefixIcon: Icon(Icons.search, color: AppTheme.textHint),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+    return TapRegion(
+      onTapOutside: (_) => _dismissSearchFocus(),
+      child: Container(
+        color: AppTheme.background.withValues(alpha: 0),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  textAlignVertical: TextAlignVertical.center,
+                  onChanged: (val) {
+                    ref.read(communityProvider.notifier).updateQuery(val);
+                  },
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    hintText: 'メモやトリックを検索...',
+                    hintStyle: TextStyle(color: AppTheme.textHint),
+                    prefixIcon: Icon(Icons.search, color: AppTheme.textHint),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -366,7 +362,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
         children: [
           GestureDetector(
             onTap: () {
-              _dismissSearchFocus();
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ProfileScreen(profile: memo.profile),
@@ -402,13 +397,25 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ProfileScreen(
+                              profile: memo.profile,
+                              initialTrickId: memo.trick.id,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
                         memo.trickName(),
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppTheme.textSecondary,
                         ),
                       ),
+                    ),
                     ],
                   ),
                 ),

@@ -119,6 +119,7 @@ enum SpinOption {
 abstract class Trick with _$Trick {
   const factory Trick.air({
     required String id,
+    required String userId,
     required Stance stance,
     required Takeoff takeoff,
     required Axis axis,
@@ -132,6 +133,7 @@ abstract class Trick with _$Trick {
 
   const factory Trick.jib({
     required String id,
+    required String userId,
     required String customName,
     required List<TechMemo> memos,
     @Default(true) bool isPublic,

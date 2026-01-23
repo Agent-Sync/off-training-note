@@ -16,7 +16,7 @@ class TricksRepository {
     final rows = await SupabaseClientProvider.client
         .from('tricks')
         .select(
-          'id, type, custom_name, stance, takeoff, axis, spin, grab, direction, is_public, '
+          'id, user_id, type, custom_name, stance, takeoff, axis, spin, grab, direction, is_public, '
           'created_at, updated_at, memos(id, trick_id, type, focus, outcome, '
           'condition, size, like_count, created_at, updated_at)',
         )
@@ -181,6 +181,7 @@ class TricksRepository {
     if (type == 'jib') {
       return Trick.jib(
         id: row['id'] as String,
+        userId: row['user_id'] as String,
         customName: row['custom_name'] as String? ?? '',
         memos: memos,
         isPublic: isPublic,
@@ -190,6 +191,7 @@ class TricksRepository {
 
     return Trick.air(
       id: row['id'] as String,
+      userId: row['user_id'] as String,
       stance: _stanceFromDb(row['stance'] as String),
       takeoff: _takeoffFromDb(row['takeoff'] as String),
       axis: _axisFromDb(row['axis'] as String),

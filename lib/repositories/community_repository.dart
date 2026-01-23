@@ -20,7 +20,7 @@ class CommunityRepository {
           'id, trick_id, type, focus, outcome, condition, size, created_at, '
           'updated_at, like_count, user_id, search_text, '
           'tricks!inner ('
-          'type, custom_name, stance, takeoff, axis, spin, grab, direction, '
+          'user_id, type, custom_name, stance, takeoff, axis, spin, grab, direction, '
           'created_at, is_public'
           '), '
           'profiles!inner (display_name, avatar_url)',
@@ -96,9 +96,11 @@ class CommunityRepository {
 
   Trick _trickFromRow(String trickId, Map<String, dynamic> row) {
     final type = row['type'] as String;
+    final userId = row['user_id'] as String;
     if (type == 'jib') {
       return Trick.jib(
         id: trickId,
+        userId: userId,
         customName: row['custom_name'] as String? ?? '',
         memos: const [],
         isPublic: row['is_public'] as bool? ?? true,
@@ -108,6 +110,7 @@ class CommunityRepository {
 
     return Trick.air(
       id: trickId,
+      userId: userId,
       stance: _stanceFromDb(row['stance'] as String?),
       takeoff: _takeoffFromDb(row['takeoff'] as String?),
       axis: _axisFromDb(row['axis'] as String?),

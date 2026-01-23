@@ -9,6 +9,7 @@ import 'package:off_training_note/utils/condition_tags.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/sheet/log_form_sheet.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class TrickDetailSheet extends ConsumerWidget {
@@ -31,6 +32,8 @@ class TrickDetailSheet extends ConsumerWidget {
     final name = currentTrick.displayName();
     final tags = currentTrick.tagLabels();
     final showAirFields = currentTrick is AirTrick;
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    final isOwner = currentUserId != null && currentTrick.userId == currentUserId;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -77,22 +80,24 @@ class TrickDetailSheet extends ConsumerWidget {
                   Positioned(
                     top: 0,
                     right: 0,
-                    child: IconButton(
-                      onPressed: () => _showTrickActionMenu(
-                        context,
-                        ref,
-                        currentTrick,
-                      ),
-                      style: ButtonStyle(
-                        overlayColor:
-                            WidgetStateProperty.all(Colors.transparent),
-                      ),
-                      icon: const Icon(
-                        Icons.more_vert,
-                        color: Colors.grey,
-                        size: 28,
-                      ),
-                    ),
+                    child: isOwner
+                        ? IconButton(
+                            onPressed: () => _showTrickActionMenu(
+                              context,
+                              ref,
+                              currentTrick,
+                            ),
+                            style: ButtonStyle(
+                              overlayColor:
+                                  WidgetStateProperty.all(Colors.transparent),
+                            ),
+                            icon: const Icon(
+                              Icons.more_vert,
+                              color: Colors.grey,
+                              size: 28,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ],
               ),
@@ -281,29 +286,31 @@ class TrickDetailSheet extends ConsumerWidget {
                                                   ),
                                                 const SizedBox(width: 0),
                                                 ],
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.more_vert,
-                                                    size: 16,
-                                                    color: Colors.grey,
-                                                  ),
-                                                  padding: EdgeInsets.zero,
-                                                  constraints:
-                                                      const BoxConstraints(),
-                                                  style: ButtonStyle(
-                                                    overlayColor:
-                                                        WidgetStateProperty.all(
-                                                      Colors.transparent,
+                                                if (isOwner)
+                                                  IconButton(
+                                                    icon: const Icon(
+                                                      Icons.more_vert,
+                                                      size: 16,
+                                                      color: Colors.grey,
                                                     ),
-                                                  ),
-                                                  splashRadius: 20,
-                                                  onPressed: () =>
-                                                      _showMemoActionMenu(
-                                                        context,
-                                                        ref,
-                                                        memo,
+                                                    padding: EdgeInsets.zero,
+                                                    constraints:
+                                                        const BoxConstraints(),
+                                                    style: ButtonStyle(
+                                                      overlayColor:
+                                                          WidgetStateProperty
+                                                              .all(
+                                                        Colors.transparent,
                                                       ),
-                                                ),
+                                                    ),
+                                                    splashRadius: 20,
+                                                    onPressed: () =>
+                                                        _showMemoActionMenu(
+                                                          context,
+                                                          ref,
+                                                          memo,
+                                                        ),
+                                                  ),
                                               ],
                                             ),
                                           ],
@@ -417,49 +424,53 @@ class TrickDetailSheet extends ConsumerWidget {
               ),
 
               // Bottom Button
-              Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-                  top: 16,
-                ),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    showAppBottomSheet(
-                      context: context,
-                      builder: (context) => LogFormSheet(
-                        showAirFields: showAirFields,
-                        onAdd: (focus, outcome, {condition, size}) {
-                          ref
-                              .read(tricksProvider.notifier)
-                              .addMemo(
-                                trick.id,
-                                focus,
-                                outcome,
-                                condition: condition,
-                                size: size,
-                              );
-                          // Stay on detail sheet, it will update
-                        },
+              if (isOwner)
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                    top: 16,
+                  ),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      showAppBottomSheet(
+                        context: context,
+                        builder: (context) => LogFormSheet(
+                          showAirFields: showAirFields,
+                          onAdd: (focus, outcome, {condition, size}) {
+                            ref
+                                .read(tricksProvider.notifier)
+                                .addMemo(
+                                  trick.id,
+                                  focus,
+                                  outcome,
+                                  condition: condition,
+                                  size: size,
+                                );
+                            // Stay on detail sheet, it will update
+                          },
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      elevation: 4,
+                      shadowColor: Colors.black.withValues(alpha: 0.3),
                     ),
-                    elevation: 4,
-                    shadowColor: Colors.black.withValues(alpha: 0.3),
-                  ),
-                  icon: const Icon(Icons.add),
-                  label: const Text(
-                    'メモを追加',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    icon: const Icon(Icons.add),
+                    label: const Text(
+                      'メモを追加',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         );

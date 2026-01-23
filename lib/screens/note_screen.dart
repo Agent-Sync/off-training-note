@@ -14,6 +14,7 @@ import 'package:off_training_note/widgets/sheet/new_jib_modal.dart';
 import 'package:off_training_note/widgets/sheet/new_trick_modal.dart';
 import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
 import 'package:uuid/uuid.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NoteScreen extends ConsumerStatefulWidget {
   const NoteScreen({super.key});
@@ -77,8 +78,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
             trick_model.Grab grab,
             trick_model.Direction direction,
           ) {
+            final userId = Supabase.instance.client.auth.currentUser?.id;
+            if (userId == null) return;
             final newTrick = trick_model.Trick.air(
               id: _uuid.v4(),
+              userId: userId,
               stance: stance,
               takeoff: takeoff,
               axis: axis,
@@ -102,8 +106,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       context: context,
       builder: (context) => NewJibModal(
         onAdd: (customName) {
+          final userId = Supabase.instance.client.auth.currentUser?.id;
+          if (userId == null) return;
           final newJib = trick_model.Trick.jib(
             id: _uuid.v4(),
+            userId: userId,
             customName: customName,
             memos: const [],
             createdAt: DateTime.now(),
