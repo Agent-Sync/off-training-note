@@ -19,7 +19,7 @@ class CommunityMemo {
     if (name != null && name.trim().isNotEmpty) {
       return name;
     }
-    return '名無し';
+    return 'No Name';
   }
 
   String trickName() => trick.displayName();

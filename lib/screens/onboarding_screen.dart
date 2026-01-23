@@ -20,6 +20,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final ImagePicker _picker = ImagePicker();
   int _pageIndex = 0;
   bool _isLoading = false;
+  bool _isCompleted = false;
   String? _nameError;
   String? _avatarUrl;
 
@@ -93,20 +94,32 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       );
       return;
     }
-    setState(() => _isLoading = true);
+
+    // 完了アニメーションを開始
+    setState(() => _isCompleted = true);
+
+    // アニメーションを見せるために少し待機
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    if (!mounted) return;
+
+    // _isLoading = true にはしない（既に _isCompleted 画面が出ているので）
+    // 裏で更新処理を行う
     try {
       await ref.read(profileProvider.notifier).updateProfile(
             displayName: newName,
             avatarUrl: _avatarUrl,
             onboarded: true,
           );
+      // profileProviderが更新されると、AppウィジェットのAnimatedSwitcherによって
+      // 自動的にHomeScreenへフェード遷移する
     } catch (e) {
       if (!mounted) return;
+      // エラー時は完了画面を戻す
+      setState(() => _isCompleted = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('プロフィールの更新に失敗しました: $e')),
       );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -114,26 +127,91 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            _buildProgress(),
-            const SizedBox(height: 24),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _pageIndex = index),
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  _buildNameStep(),
-                  _buildAvatarStep(),
-                ],
-              ),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                _buildProgress(),
+                const SizedBox(height: 24),
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) => setState(() => _pageIndex = index),
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      _buildNameStep(),
+                      _buildAvatarStep(),
+                    ],
+                  ),
+                ),
+                _buildBottomAction(),
+                const SizedBox(height: 24),
+              ],
             ),
-            _buildBottomAction(),
-            const SizedBox(height: 24),
-          ],
+          ),
+          if (_isCompleted) _buildCompletionOverlay(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompletionOverlay() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 48,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOut,
+                builder: (context, value, child) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, 20 * (1 - value)),
+                      child: child,
+                    ),
+                  );
+                },
+                child: const Text(
+                  '準備完了！',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMain,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -245,7 +323,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             Icons.person,
                             size: 56,
                             color: Colors.grey.shade400,
-                          )
+                            )
                         : null,
                   ),
                   Positioned(

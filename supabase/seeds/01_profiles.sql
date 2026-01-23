@@ -12,7 +12,10 @@ insert into public.profiles (
   '2026-01-22 08:52:57.438833+00',
   '2026-01-23 02:01:03.249488+00'
 )
-on conflict (id) do nothing;
+on conflict (id) do update set
+  display_name = excluded.display_name,
+  avatar_url = excluded.avatar_url,
+  updated_at = excluded.updated_at;
 
 insert into public.profiles (
   id,
@@ -42,4 +45,7 @@ insert into public.profiles (
   now() - interval '14 days',
   now() - interval '3 days'
 )
-on conflict (id) do nothing;
+on conflict (id) do update set
+  display_name = excluded.display_name,
+  avatar_url = excluded.avatar_url,
+  updated_at = excluded.updated_at;

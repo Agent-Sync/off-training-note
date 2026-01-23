@@ -50,36 +50,51 @@ class AuthGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionAsync = ref.watch(authSessionProvider);
-    return sessionAsync.when(
-      data: (session) {
-        if (session == null) {
-          return LoginScreen(onSignIn: _signInWithGoogle);
-        }
-        final profileAsync = ref.watch(profileProvider);
-        return profileAsync.when(
-          data: (profile) {
-            if (profile == null) {
-              return const Center(
+    
+    return Scaffold(
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 800),
+        switchInCurve: Curves.easeInOut,
+        switchOutCurve: Curves.easeInOut,
+        child: sessionAsync.when(
+          data: (session) {
+            if (session == null) {
+              return LoginScreen(key: const ValueKey('login'), onSignIn: _signInWithGoogle);
+            }
+            final profileAsync = ref.watch(profileProvider);
+            return profileAsync.when(
+              data: (profile) {
+                if (profile == null) {
+                  return const Center(
+                    key: ValueKey('loading_profile'),
+                    child: CircularProgressIndicator(color: Colors.black),
+                  );
+                }
+                if (!profile.onboarded) {
+                  return const OnboardingScreen(key: ValueKey('onboarding'));
+                }
+                return const HomeScreen(key: ValueKey('home'));
+              },
+              loading: () => const Center(
+                key: ValueKey('loading_data'),
                 child: CircularProgressIndicator(color: Colors.black),
-              );
-            }
-            if (!profile.onboarded) {
-              return const OnboardingScreen();
-            }
-            return const HomeScreen();
+              ),
+              error: (error, stackTrace) => const Center(
+                key: ValueKey('error'),
+                child: CircularProgressIndicator(color: Colors.black),
+              ),
+            );
           },
           loading: () => const Center(
+            key: ValueKey('loading_session'),
             child: CircularProgressIndicator(color: Colors.black),
           ),
-          error: (error, stackTrace) => const Center(
-            child: CircularProgressIndicator(color: Colors.black),
+          error: (error, stackTrace) => LoginScreen(
+            key: const ValueKey('login_error'),
+            onSignIn: _signInWithGoogle,
           ),
-        );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: Colors.black),
+        ),
       ),
-      error: (error, stackTrace) => LoginScreen(onSignIn: _signInWithGoogle),
     );
   }
 }
