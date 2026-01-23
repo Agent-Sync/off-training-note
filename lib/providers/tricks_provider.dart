@@ -12,6 +12,11 @@ final tricksRepositoryProvider = Provider<TricksRepository>((ref) {
   return const TricksRepository();
 });
 
+final userTricksProvider = FutureProvider.family<List<Trick>, String>((ref, userId) async {
+  final repo = ref.read(tricksRepositoryProvider);
+  return repo.fetchTricks(userId: userId);
+});
+
 class TricksNotifier extends Notifier<List<Trick>> {
   @override
   List<Trick> build() {

@@ -19,7 +19,7 @@ class TrickCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: trick.isPublic ? Colors.white : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -34,13 +34,29 @@ class TrickCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              name,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: AppTheme.textMain,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppTheme.textMain,
+                    ),
+                  ),
+                ),
+                if (!trick.isPublic)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Icon(
+                      Icons.lock_outline,
+                      size: 16,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 12),
 

@@ -4,6 +4,7 @@ import 'package:off_training_note/models/community_memo.dart';
 import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/providers/community_provider.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
+import 'package:off_training_note/screens/profile_screen.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
@@ -112,18 +113,17 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             children: [
               _buildActionItem(
                 context,
-                icon: Icons.settings,
-                label: '設定',
-                enabled: false,
-                onTap: () {},
-              ),
-              const SizedBox(height: 8),
-              _buildActionItem(
-                context,
-                icon: Icons.edit,
-                label: '編集',
-                enabled: false,
-                onTap: () {},
+                icon: Icons.person_outline,
+                label: 'プロフィール',
+                enabled: true,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 8),
               _buildActionItem(
@@ -319,52 +319,62 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: Colors.grey.shade200,
-                backgroundImage: (memo.profile.avatarUrl != null &&
-                        memo.profile.avatarUrl!.trim().isNotEmpty)
-                    ? NetworkImage(memo.profile.avatarUrl!)
-                    : null,
-                child: (memo.profile.avatarUrl == null ||
-                        memo.profile.avatarUrl!.trim().isEmpty)
-                    ? const Icon(Icons.person, color: Colors.white, size: 18)
-                    : null,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      memo.displayUserName(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textMain,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      memo.trickName(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(profile: memo.profile),
                 ),
-              ),
-              Text(
-                timeago.format(memo.memo.createdAt, locale: 'ja'),
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: AppTheme.textSecondary,
+              );
+            },
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.grey.shade200,
+                  backgroundImage: (memo.profile.avatarUrl != null &&
+                          memo.profile.avatarUrl!.trim().isNotEmpty)
+                      ? NetworkImage(memo.profile.avatarUrl!)
+                      : null,
+                  child: (memo.profile.avatarUrl == null ||
+                          memo.profile.avatarUrl!.trim().isEmpty)
+                      ? const Icon(Icons.person,
+                          color: Colors.white, size: 18)
+                      : null,
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        memo.displayUserName(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textMain,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        memo.trickName(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  timeago.format(memo.memo.createdAt, locale: 'ja'),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           Container(
