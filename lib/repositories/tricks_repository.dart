@@ -36,9 +36,9 @@ class TricksRepository {
           'custom_name': null,
           'stance': _stanceToDb(air.stance),
           'takeoff': _takeoffToDb(air.takeoff),
-          'axis': air.axis,
+          'axis': _axisToDb(air.axis),
           'spin': air.spin,
-          'grab': air.grab,
+          'grab': _grabToDb(air.grab),
           'direction': _directionToDb(air.direction),
           'is_public': air.isPublic,
           'created_at': air.createdAt.toIso8601String(),
@@ -161,9 +161,9 @@ class TricksRepository {
       id: row['id'] as String,
       stance: _stanceFromDb(row['stance'] as String),
       takeoff: _takeoffFromDb(row['takeoff'] as String),
-      axis: row['axis'] as String,
+      axis: _axisFromDb(row['axis'] as String),
       spin: (row['spin'] as num).toInt(),
-      grab: row['grab'] as String,
+      grab: _grabFromDb(row['grab'] as String),
       direction: _directionFromDb(row['direction'] as String),
       memos: memos,
       isPublic: isPublic,
@@ -253,6 +253,22 @@ class TricksRepository {
       case Direction.none:
         return 'none';
     }
+  }
+
+  Axis _axisFromDb(String value) {
+    return Axis.fromDb(value);
+  }
+
+  String _axisToDb(Axis value) {
+    return value.name;
+  }
+
+  Grab _grabFromDb(String value) {
+    return Grab.fromDb(value);
+  }
+
+  String _grabToDb(Grab value) {
+    return value.name;
   }
 
   MemoCondition _conditionFromDb(String? value) {

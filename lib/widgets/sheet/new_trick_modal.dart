@@ -11,9 +11,9 @@ class NewTrickModal extends StatefulWidget {
   final Function(
     Stance stance,
     Takeoff takeoff,
-    String axis,
+    Axis axis,
     int spin,
-    String grab,
+    Grab grab,
     Direction direction,
   )
   onAdd;
@@ -31,6 +31,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
   final TextEditingController _axisController = TextEditingController();
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
+  Axis? _selectedAxis;
+  Grab? _selectedGrab;
   bool _showValidation = false;
 
   bool get _isSpinZero => int.tryParse(_spinController.text) == 0;
@@ -116,11 +118,11 @@ class _NewTrickModalState extends State<NewTrickModal> {
   }
 
   bool get _isBackOrFront {
-    return _isBackOrFrontValue(_axisController.text);
+    return _selectedAxis?.isFlip ?? false;
   }
 
   bool get _isAxisMissing {
-    return _axisController.text.isEmpty;
+    return _selectedAxis == null;
   }
 
   bool get _isSpinMissing {
@@ -128,15 +130,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
   }
 
   bool get _isGrabMissing {
-    return _grabController.text.isEmpty;
-  }
-
-  bool _isBackOrFrontValue(String value) {
-    final normalized = value.trim().toLowerCase();
-    return normalized == 'バックフリップ' ||
-        normalized == 'フロントフリップ' ||
-        normalized == 'back flip' ||
-        normalized == 'front flip';
+    return _selectedGrab == null;
   }
 
   @override
@@ -202,14 +196,16 @@ class _NewTrickModalState extends State<NewTrickModal> {
               style: const TextStyle(fontWeight: FontWeight.w600),
               onTap: () {
                 _showAxisSheet(
-                  options: Trick.axes,
-                  selectedValue: _axisController.text.isEmpty
-                      ? null
-                      : _axisController.text,
+                  options: Axis.values
+                      .map((axis) => axis.label)
+                      .toList(growable: false),
+                  selectedValue: _selectedAxis?.label,
                   onSelected: (value) {
+                    final axis = Axis.fromLabel(value);
                     setState(() {
-                      _axisController.text = value;
-                      if (_isBackOrFrontValue(value)) {
+                      _selectedAxis = axis;
+                      _axisController.text = axis.label;
+                      if (axis.isFlip) {
                         _spinController.text = '0';
                         _direction = Direction.none;
                       } else if (_direction == Direction.none) {
@@ -247,7 +243,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 ),
                 onTap: () {
                   _showSpinSheet(
-                    options: Trick.spins.map((e) => e.toString()).toList(),
+                    options: SpinOption.values
+                        .map((spin) => spin.label)
+                        .toList(growable: false),
                     selectedValue: _spinController.text.isEmpty
                         ? null
                         : _spinController.text,
@@ -286,12 +284,16 @@ class _NewTrickModalState extends State<NewTrickModal> {
               onTap: () {
                 _showSearchableOptionSheet(
                   title: 'グラブを選択',
-                  options: Trick.grabs,
-                  selectedValue: _grabController.text.isEmpty
-                      ? null
-                      : _grabController.text,
+                  options: Grab.values
+                      .map((grab) => grab.label)
+                      .toList(growable: false),
+                  selectedValue: _selectedGrab?.label,
                   onSelected: (value) {
-                    setState(() => _grabController.text = value);
+                    setState(() {
+                      final grab = Grab.fromLabel(value);
+                      _selectedGrab = grab;
+                      _grabController.text = grab.label;
+                    });
                   },
                 );
               },
@@ -335,11 +337,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 widget.onAdd(
                   _stance,
                   _takeoff,
-                  _axisController.text.trim().isEmpty
-                      ? '平軸'
-                      : _axisController.text.trim(),
+                  _selectedAxis ?? Axis.upright,
                   spinValue,
-                  _grabController.text.isEmpty ? 'なし' : _grabController.text,
+                  _selectedGrab ?? Grab.none,
                   directionValue,
                 );
                 Navigator.pop(context);

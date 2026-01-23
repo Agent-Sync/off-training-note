@@ -73,9 +73,9 @@ class CommunityMemo {
       id: trickId,
       stance: _stanceFromDb(stance),
       takeoff: _takeoffFromDb(takeoff),
-      axis: axis ?? '',
+      axis: _axisFromDb(axis),
       spin: spin ?? 0,
-      grab: grab ?? 'なし',
+      grab: _grabFromDb(grab),
       direction: _directionFromDb(direction),
       memos: const [],
       createdAt: trickCreatedAt,
@@ -146,4 +146,18 @@ Direction _directionFromDb(String? value) {
     default:
       return Direction.none;
   }
+}
+
+Axis _axisFromDb(String? value) {
+  if (value == null) {
+    return Axis.upright;
+  }
+  return Axis.fromDb(value);
+}
+
+Grab _grabFromDb(String? value) {
+  if (value == null) {
+    return Grab.none;
+  }
+  return Grab.fromDb(value);
 }
