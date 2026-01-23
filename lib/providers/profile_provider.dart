@@ -12,14 +12,42 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return const ProfileRepository();
 });
 
-final profileProvider = FutureProvider<Profile?>((ref) async {
-  final session = ref.watch(authSessionProvider).value ??
-      Supabase.instance.client.auth.currentSession;
-  final user = session?.user;
-  if (user == null) {
-    return null;
+final profileProvider = AsyncNotifierProvider<ProfileNotifier, Profile?>(
+  ProfileNotifier.new,
+);
+
+class ProfileNotifier extends AsyncNotifier<Profile?> {
+  @override
+  Future<Profile?> build() async {
+    final session = ref.watch(authSessionProvider).value ??
+        Supabase.instance.client.auth.currentSession;
+    final user = session?.user;
+    if (user == null) {
+      return null;
+    }
+
+    final repo = ref.read(profileRepositoryProvider);
+    return repo.fetchProfile(userId: user.id);
   }
 
-  final repo = ref.read(profileRepositoryProvider);
-  return repo.fetchProfile(userId: user.id);
-});
+  Future<void> updateProfile({
+    String? displayName,
+    String? avatarUrl,
+  }) async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      return;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repo = ref.read(profileRepositoryProvider);
+      await repo.updateProfile(
+        userId: user.id,
+        displayName: displayName,
+        avatarUrl: avatarUrl,
+      );
+      return repo.fetchProfile(userId: user.id);
+    });
+  }
+}
