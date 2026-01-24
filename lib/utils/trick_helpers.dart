@@ -141,4 +141,4 @@ String _directionLabel(Direction direction) =>
     direction == Direction.left ? _directionLeftLabel : _directionRightLabel;
 
 String _takeoffLabel(Takeoff takeoff) =>
-    takeoff == Takeoff.standard ? _takeoffStandardLabel : _takeoffCarvingLabel;
+    takeoff == Takeoff.straight ? _takeoffStandardLabel : _takeoffCarvingLabel;

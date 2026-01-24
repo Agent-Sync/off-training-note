@@ -6,7 +6,7 @@ part 'trick.g.dart';
 
 enum Stance { regular, switchStance } // 'switch' is a keyword in Dart
 
-enum Takeoff { standard, carving }
+enum Takeoff { straight, carving }
 
 enum Direction { none, left, right }
 

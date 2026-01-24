@@ -26,7 +26,7 @@ class NewTrickModal extends StatefulWidget {
 
 class _NewTrickModalState extends State<NewTrickModal> {
   trick_model.Stance _stance = trick_model.Stance.regular;
-  trick_model.Takeoff _takeoff = trick_model.Takeoff.standard;
+  trick_model.Takeoff _takeoff = trick_model.Takeoff.straight;
   trick_model.Direction _direction = trick_model.Direction.left;
   final TextEditingController _axisController = TextEditingController();
   final TextEditingController _spinController = TextEditingController();
@@ -179,9 +179,9 @@ class _NewTrickModalState extends State<NewTrickModal> {
             TwoOptionToggle(
               leftLabel: 'ストレート',
               rightLabel: 'カービング',
-              isLeftSelected: _takeoff == trick_model.Takeoff.standard,
+              isLeftSelected: _takeoff == trick_model.Takeoff.straight,
               onLeftTap: () =>
-                  setState(() => _takeoff = trick_model.Takeoff.standard),
+                  setState(() => _takeoff = trick_model.Takeoff.straight),
               onRightTap: () =>
                   setState(() => _takeoff = trick_model.Takeoff.carving),
             ),
