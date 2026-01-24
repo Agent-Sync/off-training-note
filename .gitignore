@@ -5,5 +5,14 @@ assets/.env
 assets/.env.*
 !assets/.env.example
 assets/.env.release
+.dart_tool/
+.flutter-plugins-dependencies
+.idea/
+.vscode/
+*.iml
+build/
+lib/models/*.freezed.dart
+lib/models/*.g.dart
+macos/Flutter/
 ios/fastlane/report.xml
 ios/fastlane/README.md
