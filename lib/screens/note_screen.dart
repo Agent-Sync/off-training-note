@@ -7,6 +7,7 @@ import 'package:off_training_note/models/trick.dart' as trick_model;
 import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
+import 'package:off_training_note/widgets/curled_arrow.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
@@ -34,6 +35,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   final _uuid = const Uuid();
   Timer? _searchFocusTimer;
   bool _suppressSearchFocus = false;
+
   @override
   void dispose() {
     _searchFocusTimer?.cancel();
@@ -204,6 +206,38 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
                 ),
               ],
             ),
+
+            // Empty State Guide (Simple Text & Arrow)
+            if (_searchQuery.isEmpty &&
+                ((_activeTab == _HomeTab.air && filteredTricks.isEmpty) ||
+                    (_activeTab == _HomeTab.jib && filteredJibTricks.isEmpty)))
+              Positioned(
+                bottom: 84,
+                left: 24,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'まずはここから\nトリックを追加！',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.black26, // 薄めの文字
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    SizedBox(
+                      width: 96,
+                      height: 72,
+                      child: CircularArrow(
+                        color: Colors.black26, // 薄めの色
+                        strokeWidth: 3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
             // FAB
             Positioned(
@@ -412,40 +446,23 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   }
 
   Widget _buildEmptyState() {
-    final isSearching = _searchQuery.trim().isNotEmpty;
-    return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (isSearching) ...[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.search_off, size: 48, color: Colors.grey.shade300),
-                const SizedBox(height: 16),
-                const Text(
-                  'トリックが見つかりません',
-                  style: TextStyle(color: AppTheme.textHint),
-                ),
-              ],
-            ),
-          ] else ...[
+    // 検索中のみメッセージを表示する
+    if (_searchQuery.trim().isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 48, color: Colors.grey.shade300),
+            const SizedBox(height: 16),
             const Text(
-              'トリックはここから追加できます',
+              'トリックが見つかりません',
               style: TextStyle(color: AppTheme.textHint),
             ),
-            Positioned(
-              right: 12,
-              bottom: 24,
-              child: Icon(
-                Icons.subdirectory_arrow_right,
-                size: 36,
-                color: AppTheme.textHint,
-              ),
-            ),
           ],
-        ],
-      ),
-    );
+        ),
+      );
+    }
+    // 初期状態のガイドはStackのFAB近くに表示するので、ここは空のコンテナを返す
+    return const SizedBox.shrink();
   }
 }
