@@ -412,16 +412,38 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
   }
 
   Widget _buildEmptyState() {
+    final isSearching = _searchQuery.trim().isNotEmpty;
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Icon(Icons.search_off, size: 48, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
-          const Text(
-            'トリックが見つかりません',
-            style: TextStyle(color: AppTheme.textHint),
-          ),
+          if (isSearching) ...[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.search_off, size: 48, color: Colors.grey.shade300),
+                const SizedBox(height: 16),
+                const Text(
+                  'トリックが見つかりません',
+                  style: TextStyle(color: AppTheme.textHint),
+                ),
+              ],
+            ),
+          ] else ...[
+            const Text(
+              'トリックはここから追加できます',
+              style: TextStyle(color: AppTheme.textHint),
+            ),
+            Positioned(
+              right: 12,
+              bottom: 24,
+              child: Icon(
+                Icons.subdirectory_arrow_right,
+                size: 36,
+                color: AppTheme.textHint,
+              ),
+            ),
+          ],
         ],
       ),
     );
