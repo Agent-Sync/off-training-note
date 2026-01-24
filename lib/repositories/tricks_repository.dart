@@ -258,9 +258,9 @@ class TricksRepository {
     switch (value) {
       case 'carving':
         return Takeoff.carving;
-      case 'standard':
+      case 'straight':
       default:
-        return Takeoff.standard;
+        return Takeoff.straight;
     }
   }
 
@@ -268,8 +268,8 @@ class TricksRepository {
     switch (value) {
       case Takeoff.carving:
         return 'carving';
-      case Takeoff.standard:
-        return 'standard';
+      case Takeoff.straight:
+        return 'straight';
     }
   }
 

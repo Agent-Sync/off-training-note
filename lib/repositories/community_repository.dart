@@ -194,9 +194,9 @@ class CommunityRepository {
     switch (value) {
       case 'carving':
         return Takeoff.carving;
-      case 'standard':
+      case 'straight':
       default:
-        return Takeoff.standard;
+        return Takeoff.straight;
     }
   }
 
