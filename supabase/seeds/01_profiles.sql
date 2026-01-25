@@ -2,6 +2,7 @@ insert into public.profiles (
   id,
   display_name,
   avatar_url,
+  onboarded,
   created_at,
   updated_at
 ) values
@@ -9,18 +10,21 @@ insert into public.profiles (
   '38df4b07-e015-4d61-ab23-c65bf9d835c8',
   'かずき',
   'http://127.0.0.1:54321/storage/v1/object/public/avatars/38df4b07-e015-4d61-ab23-c65bf9d835c8/avatar.jpg',
+  true,
   '2026-01-22 08:52:57.438833+00',
   '2026-01-23 02:01:03.249488+00'
 )
 on conflict (id) do update set
   display_name = excluded.display_name,
   avatar_url = excluded.avatar_url,
+  onboarded = excluded.onboarded,
   updated_at = excluded.updated_at;
 
 insert into public.profiles (
   id,
   display_name,
   avatar_url,
+  onboarded,
   created_at,
   updated_at
 ) values
@@ -28,6 +32,7 @@ insert into public.profiles (
   '7c1d4e2e-5f6a-4b7e-8f2c-6f2d1b2a3c4d',
   'jc_pegy',
   'http://127.0.0.1:54321/storage/v1/object/public/avatars/7c1d4e2e-5f6a-4b7e-8f2c-6f2d1b2a3c4d/avatar.jpg',
+  true,
   now() - interval '7 days',
   now() - interval '1 day'
 ),
@@ -35,6 +40,7 @@ insert into public.profiles (
   '9a3c2b1d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
   'A@栂池',
   'http://127.0.0.1:54321/storage/v1/object/public/avatars/9a3c2b1d-4e5f-6a7b-8c9d-0e1f2a3b4c5d/avatar.jpg',
+  true,
   now() - interval '10 days',
   now() - interval '2 days'
 ),
@@ -42,10 +48,12 @@ insert into public.profiles (
   '2b4c6d8e-1f3a-5b7c-9d0e-1f2a3b4c5d6e',
   'Yuto',
   null,
+  true,
   now() - interval '14 days',
   now() - interval '3 days'
 )
 on conflict (id) do update set
   display_name = excluded.display_name,
   avatar_url = excluded.avatar_url,
+  onboarded = excluded.onboarded,
   updated_at = excluded.updated_at;
