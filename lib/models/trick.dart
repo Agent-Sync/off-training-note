@@ -80,7 +80,6 @@ enum Grab {
   leadBlunt('リードブラント'),
   leadTaipan('リードタイパン'),
   leadSeatbelt('リードシートベルト');
-  leadTaipan('リードタイパン');
 
   const Grab(this.label);
 
