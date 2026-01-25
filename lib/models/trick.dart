@@ -55,20 +55,32 @@ enum Axis {
 enum Grab {
   none('なし'),
   safety('セーフティ'),
+  doubleSafety('ダブルセーフティ'),
   mute('ミュート'),
   japan('ジャパン'),
   tail('テール'),
   nose('ノーズ'),
+  doubleNose('ダブルノーズ'),
   truckDriver('トラックドライバー'),
   octoGrab('オクトグラブ'),
   staleFish('ステールフィッシュ'),
   critical('クリティカル'),
+  blunt('ブラント'),
+  screaminSeamin('スクリーミンシーミン'),
+  taipan('タイパン'),
+  seatbelt('シートベルト'),
+  leadSafety('リードセーフティ'),
   leadMute('リードミュート'),
   leadJapan('リードジャパン'),
   leadTail('リードテール'),
-  blunt('ブラント'),
-  screaminSeaman('スクリーミンシーマン'),
-  taipan('タイパン');
+  leadNose('リードノーズ'),
+  leadOctoGrab('リードオクトグラブ'),
+  leadStaleFish('リードステールフィッシュ'),
+  leadCritical('リードクリティカル'),
+  leadBlunt('リードブラント'),
+  leadTaipan('リードタイパン'),
+  leadSeatbelt('リードシートベルト');
+  leadTaipan('リードタイパン');
 
   const Grab(this.label);
 
