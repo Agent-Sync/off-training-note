@@ -24,22 +24,24 @@ class LoginScreen extends StatelessWidget {
                     const Spacer(),
                     // Logo Mark
                     Container(
-                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            color: Colors.black.withValues(alpha: 0.18),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.sticky_note_2_rounded,
-                        size: 48,
-                        color: Colors.white,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          'assets/branding/app_icon.png',
+                          width: 88,
+                          height: 88,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -48,7 +50,7 @@ class LoginScreen extends StatelessWidget {
                       'オフトレノート',
                       style: TextStyle(
                         fontSize: 32,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w800,
                         letterSpacing: 2,
                         color: Colors.black87,
                       ),
@@ -56,7 +58,7 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     // Subtitle
                     Text(
-                      'スノーボードのオフトレ記録を\nもっと手軽に、もっと楽しく。',
+                      'オフトレ記録のためのアプリ',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.grey.shade600,
@@ -88,17 +90,6 @@ class LoginScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Terms Text
-                    Text(
-                      'ログインすることで、利用規約とプライバシーポリシーに\n同意したものとみなされます。',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey.shade400,
-                        fontSize: 11,
-                        height: 1.5,
                       ),
                     ),
                     const SizedBox(height: 24),
