@@ -1,23 +1,3 @@
--- Tricks table (air/jib)
-create table if not exists public.tricks (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  type text not null check (type in ('air', 'jib')),
-  custom_name text,
-  trick_name text,
-  stance text,
-  takeoff text,
-  axis text references public.axes(code),
-  spin integer references public.spins(value),
-  grab text references public.grabs(code),
-  direction text,
-  is_public boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create index if not exists tricks_user_id_idx on public.tricks(user_id);
-
 create or replace function public.build_air_trick_name(
   stance text,
   takeoff text,
@@ -116,29 +96,3 @@ begin
   return array_to_string(parts, ' ');
 end;
 $$ language plpgsql stable;
-
-create or replace function public.set_trick_name()
-returns trigger as $$
-begin
-  if new.type = 'jib' then
-    new.trick_name = coalesce(new.custom_name, '');
-  else
-    new.trick_name = public.build_air_trick_name(
-      new.stance,
-      new.takeoff,
-      new.axis,
-      new.spin,
-      new.grab,
-      new.direction
-    );
-  end if;
-  return new;
-end;
-$$ language plpgsql;
-
-drop trigger if exists tricks_set_trick_name on public.tricks;
-create trigger tricks_set_trick_name
-before insert or update of type, custom_name, stance, takeoff, axis, spin, grab, direction
-on public.tricks
-for each row
-execute function public.set_trick_name();
