@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:off_training_note/models/profile.dart';
@@ -6,7 +9,6 @@ import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:io';
 
 class SettingsSheet extends ConsumerStatefulWidget {
   const SettingsSheet({super.key, this.profile});
@@ -36,6 +38,24 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
     super.dispose();
   }
 
+  Future<File?> _convertToJpeg(XFile pickedFile) async {
+    final compressedBytes = await FlutterImageCompress.compressWithFile(
+      pickedFile.path,
+      format: CompressFormat.jpeg,
+      quality: 85,
+      minWidth: 600,
+      minHeight: 600,
+    );
+
+    if (compressedBytes == null) return null;
+
+    final tempPath =
+        '${Directory.systemTemp.path}/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final tempFile = File(tempPath);
+    await tempFile.writeAsBytes(compressedBytes, flush: true);
+    return tempFile;
+  }
+
   Future<void> _updateAvatar() async {
     try {
       final pickedFile = await _picker.pickImage(
@@ -49,15 +69,22 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
 
       setState(() => _isLoading = true);
 
-      final file = File(pickedFile.path);
-      final fileExt = pickedFile.path.split('.').last;
-      final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
+      final convertedFile = await _convertToJpeg(pickedFile);
+      if (convertedFile == null) {
+        throw Exception('JPEG変換に失敗しました');
+      }
+
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       final userId = Supabase.instance.client.auth.currentUser!.id;
       final filePath = '$userId/$fileName';
 
       await Supabase.instance.client.storage
           .from('avatars')
-          .upload(filePath, file);
+          .upload(
+            filePath,
+            convertedFile,
+            fileOptions: const FileOptions(contentType: 'image/jpeg'),
+          );
 
       final imageUrl = Supabase.instance.client.storage
           .from('avatars')
