@@ -284,15 +284,26 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   focusNode: _searchFocusNode,
                   textAlignVertical: TextAlignVertical.center,
                   onChanged: (val) {
+                    setState(() {});
                     ref.read(communityProvider.notifier).updateQuery(val);
                   },
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     isDense: true,
                     hintText: 'メモやトリックを検索...',
-                    hintStyle: TextStyle(color: AppTheme.textHint),
-                    prefixIcon: Icon(Icons.search, color: AppTheme.textHint),
+                    hintStyle: const TextStyle(color: AppTheme.textHint),
+                    prefixIcon: const Icon(Icons.search, color: AppTheme.textHint),
+                    suffixIcon: _searchController.text.trim().isEmpty
+                        ? null
+                        : IconButton(
+                            icon: const Icon(Icons.close, color: AppTheme.textHint),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {});
+                              ref.read(communityProvider.notifier).updateQuery('');
+                            },
+                          ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
                     ),

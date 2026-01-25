@@ -338,7 +338,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
             child: Text(
               label,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
                 fontSize: 16,
                 color: isActive ? Colors.black : Colors.grey.shade400,
                 letterSpacing: 1.2,
@@ -434,13 +434,24 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
                     _searchQuery = val;
                   });
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   isDense: true,
                   hintText: 'トリックを検索...',
-                  hintStyle: TextStyle(color: AppTheme.textHint),
-                  prefixIcon: Icon(Icons.search, color: AppTheme.textHint),
+                  hintStyle: const TextStyle(color: AppTheme.textHint),
+                  prefixIcon: const Icon(Icons.search, color: AppTheme.textHint),
+                  suffixIcon: _searchQuery.trim().isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.close, color: AppTheme.textHint),
+                          onPressed: () {
+                            setState(() {
+                              _searchController.clear();
+                              _searchQuery = '';
+                            });
+                          },
+                        ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 8,
                   ),
