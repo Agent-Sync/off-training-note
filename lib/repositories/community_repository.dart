@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:off_training_note/models/community_memo.dart';
 import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/models/tech_memo.dart';
@@ -19,7 +20,7 @@ class CommunityRepository {
         'updated_at, like_count, user_id, '
         'tricks!inner ('
         'user_id, type, custom_name, trick_name_ja, stance, takeoff, axis, spin, grab, '
-        'direction, created_at, is_public, '
+        'direction, created_at, updated_at, is_public, '
         'axes(label_ja, label_en), grabs(label_ja, label_en), spins(label_ja, label_en)'
         '), '
         'profiles!inner (display_name, avatar_url)';
@@ -42,6 +43,7 @@ class CommunityRepository {
         (_) => request.order('created_at', ascending: false).limit(limit),
       );
       rowList = rows as List<dynamic>;
+      debugPrint('[community] empty query rows=${rowList.length}');
     } else {
       final pattern = '%$normalized%';
       final baseRows = await SupabaseClientProvider.guard(
@@ -79,11 +81,17 @@ class CommunityRepository {
       if (rowList.length > limit) {
         rowList = rowList.sublist(0, limit);
       }
+      debugPrint(
+        '[community] query="$normalized" base=${(baseRows as List).length} '
+        'profile=${(profileRows as List).length} trick=${(trickRows as List).length} '
+        'merged=${rowList.length}',
+      );
     }
 
     final memoIds = rowList
         .map((row) => row['id'] as String)
         .toList();
+    debugPrint('[community] memoIds=${memoIds.length}');
 
     final likedMemoIds = userId != null
         ? await const CommunityLikeRepository().fetchLikedMemoIds(

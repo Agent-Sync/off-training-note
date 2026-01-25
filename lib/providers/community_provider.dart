@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/community_memo.dart';
 import 'package:off_training_note/repositories/community_like_repository.dart';
@@ -70,8 +71,10 @@ class CommunityNotifier extends Notifier<CommunityFeedState> {
         query: nextQuery,
         limit: 10,
       );
+      debugPrint('[community] provider items=${items.length}');
       state = state.copyWith(items: items, isLoading: false);
     } catch (e) {
+      debugPrint('[community] provider error=$e');
       state = state.copyWith(
         isLoading: false,
         errorMessage: '読み込みに失敗しました',
