@@ -16,9 +16,10 @@ class TricksRepository {
     final rows = await SupabaseClientProvider.client
         .from('tricks')
         .select(
-          'id, user_id, type, custom_name, stance, takeoff, axis, spin, grab, direction, is_public, '
-          'created_at, updated_at, memos(id, trick_id, type, focus, outcome, '
-          'condition, size, like_count, created_at, updated_at)',
+          'id, user_id, type, custom_name, trick_name, stance, takeoff, axis, spin, grab, direction, '
+          'is_public, created_at, updated_at, '
+          'axes(label_ja), grabs(label_ja), spins(label_ja), '
+          'memos(id, trick_id, type, focus, outcome, condition, size, like_count, created_at, updated_at)',
         )
         .eq('user_id', userId)
         .order('created_at', ascending: false)
@@ -59,9 +60,9 @@ class TricksRepository {
           'custom_name': null,
           'stance': _stanceToDb(air.stance),
           'takeoff': _takeoffToDb(air.takeoff),
-          'axis': _axisToDb(air.axis),
+          'axis': air.axisCode,
           'spin': air.spin,
-          'grab': _grabToDb(air.grab),
+          'grab': air.grabCode,
           'direction': _directionToDb(air.direction),
           'is_public': air.isPublic,
           'created_at': air.createdAt.toIso8601String(),
@@ -183,23 +184,36 @@ class TricksRepository {
         id: row['id'] as String,
         userId: row['user_id'] as String,
         customName: row['custom_name'] as String? ?? '',
+        trickName: row['trick_name'] as String? ?? '',
         memos: memos,
         isPublic: isPublic,
         createdAt: DateTime.parse(row['created_at'] as String),
       );
     }
 
+    final axisCode = row['axis'] as String? ?? '';
+    final grabCode = row['grab'] as String? ?? '';
+    final axisLabel =
+        (row['axes'] as Map<String, dynamic>?)?['label_ja'] as String? ??
+            axisCode;
+    final grabLabel =
+        (row['grabs'] as Map<String, dynamic>?)?['label_ja'] as String? ??
+            grabCode;
+
     return Trick.air(
       id: row['id'] as String,
       userId: row['user_id'] as String,
       stance: _stanceFromDb(row['stance'] as String),
       takeoff: _takeoffFromDb(row['takeoff'] as String),
-      axis: _axisFromDb(row['axis'] as String),
-      spin: (row['spin'] as num).toInt(),
-      grab: _grabFromDb(row['grab'] as String),
+      axisCode: axisCode,
+      axisLabel: axisLabel,
+      spin: (row['spin'] as num?)?.toInt() ?? 0,
+      grabCode: grabCode,
+      grabLabel: grabLabel,
       direction: _directionFromDb(row['direction'] as String),
       memos: memos,
       isPublic: isPublic,
+      trickName: row['trick_name'] as String? ?? '',
       createdAt: DateTime.parse(row['created_at'] as String),
     );
   }
@@ -294,22 +308,6 @@ class TricksRepository {
       case Direction.none:
         return 'none';
     }
-  }
-
-  Axis _axisFromDb(String value) {
-    return Axis.fromDb(value);
-  }
-
-  String _axisToDb(Axis value) {
-    return value.name;
-  }
-
-  Grab _grabFromDb(String value) {
-    return Grab.fromDb(value);
-  }
-
-  String _grabToDb(Grab value) {
-    return value.name;
   }
 
   MemoCondition _conditionFromDb(String? value) {

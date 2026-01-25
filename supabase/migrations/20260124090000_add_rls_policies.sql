@@ -3,6 +3,9 @@ alter table public.profiles enable row level security;
 alter table public.tricks enable row level security;
 alter table public.memos enable row level security;
 alter table public.memo_likes enable row level security;
+alter table public.grabs enable row level security;
+alter table public.axes enable row level security;
+alter table public.spins enable row level security;
 
 -- Profiles: public read, self write
 drop policy if exists "profiles_select_public" on public.profiles;
@@ -139,3 +142,25 @@ on public.memo_likes
 for delete
 to public
 using (user_id = auth.uid());
+
+-- Masters: public read
+drop policy if exists "grabs_select_public" on public.grabs;
+create policy "grabs_select_public"
+on public.grabs
+for select
+to public
+using (true);
+
+drop policy if exists "axes_select_public" on public.axes;
+create policy "axes_select_public"
+on public.axes
+for select
+to public
+using (true);
+
+drop policy if exists "spins_select_public" on public.spins;
+create policy "spins_select_public"
+on public.spins
+for select
+to public
+using (true);

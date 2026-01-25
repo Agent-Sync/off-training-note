@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:off_training_note/models/trick_masters.dart';
 import 'package:off_training_note/models/trick.dart' as trick_model;
+import 'package:off_training_note/providers/trick_masters_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/form/two_option_toggle.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
@@ -7,13 +10,15 @@ import 'package:off_training_note/widgets/sheet/axis_select_sheet.dart';
 import 'package:off_training_note/widgets/sheet/grab_select_sheet.dart';
 import 'package:off_training_note/widgets/sheet/spin_select_sheet.dart';
 
-class NewTrickModal extends StatefulWidget {
+class NewTrickModal extends ConsumerStatefulWidget {
   final Function(
     trick_model.Stance stance,
     trick_model.Takeoff takeoff,
-    trick_model.Axis axis,
+    String axisCode,
+    String axisLabel,
     int spin,
-    trick_model.Grab grab,
+    String grabCode,
+    String grabLabel,
     trick_model.Direction direction,
   )
   onAdd;
@@ -21,21 +26,22 @@ class NewTrickModal extends StatefulWidget {
   const NewTrickModal({super.key, required this.onAdd});
 
   @override
-  State<NewTrickModal> createState() => _NewTrickModalState();
+  ConsumerState<NewTrickModal> createState() => _NewTrickModalState();
 }
 
-class _NewTrickModalState extends State<NewTrickModal> {
+class _NewTrickModalState extends ConsumerState<NewTrickModal> {
   trick_model.Stance _stance = trick_model.Stance.regular;
   trick_model.Takeoff _takeoff = trick_model.Takeoff.straight;
   trick_model.Direction _direction = trick_model.Direction.left;
   final TextEditingController _axisController = TextEditingController();
   final TextEditingController _spinController = TextEditingController();
   final TextEditingController _grabController = TextEditingController();
-  trick_model.Axis? _selectedAxis;
-  trick_model.Grab? _selectedGrab;
+  TrickAxisMaster? _selectedAxis;
+  TrickSpinMaster? _selectedSpin;
+  TrickGrabMaster? _selectedGrab;
   bool _showValidation = false;
 
-  bool get _isSpinZero => int.tryParse(_spinController.text) == 0;
+  bool get _isSpinZero => (_selectedSpin?.value ?? -1) == 0;
   bool get _isDirectionDisabled =>
       _isBackOrFront || (_isSpinZero && _stance != trick_model.Stance.switchStance);
 
@@ -118,7 +124,8 @@ class _NewTrickModalState extends State<NewTrickModal> {
   }
 
   bool get _isBackOrFront {
-    return _selectedAxis?.isFlip ?? false;
+    final code = _selectedAxis?.code;
+    return code == 'backflip' || code == 'frontflip';
   }
 
   bool get _isAxisMissing {
@@ -126,15 +133,14 @@ class _NewTrickModalState extends State<NewTrickModal> {
   }
 
   bool get _isSpinMissing {
-    return !_isBackOrFront && _spinController.text.isEmpty;
+    return !_isBackOrFront && _selectedSpin == null;
   }
 
   bool get _isGrabMissing {
     return _selectedGrab == null;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildContent(BuildContext context, TrickMasterData masters) {
     return AppBottomSheetContainer(
       child: SingleChildScrollView(
         child: Column(
@@ -200,17 +206,25 @@ class _NewTrickModalState extends State<NewTrickModal> {
               style: const TextStyle(fontWeight: FontWeight.w600),
               onTap: () {
                 _showAxisSheet(
-                  options: trick_model.Axis.values
+                  options: masters.axes
                       .map((axis) => axis.label)
                       .toList(growable: false),
                   selectedValue: _selectedAxis?.label,
                   onSelected: (value) {
-                    final axis = trick_model.Axis.fromLabel(value);
+                    final axis = masters.axes.firstWhere(
+                      (axis) => axis.label == value,
+                      orElse: () => masters.axes.first,
+                    );
+                    final zeroSpin = masters.spins.firstWhere(
+                      (spin) => spin.value == 0,
+                      orElse: () => masters.spins.first,
+                    );
                     setState(() {
                       _selectedAxis = axis;
                       _axisController.text = axis.label;
-                      if (axis.isFlip) {
-                        _spinController.text = '0';
+                      if (_isBackOrFront) {
+                        _selectedSpin = zeroSpin;
+                        _spinController.text = zeroSpin.label;
                         _direction = trick_model.Direction.none;
                       } else if (_direction == trick_model.Direction.none) {
                         _direction = trick_model.Direction.left;
@@ -247,16 +261,20 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 ),
                 onTap: () {
                   _showSpinSheet(
-                    options: trick_model.SpinOption.values
+                    options: masters.spins
                         .map((spin) => spin.label)
                         .toList(growable: false),
-                    selectedValue: _spinController.text.isEmpty
-                        ? null
-                        : _spinController.text,
+                    selectedValue: _selectedSpin?.label,
                     onSelected: (value) {
+                      final spin = masters.spins.firstWhere(
+                        (spin) => spin.label == value,
+                        orElse: () => masters.spins.first,
+                      );
                       setState(() {
-                        _spinController.text = value;
-                        if (value == '0' && _stance != trick_model.Stance.switchStance) {
+                        _selectedSpin = spin;
+                        _spinController.text = spin.label;
+                        if (spin.value == 0 &&
+                            _stance != trick_model.Stance.switchStance) {
                           _direction = trick_model.Direction.none;
                         } else if (_direction == trick_model.Direction.none) {
                           _direction = trick_model.Direction.left;
@@ -288,13 +306,16 @@ class _NewTrickModalState extends State<NewTrickModal> {
               onTap: () {
                 _showSearchableOptionSheet(
                   title: 'グラブを選択',
-                  options: trick_model.Grab.values
+                  options: masters.grabs
                       .map((grab) => grab.label)
                       .toList(growable: false),
                   selectedValue: _selectedGrab?.label,
                   onSelected: (value) {
+                    final grab = masters.grabs.firstWhere(
+                      (grab) => grab.label == value,
+                      orElse: () => masters.grabs.first,
+                    );
                     setState(() {
-                      final grab = trick_model.Grab.fromLabel(value);
                       _selectedGrab = grab;
                       _grabController.text = grab.label;
                     });
@@ -327,9 +348,7 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 if (_isAxisMissing || _isSpinMissing || _isGrabMissing) {
                   return;
                 }
-                final spinValue = _isBackOrFront
-                    ? 0
-                    : int.tryParse(_spinController.text) ?? 0;
+                final spinValue = _isBackOrFront ? 0 : (_selectedSpin?.value ?? 0);
                 final directionValue =
                     _isBackOrFront ||
                         (spinValue == 0 && _stance != trick_model.Stance.switchStance)
@@ -341,9 +360,11 @@ class _NewTrickModalState extends State<NewTrickModal> {
                 widget.onAdd(
                   _stance,
                   _takeoff,
-                  _selectedAxis ?? trick_model.Axis.upright,
+                  _selectedAxis?.code ?? '',
+                  _selectedAxis?.label ?? '',
                   spinValue,
-                  _selectedGrab ?? trick_model.Grab.none,
+                  _selectedGrab?.code ?? '',
+                  _selectedGrab?.label ?? '',
                   directionValue,
                 );
                 Navigator.pop(context);
@@ -363,6 +384,30 @@ class _NewTrickModalState extends State<NewTrickModal> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mastersAsync = ref.watch(trickMastersProvider);
+    return mastersAsync.when(
+      data: (masters) => _buildContent(context, masters),
+      loading: () => const AppBottomSheetContainer(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: CircularProgressIndicator(color: AppTheme.focusColor),
+          ),
+        ),
+      ),
+      error: (error, stack) => const AppBottomSheetContainer(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text('読み込みに失敗しました'),
+          ),
         ),
       ),
     );

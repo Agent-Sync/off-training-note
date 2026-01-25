@@ -75,9 +75,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           onAdd: (
             trick_model.Stance stance,
             trick_model.Takeoff takeoff,
-            trick_model.Axis axis,
+            String axisCode,
+            String axisLabel,
             int spin,
-            trick_model.Grab grab,
+            String grabCode,
+            String grabLabel,
             trick_model.Direction direction,
           ) {
             final userId = Supabase.instance.client.auth.currentUser?.id;
@@ -87,11 +89,14 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
               userId: userId,
               stance: stance,
               takeoff: takeoff,
-              axis: axis,
+              axisCode: axisCode,
+              axisLabel: axisLabel,
               spin: spin,
-              grab: grab,
+              grabCode: grabCode,
+              grabLabel: grabLabel,
               direction: direction,
               memos: [],
+              trickName: '',
               createdAt: DateTime.now(),
             );
             ref.read(tricksProvider.notifier).addTrick(newTrick);

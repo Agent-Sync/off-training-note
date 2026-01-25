@@ -8,7 +8,6 @@ create table if not exists public.memos (
   outcome text not null,
   condition text,
   size text,
-  search_text text,
   like_count int not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

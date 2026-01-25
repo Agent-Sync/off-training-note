@@ -11,14 +11,15 @@ const _takeoffStandardLabel = 'ストレート';
 extension TrickHelpers on Trick {
   String displayName() {
     return map(
-      air: _airDisplayName,
-      jib: (jib) => jib.customName,
+      air: (air) => air.trickName.isNotEmpty ? air.trickName : _defaultAirLabel,
+      jib: (jib) => jib.trickName.isNotEmpty ? jib.trickName : jib.customName,
     );
   }
 
   String searchIndex() {
     return map(
-      air: (air) => '${air.spin} ${air.grab.label} ${air.axis.label}',
+      air: (air) =>
+          '${air.trickName} ${air.spin} ${air.grabLabel} ${air.axisLabel}',
       jib: (jib) => jib.customName,
     );
   }
@@ -38,82 +39,6 @@ extension TrickHelpers on Trick {
   }
 }
 
-String _airDisplayName(AirTrick air) {
-  final parts = <String>[];
-
-  if (air.stance == Stance.regular && air.spin == 0) {
-    final isFlatAxis = air.axis.isFlat;
-    if (air.takeoff == Takeoff.carving) {
-      parts.add(_takeoffCarvingLabel);
-      if (isFlatAxis) {
-        parts.add(_takeoffStandardLabel);
-      }
-    } else if (isFlatAxis) {
-      parts.add(_takeoffStandardLabel);
-    }
-    if (!isFlatAxis) {
-      parts.add(air.axis.label);
-      if (!air.axis.isFlip) {
-        parts.add(air.spin.toString());
-      }
-    }
-    if (air.grab != Grab.none) {
-      parts.add(air.grab.label);
-    }
-    return parts.join(' ');
-  }
-
-  if (air.stance == Stance.switchStance && air.spin == 0) {
-    final isFlatAxis = air.axis.isFlat;
-    parts.add(_stanceSwitchLabel);
-    if (air.direction != Direction.none) {
-      parts.add(_directionLabel(air.direction));
-    }
-    if (air.takeoff == Takeoff.carving) {
-      parts.add(_takeoffCarvingLabel);
-    }
-    if (!isFlatAxis) {
-      parts.add(air.axis.label);
-      if (!air.axis.isFlip) {
-        parts.add(air.spin.toString());
-      }
-    } else {
-      parts.add('0');
-    }
-    if (air.grab != Grab.none) {
-      parts.add(air.grab.label);
-    }
-    return parts.join(' ');
-  }
-
-  if (air.stance == Stance.switchStance) {
-    parts.add(_stanceSwitchLabel);
-  }
-
-  if (air.direction != Direction.none) {
-    parts.add(_directionLabel(air.direction));
-  }
-
-  if (air.takeoff == Takeoff.carving) {
-    parts.add(_takeoffCarvingLabel);
-  }
-
-  if (!air.axis.isFlat) {
-    parts.add(air.axis.label);
-  }
-
-  if (air.spin > 0 && !air.axis.isFlip) {
-    parts.add(air.spin.toString());
-  }
-
-  if (air.grab != Grab.none) {
-    parts.add(air.grab.label);
-  }
-
-  if (parts.isEmpty) return _defaultAirLabel;
-  return parts.join(' ');
-}
-
 List<String> _airTagLabels(AirTrick air) {
   final labels = <String>[];
 
@@ -125,10 +50,14 @@ List<String> _airTagLabels(AirTrick air) {
 
   labels.add(_takeoffLabel(air.takeoff));
 
-  labels.add(air.axis.label);
+  labels.add(air.axisLabel);
 
-  if (air.spin > 0 && !air.axis.isFlip) {
+  if (air.spin > 0 && !_isFlipAxis(air.axisCode)) {
     labels.add(air.spin.toString());
+  }
+
+  if (air.grabCode != 'none') {
+    labels.add(air.grabLabel);
   }
 
   return labels;
@@ -142,3 +71,6 @@ String _directionLabel(Direction direction) =>
 
 String _takeoffLabel(Takeoff takeoff) =>
     takeoff == Takeoff.straight ? _takeoffStandardLabel : _takeoffCarvingLabel;
+
+bool _isFlipAxis(String axisCode) =>
+    axisCode == 'backflip' || axisCode == 'frontflip';

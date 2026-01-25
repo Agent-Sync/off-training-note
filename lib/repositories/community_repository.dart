@@ -18,10 +18,11 @@ class CommunityRepository {
 
     var request = client.from('memos').select(
           'id, trick_id, type, focus, outcome, condition, size, created_at, '
-          'updated_at, like_count, user_id, search_text, '
+          'updated_at, like_count, user_id, '
           'tricks!inner ('
-          'user_id, type, custom_name, stance, takeoff, axis, spin, grab, direction, '
-          'created_at, is_public'
+          'user_id, type, custom_name, trick_name, stance, takeoff, axis, spin, grab, '
+          'direction, created_at, is_public, '
+          'axes(label_ja), grabs(label_ja), spins(label_ja)'
           '), '
           'profiles!inner (display_name, avatar_url)',
         );
@@ -34,7 +35,7 @@ class CommunityRepository {
         'focus.ilike.$pattern,'
         'outcome.ilike.$pattern,'
         'profiles.display_name.ilike.$pattern,'
-        'search_text.ilike.$pattern',
+        'tricks.trick_name.ilike.$pattern',
       );
     } else if (userId != null) {
       request = request.neq('user_id', userId);
@@ -102,23 +103,36 @@ class CommunityRepository {
         id: trickId,
         userId: userId,
         customName: row['custom_name'] as String? ?? '',
+        trickName: row['trick_name'] as String? ?? '',
         memos: const [],
         isPublic: row['is_public'] as bool? ?? true,
         createdAt: DateTime.parse(row['created_at'] as String),
       );
     }
 
+    final axisCode = row['axis'] as String? ?? '';
+    final grabCode = row['grab'] as String? ?? '';
+    final axisLabel =
+        (row['axes'] as Map<String, dynamic>?)?['label_ja'] as String? ??
+            axisCode;
+    final grabLabel =
+        (row['grabs'] as Map<String, dynamic>?)?['label_ja'] as String? ??
+            grabCode;
+
     return Trick.air(
       id: trickId,
       userId: userId,
       stance: _stanceFromDb(row['stance'] as String?),
       takeoff: _takeoffFromDb(row['takeoff'] as String?),
-      axis: _axisFromDb(row['axis'] as String?),
+      axisCode: axisCode,
+      axisLabel: axisLabel,
       spin: (row['spin'] as num?)?.toInt() ?? 0,
-      grab: _grabFromDb(row['grab'] as String?),
+      grabCode: grabCode,
+      grabLabel: grabLabel,
       direction: _directionFromDb(row['direction'] as String?),
       memos: const [],
       isPublic: row['is_public'] as bool? ?? true,
+      trickName: row['trick_name'] as String? ?? '',
       createdAt: DateTime.parse(row['created_at'] as String),
     );
   }
@@ -212,17 +226,4 @@ class CommunityRepository {
     }
   }
 
-  Axis _axisFromDb(String? value) {
-    if (value == null) {
-      return Axis.upright;
-    }
-    return Axis.fromDb(value);
-  }
-
-  Grab _grabFromDb(String? value) {
-    if (value == null) {
-      return Grab.none;
-    }
-    return Grab.fromDb(value);
-  }
 }

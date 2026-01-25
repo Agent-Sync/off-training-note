@@ -10,122 +10,6 @@ enum Takeoff { straight, carving }
 
 enum Direction { none, left, right }
 
-enum Axis {
-  upright('平軸'),
-  backflip('バックフリップ'),
-  frontflip('フロントフリップ'),
-  cork('コーク'),
-  bio('バイオ'),
-  misty('ミスティ'),
-  rodeo('ロデオ'),
-  flatspin('フラットスピン'),
-  underflip('アンダーフリップ'),
-  doubleCork('ダブルコーク'),
-  doubleMisty('ダブルミスティ'),
-  doubleRodeo('ダブルロデオ');
-
-  const Axis(this.label);
-
-  final String label;
-
-  bool get isFlat => this == Axis.upright;
-  bool get isFlip => this == Axis.backflip || this == Axis.frontflip;
-
-  static Axis fromDb(String value) {
-    final normalized = value.trim().toLowerCase();
-    for (final axis in Axis.values) {
-      if (axis.name.toLowerCase() == normalized) {
-        return axis;
-      }
-    }
-    return Axis.upright;
-  }
-
-  static Axis fromLabel(String label) {
-    final trimmed = label.trim();
-    for (final axis in Axis.values) {
-      if (axis.label == trimmed) {
-        return axis;
-      }
-    }
-    return Axis.upright;
-  }
-}
-
-enum Grab {
-  none('なし'),
-  safety('セーフティ'),
-  doubleSafety('ダブルセーフティ'),
-  mute('ミュート'),
-  japan('ジャパン'),
-  tail('テール'),
-  nose('ノーズ'),
-  doubleNose('ダブルノーズ'),
-  truckDriver('トラックドライバー'),
-  octoGrab('オクトグラブ'),
-  staleFish('ステールフィッシュ'),
-  critical('クリティカル'),
-  blunt('ブラント'),
-  screaminSeamin('スクリーミンシーミン'),
-  taipan('タイパン'),
-  seatbelt('シートベルト'),
-  leadSafety('リードセーフティ'),
-  leadMute('リードミュート'),
-  leadJapan('リードジャパン'),
-  leadTail('リードテール'),
-  leadNose('リードノーズ'),
-  leadOctoGrab('リードオクトグラブ'),
-  leadStaleFish('リードステールフィッシュ'),
-  leadCritical('リードクリティカル'),
-  leadBlunt('リードブラント'),
-  leadTaipan('リードタイパン'),
-  leadSeatbelt('リードシートベルト');
-
-  const Grab(this.label);
-
-  final String label;
-
-  static Grab fromDb(String value) {
-    final normalized = value.trim().toLowerCase();
-    for (final grab in Grab.values) {
-      if (grab.name.toLowerCase() == normalized) {
-        return grab;
-      }
-    }
-    return Grab.none;
-  }
-
-  static Grab fromLabel(String label) {
-    final trimmed = label.trim();
-    for (final grab in Grab.values) {
-      if (grab.label == trimmed) {
-        return grab;
-      }
-    }
-    return Grab.none;
-  }
-}
-
-enum SpinOption {
-  s0(0),
-  s180(180),
-  s360(360),
-  s540(540),
-  s720(720),
-  s900(900),
-  s1080(1080),
-  s1260(1260),
-  s1440(1440),
-  s1620(1620),
-  s1800(1800);
-
-  const SpinOption(this.value);
-
-  final int value;
-
-  String get label => value.toString();
-}
-
 @Freezed(unionKey: 'type')
 abstract class Trick with _$Trick {
   const factory Trick.air({
@@ -133,12 +17,15 @@ abstract class Trick with _$Trick {
     required String userId,
     required Stance stance,
     required Takeoff takeoff,
-    required Axis axis,
+    required String axisCode,
+    required String axisLabel,
     required int spin,
-    required Grab grab,
+    required String grabCode,
+    required String grabLabel,
     required Direction direction,
     required List<TechMemo> memos,
     @Default(true) bool isPublic,
+    @Default('') String trickName,
     required DateTime createdAt,
   }) = AirTrick;
 
@@ -148,12 +35,11 @@ abstract class Trick with _$Trick {
     required String customName,
     required List<TechMemo> memos,
     @Default(true) bool isPublic,
+    @Default('') String trickName,
     required DateTime createdAt,
   }) = JibTrick;
 
-  static List<SpinOption> get spinOptions => SpinOption.values;
-  static List<Axis> get axisOptions => Axis.values;
-  static List<Grab> get grabOptions => Grab.values;
+  static List<int> get spinOptions => const [0, 180, 360, 540, 720, 900, 1080, 1260, 1440, 1620, 1800];
 
   factory Trick.fromJson(Map<String, dynamic> json) =>
       _$TrickFromJson(json);
