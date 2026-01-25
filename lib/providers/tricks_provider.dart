@@ -54,8 +54,10 @@ class TricksNotifier extends Notifier<List<Trick>> {
       for (final trick in state)
         if (trick.id == trickId)
           trick.map(
-            air: (air) => air.copyWith(isPublic: isPublic),
-            jib: (jib) => jib.copyWith(isPublic: isPublic),
+            air: (air) =>
+                air.copyWith(meta: air.meta.copyWith(isPublic: isPublic)),
+            jib: (jib) =>
+                jib.copyWith(meta: jib.meta.copyWith(isPublic: isPublic)),
           )
         else
           trick

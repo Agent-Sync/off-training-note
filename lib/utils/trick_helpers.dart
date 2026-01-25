@@ -12,7 +12,7 @@ extension TrickHelpers on Trick {
   String searchIndex() {
     return map(
       air: (air) =>
-          '${air.trickName} ${air.spin} ${air.grabLabel} ${air.axisLabel}',
+          '${air.trickName} ${air.spin.value} ${air.grab.labelJa} ${air.axis.labelJa}',
       jib: (jib) => jib.customName,
     );
   }
@@ -43,14 +43,14 @@ List<String> _airTagLabels(AirTrick air) {
 
   labels.add(_takeoffLabel(air.takeoff));
 
-  labels.add(air.axisLabel);
+  labels.add(air.axis.labelJa);
 
-  if (air.spin > 0 && !_isFlipAxis(air.axisCode)) {
-    labels.add(air.spin.toString());
+  if (air.spin.value > 0 && !_isFlipAxis(air.axis.code)) {
+    labels.add(air.spin.value.toString());
   }
 
-  if (air.grabCode != 'none') {
-    labels.add(air.grabLabel);
+  if (air.grab.code != 'none') {
+    labels.add(air.grab.labelJa);
   }
 
   return labels;

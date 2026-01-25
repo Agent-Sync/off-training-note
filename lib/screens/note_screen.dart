@@ -75,29 +75,28 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           onAdd: (
             trick_model.Stance stance,
             trick_model.Takeoff takeoff,
-            String axisCode,
-            String axisLabel,
-            int spin,
-            String grabCode,
-            String grabLabel,
+            trick_model.Axis axis,
+            trick_model.Spin spin,
+            trick_model.Grab grab,
             trick_model.Direction direction,
           ) {
             final userId = Supabase.instance.client.auth.currentUser?.id;
             if (userId == null) return;
+            final now = DateTime.now();
             final newTrick = trick_model.Trick.air(
-              id: _uuid.v4(),
-              userId: userId,
+              meta: trick_model.TrickMeta(
+                id: _uuid.v4(),
+                userId: userId,
+                createdAt: now,
+                updatedAt: now,
+              ),
               stance: stance,
               takeoff: takeoff,
-              axisCode: axisCode,
-              axisLabel: axisLabel,
+              axis: axis,
               spin: spin,
-              grabCode: grabCode,
-              grabLabel: grabLabel,
+              grab: grab,
               direction: direction,
               memos: [],
-              trickName: '',
-              createdAt: DateTime.now(),
             );
             ref.read(tricksProvider.notifier).addTrick(newTrick);
           },
@@ -115,12 +114,16 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
         onAdd: (customName) {
           final userId = Supabase.instance.client.auth.currentUser?.id;
           if (userId == null) return;
+          final now = DateTime.now();
           final newJib = trick_model.Trick.jib(
-            id: _uuid.v4(),
-            userId: userId,
+            meta: trick_model.TrickMeta(
+              id: _uuid.v4(),
+              userId: userId,
+              createdAt: now,
+              updatedAt: now,
+            ),
             customName: customName,
             memos: const [],
-            createdAt: DateTime.now(),
           );
           ref.read(tricksProvider.notifier).addTrick(newJib);
         },

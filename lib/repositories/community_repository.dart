@@ -22,7 +22,7 @@ class CommunityRepository {
           'tricks!inner ('
           'user_id, type, custom_name, trick_name, stance, takeoff, axis, spin, grab, '
           'direction, created_at, is_public, '
-          'axes(label_ja), grabs(label_ja), spins(label_ja)'
+          'axes(label_ja, label_en), grabs(label_ja, label_en), spins(label_ja, label_en)'
           '), '
           'profiles!inner (display_name, avatar_url)',
         );
@@ -98,42 +98,54 @@ class CommunityRepository {
   Trick _trickFromRow(String trickId, Map<String, dynamic> row) {
     final type = row['type'] as String;
     final userId = row['user_id'] as String;
+    final isPublic = row['is_public'] as bool? ?? true;
+    final meta = TrickMeta(
+      id: trickId,
+      userId: userId,
+      isPublic: isPublic,
+      trickName: row['trick_name'] as String? ?? '',
+      createdAt: DateTime.parse(row['created_at'] as String),
+      updatedAt: DateTime.parse(row['updated_at'] as String),
+    );
     if (type == 'jib') {
       return Trick.jib(
-        id: trickId,
-        userId: userId,
+        meta: meta,
         customName: row['custom_name'] as String? ?? '',
-        trickName: row['trick_name'] as String? ?? '',
         memos: const [],
-        isPublic: row['is_public'] as bool? ?? true,
-        createdAt: DateTime.parse(row['created_at'] as String),
       );
     }
 
     final axisCode = row['axis'] as String? ?? '';
     final grabCode = row['grab'] as String? ?? '';
-    final axisLabel =
-        (row['axes'] as Map<String, dynamic>?)?['label_ja'] as String? ??
-            axisCode;
-    final grabLabel =
-        (row['grabs'] as Map<String, dynamic>?)?['label_ja'] as String? ??
-            grabCode;
+    final spinValue = (row['spin'] as num?)?.toInt() ?? 0;
+    final axisMap = row['axes'] as Map<String, dynamic>?;
+    final grabMap = row['grabs'] as Map<String, dynamic>?;
+    final spinMap = row['spins'] as Map<String, dynamic>?;
+    final axis = Axis(
+      code: axisCode,
+      labelJa: axisMap?['label_ja'] as String? ?? axisCode,
+      labelEn: axisMap?['label_en'] as String? ?? axisCode,
+    );
+    final grab = Grab(
+      code: grabCode,
+      labelJa: grabMap?['label_ja'] as String? ?? grabCode,
+      labelEn: grabMap?['label_en'] as String? ?? grabCode,
+    );
+    final spin = Spin(
+      value: spinValue,
+      labelJa: spinMap?['label_ja'] as String? ?? spinValue.toString(),
+      labelEn: spinMap?['label_en'] as String? ?? spinValue.toString(),
+    );
 
     return Trick.air(
-      id: trickId,
-      userId: userId,
+      meta: meta,
       stance: _stanceFromDb(row['stance'] as String?),
       takeoff: _takeoffFromDb(row['takeoff'] as String?),
-      axisCode: axisCode,
-      axisLabel: axisLabel,
-      spin: (row['spin'] as num?)?.toInt() ?? 0,
-      grabCode: grabCode,
-      grabLabel: grabLabel,
+      axis: axis,
+      spin: spin,
+      grab: grab,
       direction: _directionFromDb(row['direction'] as String?),
       memos: const [],
-      isPublic: row['is_public'] as bool? ?? true,
-      trickName: row['trick_name'] as String? ?? '',
-      createdAt: DateTime.parse(row['created_at'] as String),
     );
   }
 

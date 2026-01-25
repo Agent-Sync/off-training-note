@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/community_memo.dart';
 import 'package:off_training_note/models/profile.dart';
+import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/navigation/route_observer.dart';
 import 'package:off_training_note/providers/community_provider.dart';
 import 'package:off_training_note/providers/profile_provider.dart';

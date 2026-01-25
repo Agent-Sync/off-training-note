@@ -14,11 +14,9 @@ class NewTrickModal extends ConsumerStatefulWidget {
   final void Function(
     trick_model.Stance stance,
     trick_model.Takeoff takeoff,
-    String axisCode,
-    String axisLabel,
-    int spin,
-    String grabCode,
-    String grabLabel,
+    trick_model.Axis axis,
+    trick_model.Spin spin,
+    trick_model.Grab grab,
     trick_model.Direction direction,
   ) onAdd;
 
@@ -349,7 +347,14 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
                 if (_isAxisMissing || _isSpinMissing || _isGrabMissing) {
                   return;
                 }
-                final spinValue = _isBackOrFront ? 0 : (_selectedSpin?.value ?? 0);
+                final spinValue =
+                    _isBackOrFront ? 0 : (_selectedSpin?.value ?? 0);
+                final axisMaster = _selectedAxis ?? masters.axes.first;
+                final grabMaster = _selectedGrab ?? masters.grabs.first;
+                final spinMaster = masters.spins.firstWhere(
+                  (spin) => spin.value == spinValue,
+                  orElse: () => masters.spins.first,
+                );
                 final directionValue =
                     _isBackOrFront ||
                         (spinValue == 0 && _stance != trick_model.Stance.switchStance)
@@ -361,11 +366,21 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
                 widget.onAdd(
                   _stance,
                   _takeoff,
-                  _selectedAxis?.code ?? '',
-                  _selectedAxis?.labelJa ?? '',
-                  spinValue,
-                  _selectedGrab?.code ?? '',
-                  _selectedGrab?.labelJa ?? '',
+                  trick_model.Axis(
+                    code: axisMaster.code,
+                    labelJa: axisMaster.labelJa,
+                    labelEn: axisMaster.labelEn,
+                  ),
+                  trick_model.Spin(
+                    value: spinMaster.value,
+                    labelJa: spinMaster.labelJa,
+                    labelEn: spinMaster.labelEn,
+                  ),
+                  trick_model.Grab(
+                    code: grabMaster.code,
+                    labelJa: grabMaster.labelJa,
+                    labelEn: grabMaster.labelEn,
+                  ),
                   directionValue,
                 );
                 Navigator.pop(context);
