@@ -4,7 +4,7 @@ create table if not exists public.tricks (
   user_id uuid not null references public.profiles(id) on delete cascade,
   type text not null check (type in ('air', 'jib')),
   custom_name text,
-  trick_name text,
+  trick_name_ja text,
   trick_name_en text,
   stance text,
   takeoff text,

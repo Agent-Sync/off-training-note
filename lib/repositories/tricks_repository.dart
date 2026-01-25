@@ -13,17 +13,19 @@ class TricksRepository {
     required String userId,
     String? viewerUserId,
   }) async {
-    final rows = await SupabaseClientProvider.client
-        .from('tricks')
-        .select(
-          'id, user_id, type, custom_name, trick_name, stance, takeoff, axis, spin, grab, direction, '
-          'is_public, created_at, updated_at, '
-          'axes(label_ja, label_en), grabs(label_ja, label_en), spins(label_ja, label_en), '
-          'memos(id, trick_id, type, focus, outcome, condition, size, like_count, created_at, updated_at)',
-        )
-        .eq('user_id', userId)
-        .order('created_at', ascending: false)
-        .order('updated_at', referencedTable: 'memos', ascending: false);
+    final rows = await SupabaseClientProvider.guard(
+      (client) => client
+          .from('tricks')
+          .select(
+            'id, user_id, type, custom_name, trick_name_ja, stance, takeoff, axis, spin, grab, direction, '
+            'is_public, created_at, updated_at, '
+            'axes(label_ja, label_en), grabs(label_ja, label_en), spins(label_ja, label_en), '
+            'memos(id, trick_id, type, focus, outcome, condition, size, like_count, created_at, updated_at)',
+          )
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .order('updated_at', referencedTable: 'memos', ascending: false),
+    );
 
     final rowList = rows as List<dynamic>;
     final memoIds = rowList
@@ -51,38 +53,40 @@ class TricksRepository {
 
   Future<void> addTrick({required String userId, required Trick trick}) async {
     final now = DateTime.now().toIso8601String();
-    await SupabaseClientProvider.client.from('tricks').insert(
-      trick.map(
-        air: (air) => {
-          'id': air.id,
-          'user_id': userId,
-          'type': 'air',
-          'custom_name': null,
-          'stance': _stanceToDb(air.stance),
-          'takeoff': _takeoffToDb(air.takeoff),
-          'axis': air.axis.code,
-          'spin': air.spin.value,
-          'grab': air.grab.code,
-          'direction': _directionToDb(air.direction),
-          'is_public': air.isPublic,
-          'created_at': air.createdAt.toIso8601String(),
-          'updated_at': now,
-        },
-        jib: (jib) => {
-          'id': jib.id,
-          'user_id': userId,
-          'type': 'jib',
-          'custom_name': jib.customName,
-          'stance': null,
-          'takeoff': null,
-          'axis': null,
-          'spin': null,
-          'grab': null,
-          'direction': null,
-          'is_public': jib.isPublic,
-          'created_at': jib.createdAt.toIso8601String(),
-          'updated_at': now,
-        },
+    await SupabaseClientProvider.guard(
+      (client) => client.from('tricks').insert(
+        trick.map(
+          air: (air) => {
+            'id': air.id,
+            'user_id': userId,
+            'type': 'air',
+            'custom_name': null,
+            'stance': _stanceToDb(air.stance),
+            'takeoff': _takeoffToDb(air.takeoff),
+            'axis': air.axis.code,
+            'spin': air.spin.value,
+            'grab': air.grab.code,
+            'direction': _directionToDb(air.direction),
+            'is_public': air.isPublic,
+            'created_at': air.createdAt.toIso8601String(),
+            'updated_at': now,
+          },
+          jib: (jib) => {
+            'id': jib.id,
+            'user_id': userId,
+            'type': 'jib',
+            'custom_name': jib.customName,
+            'stance': null,
+            'takeoff': null,
+            'axis': null,
+            'spin': null,
+            'grab': null,
+            'direction': null,
+            'is_public': jib.isPublic,
+            'created_at': jib.createdAt.toIso8601String(),
+            'updated_at': now,
+          },
+        ),
       ),
     );
   }
@@ -91,10 +95,12 @@ class TricksRepository {
     required String trickId,
     required bool isPublic,
   }) async {
-    await SupabaseClientProvider.client.from('tricks').update({
-      'is_public': isPublic,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', trickId);
+    await SupabaseClientProvider.guard(
+      (client) => client.from('tricks').update({
+        'is_public': isPublic,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', trickId),
+    );
   }
 
   Future<void> addMemo({
@@ -106,61 +112,64 @@ class TricksRepository {
   }) async {
     final now = DateTime.now();
     final memoId = _trickUuid.v4();
-    await SupabaseClientProvider.client.from('memos').insert(
-      trick.map(
-        air: (_) => {
-          'id': memoId,
-          'trick_id': trick.id,
-          'type': 'air',
-          'focus': focus,
-          'outcome': outcome,
-          'condition': _conditionToDb(condition ?? MemoCondition.none),
-          'size': _sizeToDb(size ?? MemoSize.none),
-          'created_at': now.toIso8601String(),
-          'updated_at': now.toIso8601String(),
-        },
-        jib: (_) => {
-          'id': memoId,
-          'trick_id': trick.id,
-          'type': 'jib',
-          'focus': focus,
-          'outcome': outcome,
-          'condition': null,
-          'size': null,
-          'created_at': now.toIso8601String(),
-          'updated_at': now.toIso8601String(),
-        },
+    await SupabaseClientProvider.guard(
+      (client) => client.from('memos').insert(
+        trick.map(
+          air: (_) => {
+            'id': memoId,
+            'trick_id': trick.id,
+            'type': 'air',
+            'focus': focus,
+            'outcome': outcome,
+            'condition': _conditionToDb(condition ?? MemoCondition.none),
+            'size': _sizeToDb(size ?? MemoSize.none),
+            'created_at': now.toIso8601String(),
+            'updated_at': now.toIso8601String(),
+          },
+          jib: (_) => {
+            'id': memoId,
+            'trick_id': trick.id,
+            'type': 'jib',
+            'focus': focus,
+            'outcome': outcome,
+            'condition': null,
+            'size': null,
+            'created_at': now.toIso8601String(),
+            'updated_at': now.toIso8601String(),
+          },
+        ),
       ),
     );
   }
 
   Future<void> updateMemo({required TechMemo memo}) async {
     final now = DateTime.now().toIso8601String();
-    await SupabaseClientProvider.client.from('memos').update(
-      memo.map(
-        air: (airMemo) => {
-          'focus': airMemo.focus,
-          'outcome': airMemo.outcome,
-          'condition': _conditionToDb(airMemo.condition),
-          'size': _sizeToDb(airMemo.size),
-          'updated_at': now,
-        },
-        jib: (jibMemo) => {
-          'focus': jibMemo.focus,
-          'outcome': jibMemo.outcome,
-          'condition': null,
-          'size': null,
-          'updated_at': now,
-        },
-      ),
-    ).eq('id', memo.id);
+    await SupabaseClientProvider.guard(
+      (client) => client.from('memos').update(
+        memo.map(
+          air: (airMemo) => {
+            'focus': airMemo.focus,
+            'outcome': airMemo.outcome,
+            'condition': _conditionToDb(airMemo.condition),
+            'size': _sizeToDb(airMemo.size),
+            'updated_at': now,
+          },
+          jib: (jibMemo) => {
+            'focus': jibMemo.focus,
+            'outcome': jibMemo.outcome,
+            'condition': null,
+            'size': null,
+            'updated_at': now,
+          },
+        ),
+      ).eq('id', memo.id),
+    );
   }
 
   Future<void> deleteMemo({required String memoId}) async {
-    await SupabaseClientProvider.client
-        .from('memos')
-        .delete()
-        .eq('id', memoId);
+    await SupabaseClientProvider.guard(
+      (client) => client.from('memos').delete().eq('id', memoId),
+    );
   }
 
   Trick _trickFromRow(
@@ -183,7 +192,7 @@ class TricksRepository {
       id: row['id'] as String,
       userId: row['user_id'] as String,
       isPublic: isPublic,
-      trickName: row['trick_name'] as String? ?? '',
+      trickName: row['trick_name_ja'] as String? ?? '',
       createdAt: DateTime.parse(row['created_at'] as String),
       updatedAt: DateTime.parse(row['updated_at'] as String),
     );

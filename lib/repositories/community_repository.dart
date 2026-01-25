@@ -14,38 +14,73 @@ class CommunityRepository {
     int limit = 10,
   }) async {
     final normalized = query.trim();
-    final client = SupabaseClientProvider.client;
+    final selectClause =
+        'id, trick_id, type, focus, outcome, condition, size, created_at, '
+        'updated_at, like_count, user_id, '
+        'tricks!inner ('
+        'user_id, type, custom_name, trick_name_ja, stance, takeoff, axis, spin, grab, '
+        'direction, created_at, is_public, '
+        'axes(label_ja, label_en), grabs(label_ja, label_en), spins(label_ja, label_en)'
+        '), '
+        'profiles!inner (display_name, avatar_url)';
 
-    var request = client.from('memos').select(
-          'id, trick_id, type, focus, outcome, condition, size, created_at, '
-          'updated_at, like_count, user_id, '
-          'tricks!inner ('
-          'user_id, type, custom_name, trick_name, stance, takeoff, axis, spin, grab, '
-          'direction, created_at, is_public, '
-          'axes(label_ja, label_en), grabs(label_ja, label_en), spins(label_ja, label_en)'
-          '), '
-          'profiles!inner (display_name, avatar_url)',
-        );
-
-    request = request.eq('tricks.is_public', true);
-
-    if (normalized.isNotEmpty) {
-      final pattern = '%$normalized%';
-      request = request.or(
-        'focus.ilike.$pattern,'
-        'outcome.ilike.$pattern,'
-        'profiles.display_name.ilike.$pattern,'
-        'tricks.trick_name.ilike.$pattern',
-      );
-    } else if (userId != null) {
-      request = request.neq('user_id', userId);
+    dynamic buildBaseRequest() {
+      var request = SupabaseClientProvider.client
+          .from('memos')
+          .select(selectClause)
+          .eq('tricks.is_public', true);
+      if (userId != null) {
+        request = request.neq('tricks.user_id', userId);
+      }
+      return request;
     }
 
-    final rows = await request
-        .order('created_at', ascending: false)
-        .limit(limit);
+    List<dynamic> rowList;
+    if (normalized.isEmpty) {
+      final request = buildBaseRequest();
+      final rows = await SupabaseClientProvider.guard(
+        (_) => request.order('created_at', ascending: false).limit(limit),
+      );
+      rowList = rows as List<dynamic>;
+    } else {
+      final pattern = '%$normalized%';
+      final baseRows = await SupabaseClientProvider.guard(
+        (_) => buildBaseRequest()
+            .or('focus.ilike.$pattern,outcome.ilike.$pattern')
+            .order('created_at', ascending: false)
+            .limit(limit),
+      );
+      final profileRows = await SupabaseClientProvider.guard(
+        (_) => buildBaseRequest()
+            .or('display_name.ilike.$pattern', referencedTable: 'profiles')
+            .order('created_at', ascending: false)
+            .limit(limit),
+      );
+      final trickRows = await SupabaseClientProvider.guard(
+        (_) => buildBaseRequest()
+            .or('trick_name_ja.ilike.$pattern', referencedTable: 'tricks')
+            .order('created_at', ascending: false)
+            .limit(limit),
+      );
 
-    final rowList = rows as List<dynamic>;
+      final combined = <String, Map<String, dynamic>>{};
+      for (final rows in [baseRows, profileRows, trickRows]) {
+        for (final row in rows as List<dynamic>) {
+          final map = row as Map<String, dynamic>;
+          combined[map['id'] as String] = map;
+        }
+      }
+      rowList = combined.values.toList(growable: false)
+        ..sort(
+          (a, b) => DateTime.parse(
+            b['created_at'] as String,
+          ).compareTo(DateTime.parse(a['created_at'] as String)),
+        );
+      if (rowList.length > limit) {
+        rowList = rowList.sublist(0, limit);
+      }
+    }
+
     final memoIds = rowList
         .map((row) => row['id'] as String)
         .toList();
@@ -103,7 +138,7 @@ class CommunityRepository {
       id: trickId,
       userId: userId,
       isPublic: isPublic,
-      trickName: row['trick_name'] as String? ?? '',
+      trickName: row['trick_name_ja'] as String? ?? '',
       createdAt: DateTime.parse(row['created_at'] as String),
       updatedAt: DateTime.parse(row['updated_at'] as String),
     );

@@ -5,11 +5,13 @@ class ProfileRepository {
   const ProfileRepository();
 
   Future<Profile?> fetchProfile({required String userId}) async {
-    final data = await SupabaseClientProvider.client
-        .from('profiles')
-        .select('id, display_name, avatar_url, onboarded')
-        .eq('id', userId)
-        .maybeSingle();
+    final data = await SupabaseClientProvider.guard(
+      (client) => client
+          .from('profiles')
+          .select('id, display_name, avatar_url, onboarded')
+          .eq('id', userId)
+          .maybeSingle(),
+    );
 
     if (data == null) {
       return null;
@@ -37,9 +39,8 @@ class ProfileRepository {
       updates['onboarded'] = onboarded;
     }
 
-    await SupabaseClientProvider.client
-        .from('profiles')
-        .update(updates)
-        .eq('id', userId);
+    await SupabaseClientProvider.guard(
+      (client) => client.from('profiles').update(updates).eq('id', userId),
+    );
   }
 }

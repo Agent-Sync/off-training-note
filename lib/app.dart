@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:off_training_note/navigation/app_navigator.dart';
 import 'package:off_training_note/navigation/route_observer.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/screens/onboarding_screen.dart';
@@ -17,6 +18,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'オフトレノート',
       theme: AppTheme.theme,
+      navigatorKey: appNavigatorKey,
       home: const AuthGate(),
       debugShowCheckedModeBanner: false,
       navigatorObservers: [routeObserver],

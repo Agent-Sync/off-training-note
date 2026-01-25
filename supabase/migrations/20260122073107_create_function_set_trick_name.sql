@@ -2,10 +2,10 @@ create or replace function public.set_trick_name()
 returns trigger as $$
 begin
   if new.type = 'jib' then
-    new.trick_name = coalesce(new.custom_name, '');
+    new.trick_name_ja = coalesce(new.custom_name, '');
     new.trick_name_en = coalesce(new.custom_name, '');
   else
-    new.trick_name = public.build_air_trick_name(
+    new.trick_name_ja = public.build_air_trick_name(
       new.stance,
       new.takeoff,
       new.axis,

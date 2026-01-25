@@ -5,20 +5,24 @@ class TrickMastersRepository {
   const TrickMastersRepository();
 
   Future<TrickMasterData> fetchMasters() async {
-    final client = SupabaseClientProvider.client;
-
-    final grabsRows = await client
-        .from('grabs')
-        .select('code, label_ja, label_en, sort_order')
-        .order('sort_order', ascending: true);
-    final axesRows = await client
-        .from('axes')
-        .select('code, label_ja, label_en, sort_order')
-        .order('sort_order', ascending: true);
-    final spinsRows = await client
-        .from('spins')
-        .select('value, label_ja, label_en, sort_order')
-        .order('sort_order', ascending: true);
+    final grabsRows = await SupabaseClientProvider.guard(
+      (client) => client
+          .from('grabs')
+          .select('code, label_ja, label_en, sort_order')
+          .order('sort_order', ascending: true),
+    );
+    final axesRows = await SupabaseClientProvider.guard(
+      (client) => client
+          .from('axes')
+          .select('code, label_ja, label_en, sort_order')
+          .order('sort_order', ascending: true),
+    );
+    final spinsRows = await SupabaseClientProvider.guard(
+      (client) => client
+          .from('spins')
+          .select('value, label_ja, label_en, sort_order')
+          .order('sort_order', ascending: true),
+    );
 
     return TrickMasterData(
       grabs: (grabsRows as List<dynamic>)
