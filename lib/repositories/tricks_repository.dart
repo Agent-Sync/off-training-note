@@ -250,64 +250,27 @@ class TricksRepository {
   }
 
   Stance _stanceFromDb(String value) {
-    switch (value) {
-      case 'switchStance':
-        return Stance.switchStance;
-      case 'regular':
-      default:
-        return Stance.regular;
-    }
+    return Stance.fromCode(value);
   }
 
   String _stanceToDb(Stance value) {
-    switch (value) {
-      case Stance.switchStance:
-        return 'switchStance';
-      case Stance.regular:
-        return 'regular';
-    }
+    return value.code;
   }
 
   Takeoff _takeoffFromDb(String value) {
-    switch (value) {
-      case 'carving':
-        return Takeoff.carving;
-      case 'straight':
-      default:
-        return Takeoff.straight;
-    }
+    return Takeoff.fromCode(value);
   }
 
   String _takeoffToDb(Takeoff value) {
-    switch (value) {
-      case Takeoff.carving:
-        return 'carving';
-      case Takeoff.straight:
-        return 'straight';
-    }
+    return value.code;
   }
 
   Direction _directionFromDb(String value) {
-    switch (value) {
-      case 'left':
-        return Direction.left;
-      case 'right':
-        return Direction.right;
-      case 'none':
-      default:
-        return Direction.none;
-    }
+    return Direction.fromCode(value);
   }
 
   String _directionToDb(Direction value) {
-    switch (value) {
-      case Direction.left:
-        return 'left';
-      case Direction.right:
-        return 'right';
-      case Direction.none:
-        return 'none';
-    }
+    return value.code;
   }
 
   MemoCondition _conditionFromDb(String? value) {

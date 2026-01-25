@@ -1,17 +1,10 @@
 import 'package:off_training_note/models/trick.dart';
 
-const _stanceSwitchLabel = 'スイッチ';
-const _takeoffCarvingLabel = 'カービング';
-const _defaultAirLabel = 'ストレート';
-const _stanceRegularLabel = 'レギュラー';
-const _directionLeftLabel = 'レフト';
-const _directionRightLabel = 'ライト';
-const _takeoffStandardLabel = 'ストレート';
-
 extension TrickHelpers on Trick {
   String displayName() {
     return map(
-      air: (air) => air.trickName.isNotEmpty ? air.trickName : _defaultAirLabel,
+      air: (air) =>
+          air.trickName.isNotEmpty ? air.trickName : Takeoff.straight.labelJa,
       jib: (jib) => jib.trickName.isNotEmpty ? jib.trickName : jib.customName,
     );
   }
@@ -64,13 +57,13 @@ List<String> _airTagLabels(AirTrick air) {
 }
 
 String _stanceLabel(Stance stance) =>
-    stance == Stance.regular ? _stanceRegularLabel : _stanceSwitchLabel;
+    stance.labelJa;
 
 String _directionLabel(Direction direction) =>
-    direction == Direction.left ? _directionLeftLabel : _directionRightLabel;
+    direction.labelJa;
 
 String _takeoffLabel(Takeoff takeoff) =>
-    takeoff == Takeoff.straight ? _takeoffStandardLabel : _takeoffCarvingLabel;
+    takeoff.labelJa;
 
 bool _isFlipAxis(String axisCode) =>
     axisCode == 'backflip' || axisCode == 'frontflip';

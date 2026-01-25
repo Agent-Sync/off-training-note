@@ -1,14 +1,16 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:off_training_note/models/tech_memo.dart';
+import 'package:off_training_note/models/core/direction.dart';
+import 'package:off_training_note/models/core/stance.dart';
+import 'package:off_training_note/models/core/takeoff.dart';
+
+export 'package:off_training_note/models/core/direction.dart';
+export 'package:off_training_note/models/core/stance.dart';
+export 'package:off_training_note/models/core/takeoff.dart';
 
 part 'trick.freezed.dart';
 part 'trick.g.dart';
 
-enum Stance { regular, switchStance } // 'switch' is a keyword in Dart
-
-enum Takeoff { straight, carving }
-
-enum Direction { none, left, right }
 
 @Freezed(unionKey: 'type')
 abstract class Trick with _$Trick {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:off_training_note/models/trick_masters.dart';
+import 'package:off_training_note/models/core/trick_masters.dart';
 import 'package:off_training_note/models/trick.dart' as trick_model;
 import 'package:off_training_note/providers/trick_masters_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
@@ -11,7 +11,7 @@ import 'package:off_training_note/widgets/sheet/grab_select_sheet.dart';
 import 'package:off_training_note/widgets/sheet/spin_select_sheet.dart';
 
 class NewTrickModal extends ConsumerStatefulWidget {
-  final Function(
+  final void Function(
     trick_model.Stance stance,
     trick_model.Takeoff takeoff,
     String axisCode,
@@ -20,8 +20,7 @@ class NewTrickModal extends ConsumerStatefulWidget {
     String grabCode,
     String grabLabel,
     trick_model.Direction direction,
-  )
-  onAdd;
+  ) onAdd;
 
   const NewTrickModal({super.key, required this.onAdd});
 
@@ -170,8 +169,8 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
             // Stance
             _buildSectionLabel('スタンス'),
             TwoOptionToggle(
-              leftLabel: 'レギュラー',
-              rightLabel: 'スイッチ',
+              leftLabel: trick_model.Stance.regular.labelJa,
+              rightLabel: trick_model.Stance.switchStance.labelJa,
               isLeftSelected: _stance == trick_model.Stance.regular,
               onLeftTap: () =>
                   setState(() => _stance = trick_model.Stance.regular),
@@ -183,8 +182,8 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
             // Takeoff
             _buildSectionLabel('テイクオフ'),
             TwoOptionToggle(
-              leftLabel: 'ストレート',
-              rightLabel: 'カービング',
+              leftLabel: trick_model.Takeoff.straight.labelJa,
+              rightLabel: trick_model.Takeoff.carving.labelJa,
               isLeftSelected: _takeoff == trick_model.Takeoff.straight,
               onLeftTap: () =>
                   setState(() => _takeoff = trick_model.Takeoff.straight),
@@ -207,12 +206,12 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
               onTap: () {
                 _showAxisSheet(
                   options: masters.axes
-                      .map((axis) => axis.label)
+                      .map((axis) => axis.labelJa)
                       .toList(growable: false),
-                  selectedValue: _selectedAxis?.label,
+                  selectedValue: _selectedAxis?.labelJa,
                   onSelected: (value) {
                     final axis = masters.axes.firstWhere(
-                      (axis) => axis.label == value,
+                      (axis) => axis.labelJa == value,
                       orElse: () => masters.axes.first,
                     );
                     final zeroSpin = masters.spins.firstWhere(
@@ -221,10 +220,10 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
                     );
                     setState(() {
                       _selectedAxis = axis;
-                      _axisController.text = axis.label;
+                      _axisController.text = axis.labelJa;
                       if (_isBackOrFront) {
                         _selectedSpin = zeroSpin;
-                        _spinController.text = zeroSpin.label;
+                        _spinController.text = zeroSpin.labelJa;
                         _direction = trick_model.Direction.none;
                       } else if (_direction == trick_model.Direction.none) {
                         _direction = trick_model.Direction.left;
@@ -262,17 +261,17 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
                 onTap: () {
                   _showSpinSheet(
                     options: masters.spins
-                        .map((spin) => spin.label)
+                        .map((spin) => spin.labelJa)
                         .toList(growable: false),
-                    selectedValue: _selectedSpin?.label,
+                    selectedValue: _selectedSpin?.labelJa,
                     onSelected: (value) {
                       final spin = masters.spins.firstWhere(
-                        (spin) => spin.label == value,
+                        (spin) => spin.labelJa == value,
                         orElse: () => masters.spins.first,
                       );
                       setState(() {
                         _selectedSpin = spin;
-                        _spinController.text = spin.label;
+                        _spinController.text = spin.labelJa;
                         if (spin.value == 0 &&
                             _stance != trick_model.Stance.switchStance) {
                           _direction = trick_model.Direction.none;
@@ -307,17 +306,17 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
                 _showSearchableOptionSheet(
                   title: 'グラブを選択',
                   options: masters.grabs
-                      .map((grab) => grab.label)
+                      .map((grab) => grab.labelJa)
                       .toList(growable: false),
-                  selectedValue: _selectedGrab?.label,
+                  selectedValue: _selectedGrab?.labelJa,
                   onSelected: (value) {
                     final grab = masters.grabs.firstWhere(
-                      (grab) => grab.label == value,
+                      (grab) => grab.labelJa == value,
                       orElse: () => masters.grabs.first,
                     );
                     setState(() {
                       _selectedGrab = grab;
-                      _grabController.text = grab.label;
+                      _grabController.text = grab.labelJa;
                     });
                   },
                 );
@@ -332,11 +331,13 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
             // Direction
             _buildSectionLabel('方向', enabled: !_isDirectionDisabled),
             TwoOptionToggle(
-              leftLabel: 'レフト',
-              rightLabel: 'ライト',
+              leftLabel: trick_model.Direction.left.labelJa,
+              rightLabel: trick_model.Direction.right.labelJa,
               isLeftSelected: _direction == trick_model.Direction.left,
-              onLeftTap: () => setState(() => _direction = trick_model.Direction.left),
-              onRightTap: () => setState(() => _direction = trick_model.Direction.right),
+              onLeftTap: () =>
+                  setState(() => _direction = trick_model.Direction.left),
+              onRightTap: () =>
+                  setState(() => _direction = trick_model.Direction.right),
               enabled: !_isDirectionDisabled,
             ),
             const SizedBox(height: 24),
@@ -361,10 +362,10 @@ class _NewTrickModalState extends ConsumerState<NewTrickModal> {
                   _stance,
                   _takeoff,
                   _selectedAxis?.code ?? '',
-                  _selectedAxis?.label ?? '',
+                  _selectedAxis?.labelJa ?? '',
                   spinValue,
                   _selectedGrab?.code ?? '',
-                  _selectedGrab?.label ?? '',
+                  _selectedGrab?.labelJa ?? '',
                   directionValue,
                 );
                 Navigator.pop(context);

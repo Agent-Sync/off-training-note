@@ -1,4 +1,4 @@
-import 'package:off_training_note/models/trick_masters.dart';
+import 'package:off_training_note/models/core/trick_masters.dart';
 import 'package:off_training_note/services/supabase_client_service.dart';
 
 class TrickMastersRepository {
@@ -9,15 +9,15 @@ class TrickMastersRepository {
 
     final grabsRows = await client
         .from('grabs')
-        .select('code, label_ja, sort_order')
+        .select('code, label_ja, label_en, sort_order')
         .order('sort_order', ascending: true);
     final axesRows = await client
         .from('axes')
-        .select('code, label_ja, sort_order')
+        .select('code, label_ja, label_en, sort_order')
         .order('sort_order', ascending: true);
     final spinsRows = await client
         .from('spins')
-        .select('value, label_ja, sort_order')
+        .select('value, label_ja, label_en, sort_order')
         .order('sort_order', ascending: true);
 
     return TrickMasterData(

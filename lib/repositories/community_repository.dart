@@ -195,35 +195,15 @@ class CommunityRepository {
   }
 
   Stance _stanceFromDb(String? value) {
-    switch (value) {
-      case 'switchStance':
-        return Stance.switchStance;
-      case 'regular':
-      default:
-        return Stance.regular;
-    }
+    return Stance.fromCode(value ?? 'regular');
   }
 
   Takeoff _takeoffFromDb(String? value) {
-    switch (value) {
-      case 'carving':
-        return Takeoff.carving;
-      case 'straight':
-      default:
-        return Takeoff.straight;
-    }
+    return Takeoff.fromCode(value ?? 'straight');
   }
 
   Direction _directionFromDb(String? value) {
-    switch (value) {
-      case 'left':
-        return Direction.left;
-      case 'right':
-        return Direction.right;
-      case 'none':
-      default:
-        return Direction.none;
-    }
+    return Direction.fromCode(value ?? 'none');
   }
 
 }
