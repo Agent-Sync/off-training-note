@@ -63,6 +63,7 @@ enabled = true
 sql_paths = [
   "./seeds/00_auth_users.sql",
   "./seeds/01_profiles.sql",
+  "./seeds/02_trick_masters.sql",
   "./seeds/02_tricks.sql",
   "./seeds/03_memos.sql",
   "./seeds/04_memo_likes.sql",
