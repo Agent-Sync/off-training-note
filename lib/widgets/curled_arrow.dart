@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -66,15 +66,15 @@ class _CircularArrowPainter extends CustomPainter {
       return;
     }
     final end = tangent.position;
-    final angle = tangent.angle + Math.pi - (60 * Math.pi / 180);
+    final angle = tangent.angle + math.pi - (60 * math.pi / 180);
     final headLen = (w < h ? w : h) * 0.16;
     final left = Offset(
-      end.dx - headLen * Math.cos(angle - 0.5),
-      end.dy - headLen * Math.sin(angle - 0.5),
+      end.dx - headLen * math.cos(angle - 0.5),
+      end.dy - headLen * math.sin(angle - 0.5),
     );
     final right = Offset(
-      end.dx - headLen * Math.cos(angle + 0.5),
-      end.dy - headLen * Math.sin(angle + 0.5),
+      end.dx - headLen * math.cos(angle + 0.5),
+      end.dy - headLen * math.sin(angle + 0.5),
     );
     canvas.drawLine(end, left, paint);
     canvas.drawLine(end, right, paint);

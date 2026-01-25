@@ -520,6 +520,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
           ),
           const SizedBox(height: 8),
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               InkWell(
                 borderRadius: BorderRadius.circular(16),
