@@ -19,7 +19,18 @@ Future<T?> showAppBottomSheet<T>({
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: builder,
+    builder: (sheetContext) {
+      return PopScope(
+        canPop: MediaQuery.of(sheetContext).viewInsets.bottom == 0,
+        onPopInvokedWithResult: (didPop, _) {
+          final keyboardOpen = MediaQuery.of(sheetContext).viewInsets.bottom > 0;
+          if (!didPop && keyboardOpen) {
+            FocusManager.instance.primaryFocus?.unfocus();
+          }
+        },
+        child: builder(sheetContext),
+      );
+    },
   );
 }
 

@@ -51,7 +51,7 @@ class _NewJibModalState extends State<NewJibModal> {
             controller: _nameController,
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
-              hintText: 'ジブのトリック名を入力',
+              hintText: 'トリック名を入力',
               filled: true,
               fillColor: Colors.grey.shade50,
               contentPadding: const EdgeInsets.symmetric(

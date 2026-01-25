@@ -46,65 +46,68 @@ class TrickDetailSheet extends ConsumerWidget {
           child: Column(
             children: [
               // Title Header
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 48),
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.textMain,
+              SizedBox(
+                width: double.infinity,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 48),
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textMain,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      if (tags.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        // Tags
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: tags.map(_buildTag).toList(),
-                        ),
+                        if (tags.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          // Tags
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: tags.map(_buildTag).toList(),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: isOwner
-                        ? Transform.translate(
-                            offset: const Offset(32, 0),
-                            child: IconButton(
-                              onPressed: () => _showTrickActionMenu(
-                                context,
-                                ref,
-                                currentTrick,
-                              ),
-                              style: ButtonStyle(
-                                overlayColor: WidgetStateProperty.all(
-                                  Colors.transparent,
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: isOwner
+                          ? Transform.translate(
+                              offset: const Offset(20, 0),
+                              child: IconButton(
+                                onPressed: () => _showTrickActionMenu(
+                                  context,
+                                  ref,
+                                  currentTrick,
+                                ),
+                                style: ButtonStyle(
+                                  overlayColor: WidgetStateProperty.all(
+                                    Colors.transparent,
+                                  ),
+                                ),
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  color: Colors.grey,
+                                  size: 28,
                                 ),
                               ),
-                              icon: const Icon(
-                                Icons.more_vert,
-                                color: Colors.grey,
-                                size: 28,
-                              ),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ],
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               Divider(height: 1, color: Colors.grey.shade200),
