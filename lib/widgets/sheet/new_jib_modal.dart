@@ -32,7 +32,7 @@ class _NewJibModalState extends State<NewJibModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'ジブを追加',
+                '新しいジブトリックを追加',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -51,7 +51,7 @@ class _NewJibModalState extends State<NewJibModal> {
             controller: _nameController,
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
-              hintText: 'ジブ名を入力',
+              hintText: 'ジブのトリック名を入力',
               filled: true,
               fillColor: Colors.grey.shade50,
               contentPadding: const EdgeInsets.symmetric(

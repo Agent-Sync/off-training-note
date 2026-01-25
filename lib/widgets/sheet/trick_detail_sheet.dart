@@ -47,6 +47,7 @@ class TrickDetailSheet extends ConsumerWidget {
             children: [
               // Title Header
               Stack(
+                clipBehavior: Clip.none,
                 alignment: Alignment.center,
                 children: [
                   Column(
@@ -81,20 +82,24 @@ class TrickDetailSheet extends ConsumerWidget {
                     top: 0,
                     right: 0,
                     child: isOwner
-                        ? IconButton(
-                            onPressed: () => _showTrickActionMenu(
-                              context,
-                              ref,
-                              currentTrick,
-                            ),
-                            style: ButtonStyle(
-                              overlayColor:
-                                  WidgetStateProperty.all(Colors.transparent),
-                            ),
-                            icon: const Icon(
-                              Icons.more_vert,
-                              color: Colors.grey,
-                              size: 28,
+                        ? Transform.translate(
+                            offset: const Offset(32, 0),
+                            child: IconButton(
+                              onPressed: () => _showTrickActionMenu(
+                                context,
+                                ref,
+                                currentTrick,
+                              ),
+                              style: ButtonStyle(
+                                overlayColor: WidgetStateProperty.all(
+                                  Colors.transparent,
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.more_vert,
+                                color: Colors.grey,
+                                size: 28,
+                              ),
                             ),
                           )
                         : const SizedBox.shrink(),
