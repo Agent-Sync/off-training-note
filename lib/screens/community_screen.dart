@@ -8,11 +8,11 @@ import 'package:off_training_note/providers/community_provider.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/screens/profile_screen.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/relative_time.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/settings_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class CommunityScreen extends ConsumerStatefulWidget {
   const CommunityScreen({super.key});
@@ -333,6 +333,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
 
     return RefreshIndicator(
       onRefresh: () => ref.read(communityProvider.notifier).refresh(),
+      color: Colors.black,
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(
           16,
@@ -432,7 +433,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   ),
                 ),
                 Text(
-                  timeago.format(memo.memo.createdAt, locale: 'ja'),
+                  formatRelativeTime(memo.memo.createdAt),
                   style: const TextStyle(
                     fontSize: 10,
                     color: AppTheme.textSecondary,

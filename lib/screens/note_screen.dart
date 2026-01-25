@@ -182,6 +182,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
     final content = RefreshIndicator(
       onRefresh: _reloadTricks,
+      color: Colors.black,
       child: _activeTab == _HomeTab.air
           ? _buildTrickContent(filteredTricks)
           : _buildJibContent(filteredJibTricks),

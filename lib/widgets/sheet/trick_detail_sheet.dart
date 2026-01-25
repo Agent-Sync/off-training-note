@@ -6,11 +6,11 @@ import 'package:off_training_note/providers/tricks_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/widgets/dialog/app_confirm_dialog.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
+import 'package:off_training_note/utils/relative_time.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
 import 'package:off_training_note/widgets/sheet/log_form_sheet.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class TrickDetailSheet extends ConsumerWidget {
   final Trick trick;
@@ -131,14 +131,6 @@ class TrickDetailSheet extends ConsumerWidget {
                                 fontSize: 16,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              '練習の意識を記録しましょう！',
-                              style: TextStyle(
-                                color: AppTheme.textHint,
-                                fontSize: 12,
-                              ),
-                            ),
                           ],
                         ),
                       )
@@ -201,10 +193,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              timeago.format(
-                                                memo.createdAt,
-                                                locale: 'ja',
-                                              ),
+                                              formatRelativeTime(memo.createdAt),
                                               style: const TextStyle(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,

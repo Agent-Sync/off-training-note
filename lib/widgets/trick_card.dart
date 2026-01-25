@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/relative_time.dart';
 import 'package:off_training_note/utils/trick_helpers.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class TrickCard extends StatelessWidget {
   final Trick trick;
@@ -155,7 +155,7 @@ class TrickCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    timeago.format(latestMemo.createdAt, locale: 'ja'),
+                    formatRelativeTime(latestMemo.createdAt),
                     style: const TextStyle(
                       fontSize: 10,
                       color: AppTheme.textSecondary,

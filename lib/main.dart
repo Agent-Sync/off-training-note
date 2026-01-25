@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 Future<void> main() async {
   // グローバルなエラーハンドリングを設定
@@ -40,9 +39,6 @@ Future<void> main() async {
           'Warning: SUPABASE_URL or SUPABASE_ANON_KEY is missing in assets/.env',
         );
       }
-
-      timeago.setLocaleMessages('ja', timeago.JaMessages());
-      timeago.setDefaultLocale('ja');
 
       runApp(const ProviderScope(child: App()));
     },

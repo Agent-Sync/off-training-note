@@ -57,8 +57,7 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
     return SafeArea(
       child: Container(
         constraints: BoxConstraints(
-          maxHeight:
-              MediaQuery.of(context).size.height * widget.maxHeightFactor,
+          maxHeight: MediaQuery.of(context).size.height * widget.maxHeightFactor,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
