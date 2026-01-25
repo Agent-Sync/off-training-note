@@ -39,10 +39,9 @@ class AppBottomSheetContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final bottomInset = useKeyboardInset ? mediaQuery.viewInsets.bottom : 0.0;
-    final availableHeight = mediaQuery.size.height - bottomInset;
     final content = child;
     return Container(
-      constraints: BoxConstraints(maxHeight: availableHeight),
+      constraints: BoxConstraints(maxHeight: mediaQuery.size.height),
       padding: padding.add(EdgeInsets.only(bottom: bottomInset)),
       decoration: BoxDecoration(
         color: kBottomSheetBackgroundColor,
