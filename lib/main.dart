@@ -29,9 +29,7 @@ Future<void> main() async {
 
       // Supabaseの初期化
       final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
-      debugPrint('SUPABASE_URL: $supabaseUrl');
       final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
-      debugPrint('SUPABASE_ANON_KEY: $supabaseAnonKey');
       if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
         await Supabase.initialize(
           url: supabaseUrl,
