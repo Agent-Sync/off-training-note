@@ -52,7 +52,8 @@ class TricksRepository {
   }
 
   Future<void> addTrick({required String userId, required Trick trick}) async {
-    final now = DateTime.now().toIso8601String();
+    final nowUtc = DateTime.now().toUtc();
+    final now = nowUtc.toIso8601String();
     await SupabaseClientProvider.guard(
       (client) => client.from('tricks').insert(
         trick.map(
@@ -68,7 +69,7 @@ class TricksRepository {
             'grab': air.grab.code,
             'direction': _directionToDb(air.direction),
             'is_public': air.isPublic,
-            'created_at': air.createdAt.toIso8601String(),
+            'created_at': air.createdAt.toUtc().toIso8601String(),
             'updated_at': now,
           },
           jib: (jib) => {
@@ -83,7 +84,7 @@ class TricksRepository {
             'grab': null,
             'direction': null,
             'is_public': jib.isPublic,
-            'created_at': jib.createdAt.toIso8601String(),
+            'created_at': jib.createdAt.toUtc().toIso8601String(),
             'updated_at': now,
           },
         ),
@@ -98,7 +99,7 @@ class TricksRepository {
     await SupabaseClientProvider.guard(
       (client) => client.from('tricks').update({
         'is_public': isPublic,
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       }).eq('id', trickId),
     );
   }
@@ -110,7 +111,8 @@ class TricksRepository {
     MemoCondition? condition,
     MemoSize? size,
   }) async {
-    final now = DateTime.now();
+    final nowUtc = DateTime.now().toUtc();
+    final now = nowUtc.toIso8601String();
     final memoId = _trickUuid.v4();
     await SupabaseClientProvider.guard(
       (client) => client.from('memos').insert(
@@ -123,8 +125,8 @@ class TricksRepository {
             'outcome': outcome,
             'condition': _conditionToDb(condition ?? MemoCondition.none),
             'size': _sizeToDb(size ?? MemoSize.none),
-            'created_at': now.toIso8601String(),
-            'updated_at': now.toIso8601String(),
+            'created_at': now,
+            'updated_at': now,
           },
           jib: (_) => {
             'id': memoId,
@@ -134,8 +136,8 @@ class TricksRepository {
             'outcome': outcome,
             'condition': null,
             'size': null,
-            'created_at': now.toIso8601String(),
-            'updated_at': now.toIso8601String(),
+            'created_at': now,
+            'updated_at': now,
           },
         ),
       ),
@@ -143,7 +145,7 @@ class TricksRepository {
   }
 
   Future<void> updateMemo({required TechMemo memo}) async {
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
     await SupabaseClientProvider.guard(
       (client) => client.from('memos').update(
         memo.map(
