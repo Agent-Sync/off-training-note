@@ -428,6 +428,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                         memo.trickName(),
                         style: const TextStyle(
                           fontSize: 12,
+                          fontWeight: FontWeight.w600,
                           color: AppTheme.textSecondary,
                         ),
                       ),
