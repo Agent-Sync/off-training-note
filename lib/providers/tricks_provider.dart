@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/repositories/tricks_repository.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
+import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final tricksProvider = NotifierProvider<TricksNotifier, List<Trick>>(
@@ -22,6 +23,7 @@ final userTricksProvider =
 class TricksNotifier extends Notifier<List<Trick>> {
   @override
   List<Trick> build() {
+    ref.watch(authSessionProvider);
     _loadTricks();
     return const [];
   }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:off_training_note/models/community_memo.dart';
 import 'package:off_training_note/repositories/community_like_repository.dart';
 import 'package:off_training_note/repositories/community_repository.dart';
+import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
@@ -52,6 +53,7 @@ class CommunityNotifier extends Notifier<CommunityFeedState> {
 
   @override
   CommunityFeedState build() {
+    ref.watch(authSessionProvider);
     ref.onDispose(() {
       _debounce?.cancel();
     });
