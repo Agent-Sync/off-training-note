@@ -10,23 +10,39 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(authSessionProvider).value ??
+        Supabase.instance.client.auth.currentSession;
+    final sessionKey = session?.user.id ?? 'logged_out';
     return MaterialApp(
       title: 'オフトレノート',
       theme: AppTheme.theme,
       navigatorKey: appNavigatorKey,
-      home: const AuthGate(),
+      home: ProviderScope(
+        key: ValueKey<String>(sessionKey),
+        child: const AuthGate(),
+      ),
       debugShowCheckedModeBanner: false,
       navigatorObservers: [routeObserver],
       onGenerateRoute: (settings) {
-        return MaterialPageRoute(builder: (_) => const AuthGate());
+        return MaterialPageRoute(
+          builder: (_) => ProviderScope(
+            key: ValueKey<String>(sessionKey),
+            child: const AuthGate(),
+          ),
+        );
       },
       onUnknownRoute: (settings) {
-        return MaterialPageRoute(builder: (_) => const AuthGate());
+        return MaterialPageRoute(
+          builder: (_) => ProviderScope(
+            key: ValueKey<String>(sessionKey),
+            child: const AuthGate(),
+          ),
+        );
       },
     );
   }
