@@ -1,157 +1,174 @@
 insert into public.memos (
   id,
   trick_id,
+  user_id,
   type,
   focus,
   outcome,
   condition,
   size,
+  like_count,
   created_at,
   updated_at
 ) values
 (
-  'cccccccc-cccc-cccc-cccc-ccccccccccc1',
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
+  '5afc81e9-ac02-40aa-9f16-04831119330f',
+  '7e41b400-ecf8-47e9-8d6e-27a6a8baa748',
+  '38df4b07-e015-4d61-ab23-c65bf9d835c8',
   'air',
-  'テイクオフで肩のラインを水平に保つ',
-  '軸が安定して回転がスムーズになった',
+  'アプローチで外脚荷重忘れない',
+  '後継着地が無くなった',
   'snow',
   'big',
-  now() - interval '2 days',
-  now() - interval '2 days'
+  0,
+  '2026-01-25 18:40:23.84876+00',
+  '2026-01-25 18:40:23.84876+00'
 ),
 (
-  'cccccccc-cccc-cccc-cccc-ccccccccccc2',
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
+  '01abf228-9739-483e-9757-291836978425',
+  '7e41b400-ecf8-47e9-8d6e-27a6a8baa748',
+  '38df4b07-e015-4d61-ab23-c65bf9d835c8',
   'air',
-  '360の時点でランディングを見る',
-  '着地が完璧に決まった',
+  '一旦ランディングみてから回りだす',
+  'カウンター無くなった',
+  'snow',
+  'big',
+  0,
+  '2026-01-25 18:49:16.098954+00',
+  '2026-01-25 18:49:16.098954+00'
+),
+(
+  'fbdc3e84-f2a1-426c-9db3-30be519f0f6d',
+  'e03303d6-1422-4fef-8c55-d312ace5ffa6',
+  '38df4b07-e015-4d61-ab23-c65bf9d835c8',
+  'air',
+  '体倒して、ランディングずっと見るだけ',
+  '軸返ってくる
+',
+  'none',
+  'middle',
+  0,
+  '2026-01-25 18:52:26.837226+00',
+  '2026-01-25 18:52:26.837226+00'
+),
+(
+  '51c410db-f2c7-4dcb-9ac8-fbdb8230451f',
+  '1e89258a-cb23-4daf-8be0-8fa178b57ad1',
+  '38df4b07-e015-4d61-ab23-c65bf9d835c8',
+  'air',
+  '右脚のアウトエッジ踵に重心あるつもり',
+  '後傾解消＆ビタ着になった',
+  'none',
+  'none',
+  0,
+  '2026-01-25 18:56:16.62542+00',
+  '2026-01-25 18:56:58.713476+00'
+),
+(
+  'b8d257a8-a17d-47a1-bd3a-9dcaf2ccfd14',
+  '0c99d3d8-301d-4bc0-8b37-311e9a6161ff',
+  '38df4b07-e015-4d61-ab23-c65bf9d835c8',
+  'jib',
+  'ちゃんと先行してる脚の踵に重心で踏む',
+  'インで崩れなくなる',
+  null,
+  null,
+  0,
+  '2026-01-25 19:00:38.341023+00',
+  '2026-01-25 19:00:38.341023+00'
+),
+(
+  '2aad890f-f790-4b31-a01e-ab2fd6d419ba',
+  'b6784634-7577-4e32-b5fb-ed7592cd85ca',
+  '7c1d4e2e-5f6a-4b7e-8f2c-6f2d1b2a3c4d',
+  'jib',
+  '頭のてっぺんまで姿勢良くする',
+  'ちゃんと回るようになった',
+  null,
+  null,
+  0,
+  '2026-01-25 19:16:54.341452+00',
+  '2026-01-25 19:16:54.341452+00'
+),
+(
+  '8c21fba2-0565-4fac-a38a-7fc6e1303d28',
+  'b7acb868-9002-4d5b-ad25-26d73fcf6a5d',
+  '2b4c6d8e-1f3a-5b7c-9d0e-1f2a3b4c5d6e',
+  'air',
+  'アプローチ低重心で空に向かって踏み切る',
+  '楽に回れるようになった',
   'snow',
   'middle',
-  now() - interval '5 days',
-  now() - interval '5 days'
+  0,
+  '2026-01-26 03:04:54.257497+00',
+  '2026-01-26 03:04:54.257497+00'
 ),
 (
-  'cccccccc-cccc-cccc-cccc-ccccccccccc3',
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2',
+  'e6b13758-2c4f-436a-945c-f80a6970f555',
+  'a68f0f69-a35b-48e0-927e-209a96e7753f',
+  '9a3c2b1d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
   'air',
-  '右肩を下げながら抜ける',
-  'しっかり軸が入った',
+  '空中出た後もランディング見てる',
+  '手バタつかなくなる',
   'snow',
   'big',
-  now() - interval '1 day',
-  now() - interval '1 day'
+  0,
+  '2026-01-26 03:06:44.397323+00',
+  '2026-01-26 03:06:44.397323+00'
 ),
 (
-  'cccccccc-cccc-cccc-cccc-ccccccccccc4',
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3',
+  'e0d8ed0e-356a-4d0b-bed0-cdeecf9aceb0',
+  'a68f0f69-a35b-48e0-927e-209a96e7753f',
+  '9a3c2b1d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
   'air',
-  '目線を先行させる',
-  '回転不足が解消',
+  'かけはほぼストジャン',
+  '回転を止める動作が要らなくなる
+回転をシフティで合わせられるからグラブが掴みやすくなる',
+  'none',
+  'big',
+  0,
+  '2026-01-26 03:07:53.517388+00',
+  '2026-01-26 03:07:53.517388+00'
+),
+(
+  'aff773f6-f584-4826-b561-c4eca58dc5c2',
+  'a68f0f69-a35b-48e0-927e-209a96e7753f',
+  '9a3c2b1d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
+  'air',
+  'テイクオフで脇締める',
+  '早駆け直った気がする
+回りすぎない',
+  'none',
+  'big',
+  0,
+  '2026-01-26 03:08:43.255201+00',
+  '2026-01-26 03:08:43.255201+00'
+),
+(
+  '233adb5a-3393-4bd6-a02f-eeee30431db6',
+  '7faec3cc-08b5-4dc3-bf63-40a4586f49bd',
+  '7c1d4e2e-5f6a-4b7e-8f2c-6f2d1b2a3c4d',
+  'air',
+  'やや低重心で腰から後ろにかけながら踏み切る
+ランディングが見えるから見る心の準備しておく',
+  '着地が合わせられるようになった',
   'brush',
-  'small',
-  now() - interval '3 days',
-  now() - interval '3 days'
+  'middle',
+  0,
+  '2026-01-26 03:15:36.569126+00',
+  '2026-01-26 03:15:36.569126+00'
 ),
 (
-  'dddddddd-dddd-dddd-dddd-ddddddddddd1',
-  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1',
-  'jib',
-  '目線と肩を先行させる',
-  '乗り込みがスムーズになった',
-  null,
-  null,
-  now() - interval '1 day',
-  now() - interval '1 day'
-),
-(
-  'dddddddd-dddd-dddd-dddd-ddddddddddd2',
-  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2',
-  'jib',
-  'トップシートをフラットに保つ',
-  'バタつきが減った',
-  null,
-  null,
-  now() - interval '3 days',
-  now() - interval '3 days'
-)
-on conflict (id) do nothing;
-
-insert into public.memos (
-  id,
-  trick_id,
-  type,
-  focus,
-  outcome,
-  condition,
-  size,
-  created_at,
-  updated_at
-) values
-(
-  'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4',
+  'f6fd38ff-526e-4eef-bbc6-491a8382e162',
+  'b7acb868-9002-4d5b-ad25-26d73fcf6a5d',
+  '2b4c6d8e-1f3a-5b7c-9d0e-1f2a3b4c5d6e',
   'air',
-  '踏み切りで視線を先に回す',
-  '回転の入りが速くなった',
-  'snow',
-  'big',
-  now() - interval '5 days',
-  now() - interval '5 days'
-),
-(
-  'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2',
-  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb3',
-  'jib',
-  'オンで腰を低く保つ',
-  'レールの安定感が上がった',
-  null,
-  null,
-  now() - interval '4 days',
-  now() - interval '4 days'
-),
-(
-  'ffffffff-ffff-ffff-ffff-fffffffffff1',
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5',
-  'air',
-  'スイッチ踏み切りで肩を平行に',
-  '軸がぶれずに回れた',
+  '左脚をサッカーボールを後ろに蹴る感じで振り上げる',
+  '回転力めっちゃついた',
   'snow',
   'middle',
-  now() - interval '7 days',
-  now() - interval '7 days'
-),
-(
-  'ffffffff-ffff-ffff-ffff-fffffffffff2',
-  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb4',
-  'jib',
-  'プレス中に視線を出口へ',
-  'オフの回しがスムーズ',
-  null,
-  null,
-  now() - interval '6 days',
-  now() - interval '6 days'
-),
-(
-  'abababab-abab-abab-abab-abababababab',
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6',
-  'air',
-  '肩のラインを保って回転開始',
-  '900でも軸が抜けなくなった',
-  'brush',
-  'big',
-  now() - interval '11 days',
-  now() - interval '11 days'
-),
-(
-  'bcbcbcbc-bcbc-bcbc-bcbc-bcbcbcbcbcbc',
-  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb5',
-  'jib',
-  'ノーズから抜ける前に目線を上げる',
-  '360オフの回転が安定',
-  null,
-  null,
-  now() - interval '10 days',
-  now() - interval '10 days'
+  0,
+  '2026-01-26 03:16:43.701495+00',
+  '2026-01-26 03:16:43.701495+00'
 )
 on conflict (id) do nothing;
