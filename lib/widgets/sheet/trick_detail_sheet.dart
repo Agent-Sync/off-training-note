@@ -344,6 +344,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   color: AppTheme.textMain,
+                                                  fontWeight: FontWeight.w600,
                                                   height: 1.5,
                                                 ),
                                               ),
@@ -403,6 +404,7 @@ class TrickDetailSheet extends ConsumerWidget {
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   color: AppTheme.textMain,
+                                                  fontWeight: FontWeight.w600,
                                                   height: 1.5,
                                                 ),
                                               ),

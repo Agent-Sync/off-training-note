@@ -290,7 +290,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: 'メモやトリックを検索...',
-                    hintStyle: const TextStyle(color: AppTheme.textHint),
+                    hintStyle: const TextStyle(
+                      color: AppTheme.textHint,
+                      fontWeight: FontWeight.w600,
+                    ),
                     prefixIcon: const Icon(Icons.search, color: AppTheme.textHint),
                     suffixIcon: _searchController.text.trim().isEmpty
                         ? null
@@ -468,6 +471,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppTheme.textMain,
+                    fontWeight: FontWeight.w600,
                     height: 1.4,
                   ),
                 ),
@@ -513,6 +517,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppTheme.textMain,
+                    fontWeight: FontWeight.w600,
                     height: 1.4,
                   ),
                 ),
@@ -576,7 +581,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
           const SizedBox(height: 16),
           Text(
             isSearching ? 'メモが見つかりません' : 'まだ公開メモがありません',
-            style: const TextStyle(color: AppTheme.textHint),
+            style: const TextStyle(
+              color: AppTheme.textHint,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           if (!isSearching) ...[
             const SizedBox(height: 8),

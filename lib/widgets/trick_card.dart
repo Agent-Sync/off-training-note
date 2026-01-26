@@ -94,6 +94,7 @@ class TrickCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppTheme.textMain,
+                        fontWeight: FontWeight.w600,
                         height: 1.4,
                       ),
                     ),
@@ -143,6 +144,7 @@ class TrickCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppTheme.textMain,
+                        fontWeight: FontWeight.w600,
                         height: 1.4,
                       ),
                     ),

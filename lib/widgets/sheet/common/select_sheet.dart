@@ -87,7 +87,11 @@ class _AppSelectSheetState extends State<AppSelectSheet> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: '検索...',
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  hintStyle: const TextStyle(
+                    color: AppTheme.textHint,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  prefixIcon: const Icon(Icons.search, color: AppTheme.textHint),
                   filled: true,
                   fillColor: Colors.grey.shade50,
                   contentPadding: const EdgeInsets.symmetric(

@@ -438,7 +438,10 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
                 decoration: InputDecoration(
                   isDense: true,
                   hintText: 'トリックを検索...',
-                  hintStyle: const TextStyle(color: AppTheme.textHint),
+                  hintStyle: const TextStyle(
+                    color: AppTheme.textHint,
+                    fontWeight: FontWeight.w600,
+                  ),
                   prefixIcon: const Icon(Icons.search, color: AppTheme.textHint),
                   suffixIcon: _searchQuery.trim().isEmpty
                       ? null
