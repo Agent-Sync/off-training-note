@@ -32,6 +32,13 @@ class ConditionTags {
           text: Colors.green.shade700,
           border: Colors.green.shade200,
         );
+      case MemoCondition.trampoline:
+        return ConditionTagStyle(
+          label: 'トランポリン',
+          background: Colors.orange.shade50,
+          text: Colors.orange.shade700,
+          border: Colors.orange.shade200,
+        );
       case MemoCondition.none:
         return null;
     }

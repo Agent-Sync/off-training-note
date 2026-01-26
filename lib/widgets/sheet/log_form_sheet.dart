@@ -178,6 +178,18 @@ class _LogFormSheetState extends State<LogFormSheet> {
                         });
                       },
                     ),
+                    _buildConditionChip(
+                      MemoCondition.trampoline,
+                      _selectedCondition == MemoCondition.trampoline,
+                      () {
+                        setState(() {
+                          _selectedCondition =
+                              _selectedCondition == MemoCondition.trampoline
+                              ? MemoCondition.none
+                              : MemoCondition.trampoline;
+                        });
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),

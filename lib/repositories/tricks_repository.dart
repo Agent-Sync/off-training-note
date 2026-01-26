@@ -104,6 +104,12 @@ class TricksRepository {
     );
   }
 
+  Future<void> deleteTrick({required String trickId}) async {
+    await SupabaseClientProvider.guard(
+      (client) => client.from('tricks').delete().eq('id', trickId),
+    );
+  }
+
   Future<void> addMemo({
     required Trick trick,
     required String focus,
@@ -301,6 +307,8 @@ class TricksRepository {
         return MemoCondition.snow;
       case 'brush':
         return MemoCondition.brush;
+      case 'trampoline':
+        return MemoCondition.trampoline;
       case 'none':
       default:
         return MemoCondition.none;
@@ -313,6 +321,8 @@ class TricksRepository {
         return 'snow';
       case MemoCondition.brush:
         return 'brush';
+      case MemoCondition.trampoline:
+        return 'trampoline';
       case MemoCondition.none:
         return 'none';
     }

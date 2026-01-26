@@ -37,6 +37,7 @@ const _$MemoConditionEnumMap = {
   MemoCondition.none: 'none',
   MemoCondition.snow: 'snow',
   MemoCondition.brush: 'brush',
+  MemoCondition.trampoline: 'trampoline',
 };
 
 const _$MemoSizeEnumMap = {

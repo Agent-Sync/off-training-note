@@ -475,10 +475,14 @@ class TrickDetailSheet extends ConsumerWidget {
     );
   }
 
-  void _showTrickActionMenu(BuildContext context, WidgetRef ref, Trick trick) {
+  void _showTrickActionMenu(
+    BuildContext parentContext,
+    WidgetRef ref,
+    Trick trick,
+  ) {
     showAppBottomSheet(
-      context: context,
-      builder: (context) => Consumer(
+      context: parentContext,
+      builder: (menuContext) => Consumer(
         builder: (context, ref, child) {
           final currentTrick = ref
               .watch(tricksProvider)
@@ -489,6 +493,21 @@ class TrickDetailSheet extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildPublicSwitchItem(context, ref, currentTrick),
+                const SizedBox(height: 8),
+                _buildActionItem(
+                  menuContext,
+                  icon: Icons.delete_outline,
+                  label: 'トリックを削除',
+                  isDestructive: true,
+                  onTap: () {
+                    Navigator.pop(menuContext);
+                    _showDeleteTrickConfirmDialog(
+                      parentContext,
+                      ref,
+                      currentTrick,
+                    );
+                  },
+                ),
                 const SizedBox(height: 16),
               ],
             ),
@@ -622,6 +641,28 @@ class TrickDetailSheet extends ConsumerWidget {
     );
     if (shouldDelete == true) {
       ref.read(tricksProvider.notifier).deleteMemo(trick.id, memo.id);
+    }
+  }
+
+  Future<void> _showDeleteTrickConfirmDialog(
+    BuildContext parentContext,
+    WidgetRef ref,
+    Trick targetTrick,
+  ) async {
+    final notifier = ref.read(tricksProvider.notifier);
+    final shouldDelete = await showAppConfirmDialog(
+      context: parentContext,
+      title: 'トリックを削除しますか？',
+      message: 'このトリックのメモも削除されます。',
+      confirmLabel: '削除',
+      cancelLabel: 'キャンセル',
+      isDestructive: true,
+    );
+    if (shouldDelete == true) {
+      await notifier.deleteTrick(targetTrick.id);
+      if (parentContext.mounted) {
+        Navigator.of(parentContext).pop();
+      }
     }
   }
 

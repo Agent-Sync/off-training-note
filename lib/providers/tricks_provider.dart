@@ -101,6 +101,12 @@ class TricksNotifier extends Notifier<List<Trick>> {
     await _loadTricks();
   }
 
+  Future<void> deleteTrick(String trickId) async {
+    final repo = ref.read(tricksRepositoryProvider);
+    await repo.deleteTrick(trickId: trickId);
+    await _loadTricks();
+  }
+
   Future<void> refresh() async {
     await _loadTricks();
   }

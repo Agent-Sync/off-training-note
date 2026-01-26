@@ -221,6 +221,8 @@ class CommunityRepository {
         return MemoCondition.snow;
       case 'brush':
         return MemoCondition.brush;
+      case 'trampoline':
+        return MemoCondition.trampoline;
       case 'none':
       default:
         return MemoCondition.none;

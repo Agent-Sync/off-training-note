@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'tech_memo.freezed.dart';
 part 'tech_memo.g.dart';
 
-enum MemoCondition { none, snow, brush }
+enum MemoCondition { none, snow, brush, trampoline }
 
 enum MemoSize { none, small, middle, big }
 
