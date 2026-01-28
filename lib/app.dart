@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:off_training_note/navigation/app_navigator.dart';
 import 'package:off_training_note/navigation/route_observer.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
@@ -65,6 +66,28 @@ class AuthGate extends ConsumerWidget {
     }
   }
 
+  Future<void> _signInWithApple() async {
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.apple,
+        redirectTo: 'com.kafu.offtrainingnote://login-callback/',
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+    } catch (e, stack) {
+      debugPrint('signIn error: $e');
+      debugPrint('$stack');
+      rethrow;
+    }
+  }
+
+  bool get _showAppleSignIn {
+    if (kIsWeb) {
+      return false;
+    }
+    return defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionAsync = ref.watch(authSessionProvider);
@@ -77,7 +100,11 @@ class AuthGate extends ConsumerWidget {
         child: sessionAsync.when(
           data: (session) {
             if (session == null) {
-              return LoginScreen(key: const ValueKey('login'), onSignIn: _signInWithGoogle);
+              return LoginScreen(
+                key: const ValueKey('login'),
+                onSignInGoogle: _signInWithGoogle,
+                onSignInApple: _showAppleSignIn ? _signInWithApple : null,
+              );
             }
             final profileAsync = ref.watch(profileProvider);
             return profileAsync.when(
@@ -109,7 +136,8 @@ class AuthGate extends ConsumerWidget {
           ),
           error: (error, stackTrace) => LoginScreen(
             key: const ValueKey('login_error'),
-            onSignIn: _signInWithGoogle,
+            onSignInGoogle: _signInWithGoogle,
+            onSignInApple: _showAppleSignIn ? _signInWithApple : null,
           ),
         ),
       ),

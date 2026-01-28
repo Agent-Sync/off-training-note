@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_any_logo/flutter_any_logo.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key, required this.onSignIn});
+  const LoginScreen({
+    super.key,
+    required this.onSignInGoogle,
+    this.onSignInApple,
+  });
 
-  final Future<void> Function() onSignIn;
+  final Future<void> Function() onSignInGoogle;
+  final Future<void> Function()? onSignInApple;
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +80,12 @@ class LoginScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton.icon(
-                        onPressed: () => onSignIn(),
-                        icon: const Icon(Icons.login, color: Colors.white),
+                        onPressed: () => onSignInGoogle(),
+                        icon: AnyLogo.tech.google.image(
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        ),
                         label: const Text(
                           'Googleでログイン',
                           style: TextStyle(
@@ -92,6 +103,36 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (onSignInApple != null) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton.icon(
+                          onPressed: () => onSignInApple!(),
+                          icon: AnyLogo.tech.apple.image(
+                            width: 20,
+                            height: 20,
+                            fit: BoxFit.contain,
+                          ),
+                          label: const Text(
+                            'Appleでログイン',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                   ],
                 ),
