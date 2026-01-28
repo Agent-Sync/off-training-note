@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_any_logo/flutter_any_logo.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -81,7 +79,8 @@ class LoginScreen extends StatelessWidget {
                       height: 56,
                       child: ElevatedButton.icon(
                         onPressed: () => onSignInGoogle(),
-                        icon: AnyLogo.tech.google.image(
+                        icon: Image.asset(
+                          'assets/images/google.png',
                           width: 20,
                           height: 20,
                           fit: BoxFit.contain,
@@ -110,11 +109,7 @@ class LoginScreen extends StatelessWidget {
                         height: 56,
                         child: ElevatedButton.icon(
                           onPressed: () => onSignInApple!(),
-                          icon: AnyLogo.tech.apple.image(
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
-                          ),
+                          icon: const AppleLogo(size: 28),
                           label: const Text(
                             'Appleでログイン',
                             style: TextStyle(
@@ -141,6 +136,21 @@ class LoginScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AppleLogo extends StatelessWidget {
+  const AppleLogo({super.key, required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      Icons.apple,
+      size: size,
+      color: Colors.white,
     );
   }
 }
