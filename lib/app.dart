@@ -1,11 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:off_training_note/navigation/app_navigator.dart';
 import 'package:off_training_note/navigation/route_observer.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/screens/onboarding_screen.dart';
 import 'package:off_training_note/screens/login_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'screens/home_screen.dart';
@@ -68,10 +72,28 @@ class AuthGate extends ConsumerWidget {
 
   Future<void> _signInWithApple() async {
     try {
-      await Supabase.instance.client.auth.signInWithOAuth(
-        OAuthProvider.apple,
-        redirectTo: 'com.kafu.offtrainingnote://login-callback/',
-        authScreenLaunchMode: LaunchMode.externalApplication,
+      final rawNonce = Supabase.instance.client.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw const AuthException(
+          'Could not find ID Token from generated credential.',
+        );
+      }
+
+      await Supabase.instance.client.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
       );
     } catch (e, stack) {
       debugPrint('signIn error: $e');
