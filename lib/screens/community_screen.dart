@@ -177,6 +177,17 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   await _signOut();
                 },
               ),
+              const SizedBox(height: 8),
+              _buildActionItem(
+                context,
+                icon: Icons.delete_outline,
+                label: 'アカウント削除',
+                isDestructive: true,
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await _showDeleteAccountFlow();
+                },
+              ),
               const SizedBox(height: 16),
             ],
           ),
@@ -219,6 +230,131 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showDeleteAccountFlow() async {
+    final shouldDelete = await showAppConfirmDialog(
+      context: context,
+      title: 'アカウントを削除しますか？',
+      message: '削除すると元に戻せません。',
+      confirmLabel: '削除',
+      isDestructive: true,
+    );
+    if (!mounted || shouldDelete != true) return;
+
+    final email = Supabase.instance.client.auth.currentUser?.email ?? '';
+    if (email.isEmpty) {
+      showAppBanner(context, 'メールアドレスが取得できませんでした');
+      return;
+    }
+
+    final confirmed = await _showDeleteAccountEmailDialog(email: email);
+    if (!mounted || confirmed != true) return;
+
+    // TODO: 実削除APIを接続する場合はここで呼び出す
+    showAppBanner(context, 'アカウントを削除しました');
+  }
+
+  Future<bool?> _showDeleteAccountEmailDialog({required String email}) {
+    final controller = TextEditingController();
+
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final isMatch = controller.text.trim() == email;
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              title: const Text(
+                'メールアドレスを入力してください',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'メールアドレス（$email）を入力すると削除できます。',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: 'メールアドレス',
+                      filled: true,
+                      fillColor: Colors.grey.shade50,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                  ),
+                ],
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              actionsPadding: const EdgeInsets.only(
+                bottom: 16,
+                left: 16,
+                right: 16,
+              ),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(dialogContext, false),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey.shade300),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        child: const Text(
+                          'キャンセル',
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: isMatch
+                            ? () => Navigator.pop(dialogContext, true)
+                            : null,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.red.shade200),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                        child: const Text(
+                          '削除',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
