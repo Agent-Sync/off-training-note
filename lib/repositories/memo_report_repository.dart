@@ -8,7 +8,9 @@ class MemoReportRepository {
     required String userId,
   }) async {
     await SupabaseClientProvider.guard(
-      (client) => client.from('memo_reports').upsert(
+      (client) => client
+          .from('memo_reports')
+          .upsert(
             {
               'memo_id': memoId,
               'reported_by': userId,

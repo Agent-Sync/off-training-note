@@ -5,14 +5,34 @@ ENV_PROD ?= assets/.env.release
 .PHONY: run
 
 run:
-	open -a Simulator
-	@xcrun simctl boot "$(SIM_NAME)" || true
-	@booted_id=$$(xcrun simctl list devices | grep Booted | awk -F '[()]' '{print $$2}' | head -n1); \
-	if [ -z "$$booted_id" ]; then \
-		echo "No booted simulator found for $(SIM_NAME)."; \
+	@sim_app=""; \
+	for p in "$$(xcode-select -p)/Applications/Simulator.app" \
+		/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app \
+		/Applications/Xcode-beta.app/Contents/Developer/Applications/Simulator.app \
+		/Applications/Simulator.app; do \
+		if [ -d "$$p" ]; then sim_app="$$p"; break; fi; \
+	done; \
+	if [ -n "$$sim_app" ]; then \
+		if ! open "$$sim_app"; then \
+			echo "Warning: Failed to open Simulator.app (continuing)."; \
+		fi; \
+	else \
+		if ! open -a Simulator; then \
+			echo "Warning: Failed to open Simulator.app (continuing)."; \
+		fi; \
+	fi
+	@sim_id=$$(xcrun simctl list devices | awk -v name="$(SIM_NAME)" -F '[()]' '$$0 ~ name {print $$2; exit}'); \
+	if [ -z "$$sim_id" ]; then \
+		echo "No simulator found for $(SIM_NAME)."; \
 		exit 1; \
 	fi; \
-	flutter run -d "$$booted_id"
+	xcrun simctl shutdown all >/dev/null 2>&1 || true; \
+	xcrun simctl boot "$$sim_id" || true; \
+	if ! xcrun simctl list devices | grep -q "$$sim_id.*Booted"; then \
+		echo "Failed to boot simulator for $(SIM_NAME)."; \
+		exit 1; \
+	fi; \
+	flutter run -d "$$sim_id"
 
 .PHONY: ios-prod-upload upload-ios-testflight
 
