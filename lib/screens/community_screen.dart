@@ -620,6 +620,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   }
                   await ref.read(memoReportRepositoryProvider).reportMemo(
                         memoId: memo.memo.id,
+                        userId: user.id,
                       );
                   showAppBanner(parentContext, '報告しました');
                 }
