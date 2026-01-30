@@ -263,6 +263,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
     try {
       final accessToken =
           Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      debugPrint('delete-account: access token length=${accessToken.length}');
       if (accessToken.isEmpty) {
         showAppBanner(context, '認証情報が取得できませんでした');
         return false;
@@ -623,34 +624,37 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                     ],
                   ),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      formatRelativeTime(memo.memo.createdAt),
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.more_vert,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      style: ButtonStyle(
-                        overlayColor: WidgetStateProperty.all(
-                          Colors.transparent,
+                Transform.translate(
+                  offset: const Offset(20, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        formatRelativeTime(memo.memo.createdAt),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.textSecondary,
                         ),
                       ),
-                      splashRadius: 18,
-                      onPressed: () => _showReportMenu(context, memo),
-                    ),
-                  ],
+                      const SizedBox(width: 0),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.more_vert,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        style: ButtonStyle(
+                          overlayColor: WidgetStateProperty.all(
+                            Colors.transparent,
+                          ),
+                        ),
+                        splashRadius: 18,
+                        onPressed: () => _showReportMenu(context, memo),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
