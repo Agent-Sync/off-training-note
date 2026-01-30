@@ -618,14 +618,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   if (user == null) {
                     return;
                   }
-                  final auth = Supabase.instance.client.auth;
-                  debugPrint('[報告] user=${auth.currentUser?.id}');
-                  debugPrint(
-                    '[報告] sessionUser=${auth.currentSession?.user.id}',
-                  );
-                  debugPrint(
-                    '[報告] tokenLen=${auth.currentSession?.accessToken?.length}',
-                  );
                   await ref.read(memoReportRepositoryProvider).reportMemo(
                         memoId: memo.memo.id,
                         userId: user.id,

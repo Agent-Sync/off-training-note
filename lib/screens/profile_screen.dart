@@ -5,8 +5,11 @@ import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/providers/tricks_provider.dart';
+import 'package:off_training_note/providers/user_block_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
+import 'package:off_training_note/widgets/dialog/app_confirm_dialog.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/trick_detail_sheet.dart';
 import 'package:off_training_note/widgets/trick_card.dart';
@@ -95,6 +98,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.textMain),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          if (!isMe)
+            IconButton(
+              icon: const Icon(Icons.more_vert, color: AppTheme.textMain),
+              onPressed: () => _showProfileMenu(displayProfile),
+            ),
+        ],
       ),
       body: Stack(
         children: [
@@ -222,6 +232,83 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  void _showProfileMenu(Profile? profile) {
+    if (profile == null) {
+      return;
+    }
+    showAppBottomSheet(
+      context: context,
+      builder: (menuContext) => AppBottomSheetContainer(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildActionItem(
+              menuContext,
+              icon: Icons.block,
+              label: 'ブロックする',
+              onTap: () async {
+                Navigator.pop(menuContext);
+                final shouldBlock = await showAppConfirmDialog(
+                  context: context,
+                  title: 'このユーザーをブロックしますか？',
+                  message: 'ブロックするとこのユーザーの投稿は表示されません。',
+                  confirmLabel: 'ブロックする',
+                  cancelLabel: 'キャンセル',
+                  isDestructive: true,
+                );
+                if (shouldBlock == true && context.mounted) {
+                  final userId = Supabase.instance.client.auth.currentUser?.id;
+                  if (userId == null) {
+                    return;
+                  }
+                  try {
+                    await ref.read(userBlockRepositoryProvider).blockUser(
+                      blockerId: userId,
+                      blockedId: profile.userId,
+                    );
+                    showAppBanner(context, 'ブロックしました');
+                  } catch (e) {
+                    showAppBanner(context, 'ブロックに失敗しました');
+                  }
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppTheme.textMain),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppTheme.textMain,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
