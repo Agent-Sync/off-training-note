@@ -258,6 +258,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
 
   Future<bool?> _showDeleteAccountEmailDialog({required String email}) {
     final controller = TextEditingController();
+    bool showError = false;
 
     return showDialog<bool>(
       context: context,
@@ -284,7 +285,13 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   TextField(
                     controller: controller,
                     keyboardType: TextInputType.emailAddress,
-                    onChanged: (_) => setState(() {}),
+                    onChanged: (_) {
+                      if (showError && isMatch) {
+                        setState(() => showError = false);
+                      } else if (showError) {
+                        setState(() {});
+                      }
+                    },
                     decoration: InputDecoration(
                       hintText: 'メールアドレス',
                       filled: true,
@@ -296,6 +303,17 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                       contentPadding: const EdgeInsets.all(12),
                     ),
                   ),
+                  if (showError && !isMatch) ...[
+                    const SizedBox(height: 8),
+                    const Text(
+                      'メールアドレスが一致しません',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ],
               ),
               shape: RoundedRectangleBorder(
@@ -330,9 +348,13 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: isMatch
-                            ? () => Navigator.pop(dialogContext, true)
-                            : null,
+                        onPressed: () {
+                          if (!isMatch) {
+                            setState(() => showError = true);
+                            return;
+                          }
+                          Navigator.pop(dialogContext, true);
+                        },
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Colors.red.shade200),
                           shape: RoundedRectangleBorder(
