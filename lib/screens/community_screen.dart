@@ -263,7 +263,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
     try {
       final accessToken =
           Supabase.instance.client.auth.currentSession?.accessToken ?? '';
-      debugPrint('delete-account: access token=$accessToken');
       if (accessToken.isEmpty) {
         showAppBanner(context, '認証情報が取得できませんでした');
         return false;
