@@ -3,6 +3,7 @@ import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/models/trick.dart';
 import 'package:off_training_note/repositories/community_like_repository.dart';
+import 'package:off_training_note/repositories/user_block_repository.dart';
 import 'package:off_training_note/services/supabase_client_service.dart';
 
 class CommunityRepository {
@@ -91,12 +92,18 @@ class CommunityRepository {
             memoIds: memoIds,
           )
         : <String>{};
+    final blockedUserIds = userId != null
+        ? await const UserBlockRepository().fetchBlockedUserIds(
+            blockerId: userId,
+          )
+        : <String>{};
 
     return rowList.map((row) {
       final memoId = row['id'] as String;
       return _communityMemoFromRow(
         row as Map<String, dynamic>,
         likedByMe: likedMemoIds.contains(memoId),
+        blockedByMe: blockedUserIds,
       );
     }).toList();
   }
@@ -104,6 +111,7 @@ class CommunityRepository {
   CommunityMemo _communityMemoFromRow(
     Map<String, dynamic> row, {
     required bool likedByMe,
+    required Set<String> blockedByMe,
   }) {
     return CommunityMemo(
       memo: _techMemoFromRow(
@@ -117,16 +125,22 @@ class CommunityRepository {
       profile: _profileFromRow(
         row['user_id'] as String,
         row['profiles'] as Map<String, dynamic>,
+        isBlockedByMe: blockedByMe.contains(row['user_id'] as String),
       ),
     );
   }
 
-  Profile _profileFromRow(String userId, Map<String, dynamic> row) {
+  Profile _profileFromRow(
+    String userId,
+    Map<String, dynamic> row, {
+    required bool isBlockedByMe,
+  }) {
     return Profile(
       userId: userId,
       displayName: row['display_name'] as String?,
       avatarUrl: row['avatar_url'] as String?,
       onboarded: row['onboarded'] as bool? ?? false,
+      isBlockedByMe: isBlockedByMe,
     );
   }
 

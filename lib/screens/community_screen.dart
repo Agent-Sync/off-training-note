@@ -252,8 +252,26 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
     final confirmed = await _showDeleteAccountEmailDialog(email: email);
     if (!mounted || confirmed != true) return;
 
-    // TODO: 実削除APIを接続する場合はここで呼び出す
+    final deleted = await _deleteAccount();
+    if (!mounted || !deleted) return;
+
     showAppBanner(context, 'アカウントを削除しました');
+    await _signOut();
+  }
+
+  Future<bool> _deleteAccount() async {
+    try {
+      final response =
+          await Supabase.instance.client.functions.invoke('delete-account');
+      if (response.error != null) {
+        showAppBanner(context, 'アカウント削除に失敗しました');
+        return false;
+      }
+      return true;
+    } catch (_) {
+      showAppBanner(context, 'アカウント削除に失敗しました');
+      return false;
+    }
   }
 
   Future<bool?> _showDeleteAccountEmailDialog({required String email}) {

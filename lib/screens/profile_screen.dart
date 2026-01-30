@@ -30,6 +30,13 @@ enum _ProfileTab { air, jib }
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   _ProfileTab _activeTab = _ProfileTab.air;
   bool _didOpenInitial = false;
+  bool _isBlockedByMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isBlockedByMe = widget.profile?.isBlockedByMe ?? false;
+  }
 
   void _showTrickDetail(Trick trick) {
     showAppBottomSheet(
@@ -247,17 +254,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           children: [
             _buildActionItem(
               menuContext,
-              icon: Icons.block,
-              label: 'ブロックする',
+              icon: _isBlockedByMe ? Icons.undo : Icons.block,
+              label: _isBlockedByMe ? 'ブロック解除' : 'ブロックする',
               onTap: () async {
                 Navigator.pop(menuContext);
                 final shouldBlock = await showAppConfirmDialog(
                   context: context,
-                  title: 'このユーザーをブロックしますか？',
-                  message: 'ブロックするとこのユーザーの投稿は表示されません。',
-                  confirmLabel: 'ブロックする',
+                  title: _isBlockedByMe
+                      ? 'このユーザーのブロックを解除しますか？'
+                      : 'このユーザーをブロックしますか？',
+                  message: _isBlockedByMe
+                      ? 'ブロック解除するとこのユーザーの投稿が表示されます。'
+                      : 'ブロックするとこのユーザーの投稿は表示されません。',
+                  confirmLabel: _isBlockedByMe ? 'ブロック解除' : 'ブロックする',
                   cancelLabel: 'キャンセル',
-                  isDestructive: true,
+                  isDestructive: !_isBlockedByMe,
                 );
                 if (shouldBlock == true && context.mounted) {
                   final userId = Supabase.instance.client.auth.currentUser?.id;
@@ -265,13 +276,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     return;
                   }
                   try {
-                    await ref.read(userBlockRepositoryProvider).blockUser(
-                      blockerId: userId,
-                      blockedId: profile.userId,
-                    );
-                    showAppBanner(context, 'ブロックしました');
+                    if (_isBlockedByMe) {
+                      await ref.read(userBlockRepositoryProvider).unblockUser(
+                        blockerId: userId,
+                        blockedId: profile.userId,
+                      );
+                      if (mounted) {
+                        setState(() => _isBlockedByMe = false);
+                      }
+                      showAppBanner(context, 'ブロック解除しました');
+                    } else {
+                      await ref.read(userBlockRepositoryProvider).blockUser(
+                        blockerId: userId,
+                        blockedId: profile.userId,
+                      );
+                      if (mounted) {
+                        setState(() => _isBlockedByMe = true);
+                      }
+                      showAppBanner(context, 'ブロックしました');
+                    }
                   } catch (e) {
-                    showAppBanner(context, 'ブロックに失敗しました');
+                    showAppBanner(
+                      context,
+                      _isBlockedByMe ? 'ブロック解除に失敗しました' : 'ブロックに失敗しました',
+                    );
                   }
                 }
               },

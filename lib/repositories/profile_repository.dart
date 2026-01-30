@@ -1,5 +1,7 @@
-import 'package:off_training_note/services/supabase_client_service.dart';
 import 'package:off_training_note/models/profile.dart';
+import 'package:off_training_note/repositories/user_block_repository.dart';
+import 'package:off_training_note/services/supabase_client_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileRepository {
   const ProfileRepository();
@@ -16,8 +18,25 @@ class ProfileRepository {
     if (data == null) {
       return null;
     }
-
-    return Profile.fromMap(data);
+    final profile = Profile.fromMap(data);
+    final currentUser = Supabase.instance.client.auth.currentUser;
+    if (currentUser == null || currentUser.id == userId) {
+      return profile;
+    }
+    final isBlocked = await const UserBlockRepository().isBlocked(
+      blockerId: currentUser.id,
+      blockedId: userId,
+    );
+    if (!isBlocked) {
+      return profile;
+    }
+    return Profile(
+      userId: profile.userId,
+      displayName: profile.displayName,
+      avatarUrl: profile.avatarUrl,
+      onboarded: profile.onboarded,
+      isBlockedByMe: true,
+    );
   }
 
   Future<void> updateProfile({
