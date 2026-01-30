@@ -6,6 +6,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -88,9 +89,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       setState(() => _avatarUrl = imageUrl);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('画像のアップロードに失敗しました: $e')),
-      );
+      showAppBanner(context, '画像のアップロードに失敗しました');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -143,9 +142,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       if (!mounted) return;
       // エラー時は完了画面を戻す
       setState(() => _isCompleted = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('プロフィールの更新に失敗しました: $e')),
-      );
+      showAppBanner(context, 'プロフィールの更新に失敗しました');
     }
   }
 

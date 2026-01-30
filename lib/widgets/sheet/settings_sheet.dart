@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -93,9 +94,7 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
       await ref.read(profileProvider.notifier).updateProfile(avatarUrl: imageUrl);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('画像のアップロードに失敗しました: $e')),
-      );
+      showAppBanner(context, '画像のアップロードに失敗しました');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -121,9 +120,7 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('プロフィールの更新に失敗しました: $e')),
-      );
+      showAppBanner(context, 'プロフィールの更新に失敗しました');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
