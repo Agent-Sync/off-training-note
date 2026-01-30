@@ -263,7 +263,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
     try {
       final response =
           await Supabase.instance.client.functions.invoke('delete-account');
-      if (response.error != null) {
+      if (response.status < 200 || response.status >= 300) {
         showAppBanner(context, 'アカウント削除に失敗しました');
         return false;
       }
