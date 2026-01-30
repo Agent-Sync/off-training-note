@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,9 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('リンクを開けませんでした')),
-      );
+      showAppBanner(context, 'リンクを開けませんでした');
     }
   }
 
