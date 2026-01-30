@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
     required this.onSignInGoogle,
@@ -10,6 +11,24 @@ class LoginScreen extends StatelessWidget {
 
   final Future<void> Function() onSignInGoogle;
   final Future<void> Function()? onSignInApple;
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  static const _termsUrl = 'https://bubbly-puck-424.notion.site/2f85b243a473803f9f0bdc2c6cefdc76?source=copy_link';
+  static const _privacyUrl = 'https://bubbly-puck-424.notion.site/2f45b243a4738007823afd672b5f1d7b?pvs=73';
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('リンクを開けませんでした')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +97,7 @@ class LoginScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton.icon(
-                        onPressed: () => onSignInGoogle(),
+                        onPressed: () => widget.onSignInGoogle(),
                         icon: Image.asset(
                           'assets/images/google.png',
                           width: 20,
@@ -102,13 +121,13 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (onSignInApple != null) ...[
+                    if (widget.onSignInApple != null) ...[
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton.icon(
-                          onPressed: () => onSignInApple!(),
+                          onPressed: () => widget.onSignInApple!(),
                           icon: const AppleLogo(size: 28),
                           label: const Text(
                             'Appleでログイン',
@@ -128,6 +147,72 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Wrap(
+                        alignment: WrapAlignment.start,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            'ログイン/新規登録することで、',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                              height: 1.4,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => _openUrl(_termsUrl),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              '利用規約',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Text(
+                            'と',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                              height: 1.4,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => _openUrl(_privacyUrl),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              'プライバシーポリシー',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Text(
+                            'に同意したものとみなします。',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 24),
                   ],
                 ),
