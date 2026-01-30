@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/models/tech_memo.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/content_filter.dart';
 import 'package:off_training_note/utils/condition_tags.dart';
+import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
 class LogFormSheet extends StatefulWidget {
@@ -263,6 +265,13 @@ class _LogFormSheetState extends State<LogFormSheet> {
                     child: ElevatedButton(
                       onPressed: _isValid
                           ? () {
+                              if (anyObjectionableContent([
+                                _focusController.text,
+                                _outcomeController.text,
+                              ])) {
+                                showAppBanner(context, '不適切な内容が含まれています');
+                                return;
+                              }
                               widget.onAdd(
                                 _focusController.text,
                                 _outcomeController.text,

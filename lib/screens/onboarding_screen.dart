@@ -6,6 +6,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/content_filter.dart';
 import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -101,6 +102,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       setState(() => _nameError = '表示名を入力してください');
       return;
     }
+    if (containsObjectionableContent(newName)) {
+      setState(() => _nameError = '使用できない内容が含まれています');
+      return;
+    }
     setState(() => _nameError = null);
     _pageController.nextPage(
       duration: const Duration(milliseconds: 300),
@@ -112,6 +117,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final newName = _nameController.text.trim();
     if (newName.isEmpty) {
       setState(() => _nameError = '表示名を入力してください');
+      await _pageController.animateToPage(
+        0,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+      return;
+    }
+    if (containsObjectionableContent(newName)) {
+      setState(() => _nameError = '使用できない内容が含まれています');
       await _pageController.animateToPage(
         0,
         duration: const Duration(milliseconds: 250),

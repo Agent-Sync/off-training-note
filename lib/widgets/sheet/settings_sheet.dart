@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:off_training_note/models/profile.dart';
 import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/content_filter.dart';
 import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -107,6 +108,11 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
     if (newName.isEmpty) {
       if (!mounted) return;
       setState(() => _nameError = '表示名を入力してください');
+      return;
+    }
+    if (containsObjectionableContent(newName)) {
+      if (!mounted) return;
+      setState(() => _nameError = '使用できない内容が含まれています');
       return;
     }
 

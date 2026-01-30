@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:off_training_note/theme/app_theme.dart';
+import 'package:off_training_note/utils/content_filter.dart';
+import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 
 class NewJibModal extends StatefulWidget {
@@ -73,6 +75,10 @@ class _NewJibModalState extends State<NewJibModal> {
               setState(() => _showValidation = true);
               final name = _nameController.text.trim();
               if (name.isEmpty) {
+                return;
+              }
+              if (containsObjectionableContent(name)) {
+                showAppBanner(context, '不適切な内容が含まれています');
                 return;
               }
               widget.onAdd(name);
