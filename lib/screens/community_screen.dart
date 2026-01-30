@@ -9,7 +9,9 @@ import 'package:off_training_note/providers/profile_provider.dart';
 import 'package:off_training_note/screens/profile_screen.dart';
 import 'package:off_training_note/theme/app_theme.dart';
 import 'package:off_training_note/utils/relative_time.dart';
+import 'package:off_training_note/widgets/common/app_banner.dart';
 import 'package:off_training_note/widgets/dotted_background.dart';
+import 'package:off_training_note/widgets/dialog/app_confirm_dialog.dart';
 import 'package:off_training_note/widgets/sheet/common/app_bottom_sheet.dart';
 import 'package:off_training_note/widgets/sheet/settings_sheet.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -436,12 +438,34 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                     ],
                   ),
                 ),
-                Text(
-                  formatRelativeTime(memo.memo.createdAt),
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: AppTheme.textSecondary,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      formatRelativeTime(memo.memo.createdAt),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.more_vert,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      style: ButtonStyle(
+                        overlayColor: WidgetStateProperty.all(
+                          Colors.transparent,
+                        ),
+                      ),
+                      splashRadius: 18,
+                      onPressed: () => _showReportMenu(context, memo),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -564,6 +588,46 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _showReportMenu(BuildContext parentContext, CommunityMemo memo) {
+    showAppBottomSheet(
+      context: parentContext,
+      builder: (menuContext) => AppBottomSheetContainer(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildActionItem(
+              menuContext,
+              icon: Icons.flag_outlined,
+              label: '報告する',
+              onTap: () async {
+                Navigator.pop(menuContext);
+                final user = Supabase.instance.client.auth.currentUser;
+                final shouldReport = await showAppConfirmDialog(
+                  context: parentContext,
+                  title: 'このメモを報告しますか？',
+                  message: '不適切な内容として報告します。',
+                  confirmLabel: '報告する',
+                  cancelLabel: 'キャンセル',
+                  isDestructive: true,
+                );
+                if (shouldReport == true && parentContext.mounted) {
+                  if (user == null) {
+                    return;
+                  }
+                  await ref.read(memoReportRepositoryProvider).reportMemo(
+                        memoId: memo.memo.id,
+                      );
+                  showAppBanner(parentContext, '報告しました');
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }
