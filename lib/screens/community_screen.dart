@@ -311,6 +311,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
                   TextField(
                     controller: controller,
                     keyboardType: TextInputType.emailAddress,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                     onChanged: (_) {
                       if (showError && isMatch) {
                         setState(() => showError = false);
