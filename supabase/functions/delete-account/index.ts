@@ -5,14 +5,13 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
 const supabaseServiceRoleKey =
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
-console.log(
-  `${supabaseUrl ? "✅" : "❌"} SUPABASE_URL`,
-);
-console.log(
-  `${supabaseServiceRoleKey ? "✅" : "❌"} SUPABASE_SERVICE_ROLE_KEY`,
-);
-
 serve(async (req) => {
+  console.log(
+    `${supabaseUrl ? "✅" : "❌"} SUPABASE_URL`,
+  );
+  console.log(
+    `${supabaseServiceRoleKey ? "✅" : "❌"} SUPABASE_SERVICE_ROLE_KEY`,
+  );
 
   if (req.method !== "POST") {
     return new Response(

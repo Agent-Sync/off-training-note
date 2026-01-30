@@ -261,8 +261,16 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
 
   Future<bool> _deleteAccount() async {
     try {
-      final response =
-          await Supabase.instance.client.functions.invoke('delete-account');
+      final accessToken =
+          Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      if (accessToken.isEmpty) {
+        showAppBanner(context, '認証情報が取得できませんでした');
+        return false;
+      }
+      final response = await Supabase.instance.client.functions.invoke(
+        'delete-account',
+        headers: {'Authorization': 'Bearer $accessToken'},
+      );
       if (response.status < 200 || response.status >= 300) {
         showAppBanner(context, 'アカウント削除に失敗しました');
         return false;
